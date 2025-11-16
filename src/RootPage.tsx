@@ -1,22 +1,25 @@
 import {
-    Github,
-    Globe,
-    HomeIcon,
-    LayoutGridIcon,
-    SearchIcon,
+  Github,
+  Globe,
+  HomeIcon,
+  LayoutGridIcon,
+  LogOutIcon,
+  SearchIcon,
 } from 'lucide-react'
-import type { JSX } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { useEffect, type JSX } from 'react'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { hideSplashScreen } from 'vite-plugin-splash-screen/runtime'
+import { useLoggedInQuery } from '../generated/graphql'
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
 } from './components/blocks/sidebar'
 import { Button } from './components/ui/button'
 import { Separator } from './components/ui/separator'
@@ -46,9 +49,23 @@ const items: SidebarItem[] = [
 ]
 
 const RootPage: React.FC = () => {
+  const navigate = useNavigate()
+  const { data: loggedInQueryData } = useLoggedInQuery()
+
+  useEffect(() => {
+    if (loggedInQueryData?.loggedIn?.verified === false) {
+      navigate('/auth/verify')
+    }
+    hideSplashScreen()
+  }, [
+    loggedInQueryData?.loggedIn,
+    loggedInQueryData?.loggedIn?.verified,
+    navigate,
+  ])
+
   return (
     <SidebarProvider>
-      <Sidebar collapsible="none">
+      <Sidebar collapsible="none" className="min-w-[256px]">
         <SidebarContent>
           <SidebarGroup>
             <img src="/turbine-wordmark.png" width="120px" className="mb-2" />
@@ -74,6 +91,45 @@ const RootPage: React.FC = () => {
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
+            {loggedInQueryData?.loggedIn ? (
+              <div className="bg-white border rounded-lg p-4 flex justify-between items-center mt-4 mb-2">
+                <div className="flex flex-col">
+                  <p className="text-sm font-bold">
+                    {loggedInQueryData?.loggedIn.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {loggedInQueryData?.loggedIn.email}
+                  </p>
+                </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => navigate('/auth/logout', { replace: true })}
+                >
+                  <LogOutIcon width={16} className="text-red-500" />
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 w-full">
+                <Button
+                  className="bg-green-600 hover:bg-green-700 mt-4"
+                  onClick={() => {
+                    navigate('/auth/login')
+                  }}
+                >
+                  Log in
+                </Button>
+                <Button
+                  variant="outline"
+                  className="text-green-600 hover:text-green-700 mt-4"
+                  onClick={() => {
+                    navigate('/auth/signup')
+                  }}
+                >
+                  Sign up
+                </Button>
+              </div>
+            )}
           </SidebarGroup>
         </SidebarContent>
 
@@ -84,6 +140,9 @@ const RootPage: React.FC = () => {
                 variant="ghost"
                 size="icon"
                 className="mb-2 text-muted-foreground"
+                onClick={() =>
+                  window.open('https://utopiancontributors.com', '_blank')
+                }
               >
                 <Globe width="1.1rem" height="1.1rem" />
               </Button>
@@ -101,7 +160,7 @@ const RootPage: React.FC = () => {
                 <Github width="1.1rem" height="1.1rem" />
               </Button>
             </div>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-gray-300">
               © {new Date().getFullYear()} Utopian Contributors
             </span>
           </SidebarGroup>

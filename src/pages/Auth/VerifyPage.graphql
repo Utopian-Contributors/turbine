@@ -1,0 +1,11 @@
+mutation verify($code: String!) {
+  verify(code: $code) {
+    id
+    email
+    verified
+  }
+}
+
+mutation resendCode {
+  resendVerificationCode
+}

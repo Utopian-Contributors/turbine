@@ -1,8 +1,20 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import RootPage from './RootPage';
-import HomePage from './pages/HomePage';
-import ProjectsPage from './pages/ProjectsPage';
-import SearchPage from './pages/SearchPage';
+import { ApolloProvider } from '@apollo/client'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import RootPage from './RootPage'
+import { client } from './apollo'
+import { Auth } from './components/Auth'
+import {
+  ForgotPasswordPage,
+  LoginPage,
+  SignupPage,
+  VerifyPage,
+} from './pages/Auth'
+import Logout from './pages/Auth/Logout'
+import { NotFoundPage } from './pages/Error/404Page'
+import HomePage from './pages/HomePage'
+import LibraryPage from './pages/LibraryPage'
+import ProjectsPage from './pages/ProjectsPage'
+import SearchPage from './pages/SearchPage'
 
 const router = createBrowserRouter([
   {
@@ -21,12 +33,33 @@ const router = createBrowserRouter([
         path: 'projects',
         element: <ProjectsPage />,
       },
+      {
+        path: 'l/:name',
+        element: <LibraryPage />,
+      },
+    ],
+    errorElement: <NotFoundPage />,
+  },
+  {
+    path: 'auth',
+    element: <Auth />,
+    errorElement: <NotFoundPage />,
+    children: [
+      { path: 'login', element: <LoginPage /> },
+      { path: 'signup', element: <SignupPage /> },
+      { path: 'verify', element: <VerifyPage /> },
+      { path: 'forgot-password', element: <ForgotPasswordPage /> },
     ],
   },
-]);
+  { path: 'auth/logout', element: <Logout /> },
+])
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ApolloProvider client={client}>
+      <RouterProvider router={router} />
+    </ApolloProvider>
+  )
 }
 
-export default App;
+export default App
