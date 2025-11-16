@@ -20,6 +20,8 @@ export const Auth: React.FC = () => {
       } else if (!location.pathname.endsWith('/logout')) {
         navigate('/', { replace: true })
       }
+    } else if (data?.loggedIn && !data.loggedIn.verified) {
+      navigate('/auth/verify', { replace: true })
     }
     hideSplashScreen()
   }, [data?.loggedIn, navigate, location.pathname])
@@ -39,19 +41,20 @@ export const Auth: React.FC = () => {
         </div>
       </div>
       <div
-        className="bg-muted relative hidden lg:block"
+        className="bg-muted relative hidden lg:block overflow-hidden"
         style={{
           background:
             'radial-gradient(ellipse at top, rgba(50, 205, 50, 0.6), green)',
         }}
       >
         <motion.h1
-          className="mx-auto max-w-[700px] font-bold text-7xl text-center bg-clip-text bg-gradient-to-b from-green-800 to-green-500 text-transparent mt-8"
+          className="relative mx-auto max-w-[560px] font-bold text-6xl text-center bg-clip-text bg-gradient-to-b from-green-800 to-green-600 text-transparent mt-8"
           animate={{
-            opacity: [0.1, 1, 0.1],
+            opacity: [0.1, 0.5, 1, 0.1],
+            top: [200, 120, 50, 0],
             transition: {
-              duration: 8,
               repeat: Infinity,
+              duration: 8,
               ease: 'linear',
             },
           }}
