@@ -1,97 +1,21 @@
 import Search from '@/components/blocks/search'
 import { Icons } from '@/components/ui/icons'
+import { useSearch } from '@/hooks/useSearch'
 import { abbreviateNumber } from 'js-abbreviation-number'
 import { Globe } from 'lucide-react'
 import moment from 'moment'
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface SearchPageProps {}
-
-interface SearchResult {
-  id: number
-  name: string
-  description: string
-  latestVersion?: string
-  updated: string
-  downloads: number
-  links: {
-    repository?: string
-    npm?: string
-    homepage?: string
-  }
-}
 
 const SearchPage: React.FC<SearchPageProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
   const initialSearchTerm = new URLSearchParams(location.search).get('q') || ''
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [searchTimeout, setSearchTimeout] = useState<ReturnType<
-    typeof setTimeout
-  > | null>(null)
-
-  const search = useCallback(
-    (term: string) => {
-      if (term.trim().length === 0) {
-        setResults([])
-        return
-      }
-
-      if (searchTimeout) {
-        clearTimeout(searchTimeout)
-      }
-
-      setSearchTimeout(
-        setTimeout(() => {
-          fetch(`https://registry.npmjs.org/-/v1/search?text=${term}&size=10`)
-            .then((res) => res.json())
-            .then((data) => {
-              navigate('/search?q=' + term)
-              setResults(
-                data.objects.map(
-                  (
-                    obj: {
-                      downloads: { weekly: number }
-                      package: {
-                        name: string
-                        description: string
-                        version: string
-                        date: string
-                        links: {
-                          npm: string
-                          repository?: string
-                          homepage?: string
-                        }
-                      }
-                    },
-                    index: number
-                  ) => ({
-                    id: index,
-                    name: obj.package.name,
-                    description: obj.package.description,
-                    downloads: obj.downloads.weekly,
-                    latestVersion: obj.package.version,
-                    updated: obj.package.date,
-                    links: obj.package.links,
-                  })
-                )
-              )
-            })
-        }, 300)
-      )
-    },
-    [navigate, searchTimeout]
-  )
-
-  useEffect(() => {
-    if (initialSearchTerm.trim().length !== 0) {
-      search(initialSearchTerm)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const { results, search } = useSearch(initialSearchTerm)
 
   return (
     <div>
@@ -104,7 +28,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
         />
         <div className="max-w-[60ch] flex flex-col gap-1 mt-6">
           {results.length === 0 ? (
-            <p className="text-gray-300">No results</p>
+            <p className="text-gray-300 text-center">No results</p>
           ) : (
             results.map((result) => (
               <div

@@ -121,7 +121,7 @@ const RootPage: React.FC = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  className="text-green-600 hover:text-green-700 mt-4"
+                  className="mt-4"
                   onClick={() => {
                     navigate('/auth/signup')
                   }}
@@ -168,7 +168,7 @@ const RootPage: React.FC = () => {
       </Sidebar>
 
       <main className="flex-1 min-w-100vh">
-        <div className="p-6 max-h-screen overflow-auto">
+        <div className="p-6 max-h-screen max-w-[calc(100vw-256px)] overflow-auto overflow-x-hidden">
           <Outlet />
         </div>
       </main>
