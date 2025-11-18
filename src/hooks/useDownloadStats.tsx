@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 
-export const useFetchDownloads = () => {
+export const useDownloadStats = () => {
   const [downloads, setDownloads] = useState<number | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const fetchDownloads = useCallback(

@@ -4,6 +4,7 @@ export const useFetchLibrary = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [library, setLibrary] = useState<any | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
+  
   const fetchLibrary = useCallback((term: string) => {
     setLoading(true)
     return fetch(`https://registry.npmjs.org/${term}`)

@@ -1,5 +1,6 @@
 import Search from '@/components/blocks/search'
 import { Icons } from '@/components/ui/icons'
+import { Separator } from '@/components/ui/separator'
 import { useSearch } from '@/hooks/useSearch'
 import { abbreviateNumber } from 'js-abbreviation-number'
 import { Globe } from 'lucide-react'
@@ -25,12 +26,13 @@ const SearchPage: React.FC<SearchPageProps> = () => {
           onChange={(res) => search(res)}
           defaultValue={initialSearchTerm}
           className="mx-auto"
+          autoFocus
         />
         <div className="max-w-[60ch] flex flex-col gap-1 mt-6">
           {results.length === 0 ? (
             <p className="text-gray-300 text-center">No results</p>
           ) : (
-            results.map((result) => (
+            results.map((result) => [
               <div
                 key={result.id}
                 className="cursor-pointer flex-col my-1 p-4 border border-white hover:border-gray-300 rounded-xl"
@@ -80,8 +82,12 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                     {result.latestVersion}
                   </p>
                 </div>
-              </div>
-            ))
+              </div>,
+              <Separator
+                key={result.id + '-sep'}
+                className="bg-muted my-2"
+              />,
+            ])
           )}
         </div>
       </div>

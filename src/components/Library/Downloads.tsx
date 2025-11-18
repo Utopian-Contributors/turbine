@@ -1,5 +1,6 @@
-import { useFetchDownloads } from '@/hooks/useFetchDownloads'
+import { useDownloadStats } from '@/hooks/useDownloadStats'
 import { cn } from '@/lib/utils'
+import { Link } from '@radix-ui/themes'
 import { abbreviateNumber } from 'js-abbreviation-number'
 import { MoveRight, TrendingDown, TrendingUp } from 'lucide-react'
 import moment from 'moment'
@@ -10,7 +11,7 @@ interface DownloadsProps {
 }
 
 const Downloads: React.FC<DownloadsProps> = ({ library }) => {
-  const { fetchDownloads, downloads } = useFetchDownloads()
+  const { fetchDownloads, downloads } = useDownloadStats()
   const [prevDownloads, setPrevDownloads] = useState<number | null>(null)
 
   useEffect(() => {
@@ -31,9 +32,18 @@ const Downloads: React.FC<DownloadsProps> = ({ library }) => {
   }, [library, fetchDownloads])
 
   return (
-    <div className="hidden md:flex flex-col items-start gap-1 mx-8 p-4 border rounded-xl">
-      <p>NPM downloads last week: </p>
-      <p className="text-4xl">
+    <div className="hidden md:flex flex-col items-start gap-1">
+      <div className="flex gap-1 items-center">
+        <Link
+          className="underline"
+          target="_blank"
+          href={`https://npmjs.com/package/${library}`}
+        >
+          NPM downloads
+        </Link>
+        <p className="text-sm text-muted-foreground">(last week)</p>
+      </div>
+      <p className="text-4xl font-light">
         {downloads !== null ? abbreviateNumber(downloads) : 'Loading...'}
       </p>
       {prevDownloads !== null && downloads !== null && (

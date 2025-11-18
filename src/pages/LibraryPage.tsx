@@ -1,12 +1,15 @@
 import Search from '@/components/blocks/search'
+import Bandwidth from '@/components/Library/Bandwidth'
 import Downloads from '@/components/Library/Downloads'
 import Versions from '@/components/Library/Versions'
+import { Icons } from '@/components/ui/icons'
 import { ScriptCopyBtn } from '@/components/ui/script-copy-button'
 import { Separator } from '@/components/ui/separator'
 import { useFetchLibrary } from '@/hooks/useFetchLibrary'
-import { useFetchReadme } from '@/hooks/useFetchReadme'
 import { useSearch } from '@/hooks/useSearch'
 import { useVersions } from '@/hooks/useVersions'
+import { Link } from '@radix-ui/themes'
+import { Globe } from 'lucide-react'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
@@ -19,14 +22,13 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
   const { fetchLibrary, library, loading } = useFetchLibrary()
   const versions = useVersions(library?.versions || {})
   const [selectedVersion, setSelectedVersion] = useState<string | null>()
-  const { fetchReadme, readme, loading: readmeLoading } = useFetchReadme()
   const { search } = useSearch()
 
   useEffect(() => {
     fetchLibrary(params.name || '').then((lib) => {
       setSelectedVersion(lib['dist-tags'].latest)
     })
-  }, [fetchLibrary, fetchReadme, params.name])
+  }, [fetchLibrary, params.name])
 
   if (loading) {
     return <div>Loading...</div>
@@ -46,7 +48,26 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
       <div className="grid grid-cols-3 mt-6">
         <div className="col-span-2">
           <div className="flex flex-col gap-2">
-            <h1 className="text-4xl">{library.name}</h1>
+            <div className="w-full flex justify-between items-center">
+              <h1 className="text-4xl">{library.name}</h1>
+              <div className="flex gap-2">
+                <Link href={library.homepage} target="_blank">
+                  <Globe className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
+                </Link>
+                <Link
+                  href={library.repository.url.replace('git:', 'https:')}
+                  target="_blank"
+                >
+                  <Icons.gitHub className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
+                </Link>
+                <Link
+                  href={`https://npmjs.com/${library.name}`}
+                  target="_blank"
+                >
+                  <Icons.npm className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
+                </Link>
+              </div>
+            </div>
             <p>{library.description}</p>
             <div className="flex gap-2 text-muted-foreground">
               <span className="font-mono">{library['dist-tags'].latest}</span>
@@ -58,16 +79,6 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             </div>
           </div>
           <Separator className="my-4" />
-          {readmeLoading ? (
-            <div>Loading README...</div>
-          ) : readme ? (
-            <div>
-              <h2 className="text-2xl mb-2">README</h2>
-              <pre className="whitespace-pre-wrap">{readme}</pre>
-            </div>
-          ) : (
-            <div>No README found.</div>
-          )}
         </div>
         <div className="col-span-1 gap-4 flex flex-col">
           <div className="hidden md:flex flex-col items-start gap-4 mx-8 p-4 border rounded-xl">
@@ -89,7 +100,10 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
               }}
             />
           </div>
-          <Downloads library={library.name} />
+          <div className="max-w-[16rem] flex flex-col gap-2 mx-8 p-4 border rounded-xl">
+            <Downloads library={library.name} />
+            <Bandwidth library={library.name} />
+          </div>
         </div>
       </div>
     </div>
