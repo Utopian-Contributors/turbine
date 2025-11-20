@@ -3,7 +3,7 @@ import { Icons } from '@/components/ui/icons'
 import { Separator } from '@/components/ui/separator'
 import { useSearch } from '@/hooks/useSearch'
 import { abbreviateNumber } from 'js-abbreviation-number'
-import { Globe } from 'lucide-react'
+import { Globe, PackageIcon } from 'lucide-react'
 import moment from 'moment'
 import React from 'react'
 import { useLocation, useNavigate } from 'react-router'
@@ -25,7 +25,6 @@ const SearchPage: React.FC<SearchPageProps> = () => {
         <Search
           onChange={(res) => search(res)}
           defaultValue={initialSearchTerm}
-          className="mx-auto"
           autoFocus
         />
         <div className="max-w-[60ch] flex flex-col gap-1 mt-6">
@@ -41,8 +40,9 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                 }
               >
                 <div className="flex justify-between">
-                  <div className="flex gap-2 items-end">
-                    <h3 className="text-xl">{result.name}</h3>
+                  <div className="flex gap-1 items-end">
+                    <PackageIcon className="fill-lime-400" />
+                    <h3 className="text-xl underline">{result.name}</h3>
                   </div>
                   <div className="flex gap-2">
                     <Globe
@@ -83,10 +83,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                   </p>
                 </div>
               </div>,
-              <Separator
-                key={result.id + '-sep'}
-                className="bg-muted my-2"
-              />,
+              <Separator key={result.id + '-sep'} className="bg-muted my-2" />,
             ])
           )}
         </div>

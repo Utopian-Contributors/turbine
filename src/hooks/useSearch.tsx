@@ -33,12 +33,13 @@ export const useSearch = (initialSearchTerm?: string) => {
         clearTimeout(searchTimeout)
       }
 
+      navigate('/search?q=' + term)
+
       setSearchTimeout(
         setTimeout(() => {
           fetch(`https://registry.npmjs.org/-/v1/search?text=${term}&size=10`)
             .then((res) => res.json())
             .then((data) => {
-              navigate('/search?q=' + term)
               setResults(
                 data.objects.map(
                   (
