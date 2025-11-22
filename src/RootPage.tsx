@@ -1,10 +1,10 @@
 import {
   Github,
-  Globe,
   HomeIcon,
-  LayoutGridIcon,
   LogOutIcon,
+  PackageIcon,
   SearchIcon,
+  TypeIcon,
 } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
@@ -21,6 +21,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from './components/blocks/sidebar'
+import LogoSilhouette from './components/icons/logoSilhouette'
 import { Button } from './components/ui/button'
 import { Separator } from './components/ui/separator'
 
@@ -42,9 +43,14 @@ const items: SidebarItem[] = [
     icon: <SearchIcon />,
   },
   {
-    title: 'Projects',
-    url: '/projects',
-    icon: <LayoutGridIcon />,
+    title: 'Libraries',
+    url: '/libraries',
+    icon: <PackageIcon />,
+  },
+  {
+    title: 'Fonts',
+    url: '/fonts',
+    icon: <TypeIcon />,
   },
 ]
 
@@ -144,7 +150,7 @@ const RootPage: React.FC = () => {
                   window.open('https://utopiancontributors.com', '_blank')
                 }
               >
-                <Globe width="1.1rem" height="1.1rem" />
+                <LogoSilhouette />
               </Button>
               <Button
                 variant="ghost"

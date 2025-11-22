@@ -12,8 +12,8 @@ import {
 import Logout from './pages/Auth/Logout'
 import { NotFoundPage } from './pages/Error/404Page'
 import HomePage from './pages/HomePage'
+import LibrariesPage from './pages/LibrariesPage'
 import LibraryPage from './pages/LibraryPage'
-import ProjectsPage from './pages/ProjectsPage'
 import SearchPage from './pages/SearchPage'
 
 const router = createBrowserRouter([
@@ -30,8 +30,8 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: 'projects',
-        element: <ProjectsPage />,
+        path: 'libraries',
+        element: <LibrariesPage />,
       },
       {
         path: 'l/:name',
