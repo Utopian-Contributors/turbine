@@ -2,6 +2,7 @@ import Search from '@/components/blocks/search'
 import { Icons } from '@/components/ui/icons'
 import { Separator } from '@/components/ui/separator'
 import { useSearch } from '@/hooks/useSearch'
+import { cn } from '@/lib/utils'
 import { abbreviateNumber } from 'js-abbreviation-number'
 import { Globe, PackageIcon } from 'lucide-react'
 import moment from 'moment'
@@ -34,25 +35,34 @@ const SearchPage: React.FC<SearchPageProps> = () => {
             results.map((result) => [
               <div
                 key={result.id}
-                className="cursor-pointer flex-col my-1 p-4 border border-white hover:border-gray-300 rounded-xl"
+                className={cn(
+                  'cursor-pointer flex-col my-1 p-4 border border-white hover:border-gray-300 rounded-xl',
+                  'hover:bg-green-400/20 hover:border-green-500 transition-all'
+                )}
                 onClick={() =>
                   navigate('/l/' + encodeURIComponent(result.name))
                 }
               >
-                <div className="flex justify-between">
-                  <div className="flex gap-1 items-end">
-                    <PackageIcon className="fill-lime-400" />
-                    <h3 className="text-xl underline">{result.name}</h3>
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-1 items-center">
+                    <PackageIcon className={cn('fill-amber-300 stroke-1')} />
+                    <h3 className="text-xl leading-4">{result.name}</h3>
                   </div>
                   <div className="flex gap-2">
                     <Globe
-                      className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer"
+                      className={cn(
+                        'h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer',
+                        'text-green-500'
+                      )}
                       onClick={() =>
                         window.open(result.links.homepage, '_blank')
                       }
                     />
                     <Icons.gitHub
-                      className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer"
+                      className={cn(
+                        'h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer',
+                        'text-green-500'
+                      )}
                       onClick={() =>
                         window.open(
                           result.links.repository?.replace('git+', ''),
@@ -61,7 +71,10 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                       }
                     />
                     <Icons.npm
-                      className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer"
+                      className={cn(
+                        'h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer',
+                        'text-green-500'
+                      )}
                       onClick={() => window.open(result.links.npm, '_blank')}
                     />
                   </div>

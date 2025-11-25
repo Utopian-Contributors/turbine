@@ -24,6 +24,32 @@ export type CreateUserInput = {
   password: Scalars['String']['input'];
 };
 
+export type Library = {
+  __typename?: 'Library';
+  category?: Maybe<LibraryCategory>;
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  homepage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  integrated?: Maybe<Scalars['Boolean']['output']>;
+  lastVersion?: Maybe<Version>;
+  name: Scalars['String']['output'];
+  repository?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  versions: Array<Version>;
+};
+
+export enum LibraryCategory {
+  Animation = 'ANIMATION',
+  Data = 'DATA',
+  Forms = 'FORMS',
+  Networking = 'NETWORKING',
+  Other = 'OTHER',
+  StateManagement = 'STATE_MANAGEMENT',
+  Ui = 'UI',
+  Utilities = 'UTILITIES'
+}
+
 export type Mutation = {
   __typename?: 'Mutation';
   login?: Maybe<User>;
@@ -65,8 +91,14 @@ export type MutationVerifyArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  library?: Maybe<Library>;
   loggedIn: User;
   users?: Maybe<Array<Maybe<User>>>;
+};
+
+
+export type QueryLibraryArgs = {
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum Role {
@@ -79,7 +111,7 @@ export type User = {
   accessToken?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
-  id: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   role: Role;
   updatedAt: Scalars['DateTime']['output'];
@@ -90,14 +122,26 @@ export type VerificationCode = {
   __typename?: 'VerificationCode';
   code: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
-  id: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
   user: User;
+};
+
+export type Version = {
+  __typename?: 'Version';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  integrated: Scalars['Boolean']['output'];
+  library: Library;
+  publishedAt: Scalars['DateTime']['output'];
+  size?: Maybe<Scalars['Int']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  version: Scalars['String']['output'];
 };
 
 export type LoggedInQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LoggedInQuery = { __typename?: 'Query', loggedIn: { __typename?: 'User', id: number, email: string, name: string, role: Role, verified: boolean } };
+export type LoggedInQuery = { __typename?: 'Query', loggedIn: { __typename?: 'User', id: string, email: string, name: string, role: Role, verified: boolean } };
 
 export type SendResetLinkMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -120,31 +164,38 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'User', id: number, verified: boolean, accessToken?: string | null } | null };
+export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'User', id: string, verified: boolean, accessToken?: string | null } | null };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout?: { __typename?: 'User', id: number } | null };
+export type LogoutMutation = { __typename?: 'Mutation', logout?: { __typename?: 'User', id: string } | null };
 
 export type RegisterMutationVariables = Exact<{
   data: CreateUserInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register?: { __typename?: 'User', id: number, email: string, accessToken?: string | null } | null };
+export type RegisterMutation = { __typename?: 'Mutation', register?: { __typename?: 'User', id: string, email: string, accessToken?: string | null } | null };
 
 export type VerifyMutationVariables = Exact<{
   code: Scalars['String']['input'];
 }>;
 
 
-export type VerifyMutation = { __typename?: 'Mutation', verify?: { __typename?: 'User', id: number, email: string, verified: boolean } | null };
+export type VerifyMutation = { __typename?: 'Mutation', verify?: { __typename?: 'User', id: string, email: string, verified: boolean } | null };
 
 export type ResendCodeMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ResendCodeMutation = { __typename?: 'Mutation', resendVerificationCode?: boolean | null };
+
+export type LibraryQueryVariables = Exact<{
+  name: Scalars['String']['input'];
+}>;
+
+
+export type LibraryQuery = { __typename?: 'Query', library?: { __typename?: 'Library', id: string, name: string, description?: string | null, homepage?: string | null, repository?: string | null, integrated?: boolean | null, lastVersion?: { __typename?: 'Version', version: string, publishedAt: any } | null, versions: Array<{ __typename?: 'Version', version: string, publishedAt: any }> } | null };
 
 
 export const LoggedInDocument = gql`
@@ -421,3 +472,56 @@ export function useResendCodeMutation(baseOptions?: Apollo.MutationHookOptions<R
 export type ResendCodeMutationHookResult = ReturnType<typeof useResendCodeMutation>;
 export type ResendCodeMutationResult = Apollo.MutationResult<ResendCodeMutation>;
 export type ResendCodeMutationOptions = Apollo.BaseMutationOptions<ResendCodeMutation, ResendCodeMutationVariables>;
+export const LibraryDocument = gql`
+    query library($name: String!) {
+  library(name: $name) {
+    id
+    name
+    description
+    homepage
+    repository
+    integrated
+    lastVersion {
+      version
+      publishedAt
+    }
+    versions {
+      version
+      publishedAt
+    }
+  }
+}
+    `;
+
+/**
+ * __useLibraryQuery__
+ *
+ * To run a query within a React component, call `useLibraryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLibraryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLibraryQuery({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useLibraryQuery(baseOptions: Apollo.QueryHookOptions<LibraryQuery, LibraryQueryVariables> & ({ variables: LibraryQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LibraryQuery, LibraryQueryVariables>(LibraryDocument, options);
+      }
+export function useLibraryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LibraryQuery, LibraryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LibraryQuery, LibraryQueryVariables>(LibraryDocument, options);
+        }
+export function useLibrarySuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LibraryQuery, LibraryQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LibraryQuery, LibraryQueryVariables>(LibraryDocument, options);
+        }
+export type LibraryQueryHookResult = ReturnType<typeof useLibraryQuery>;
+export type LibraryLazyQueryHookResult = ReturnType<typeof useLibraryLazyQuery>;
+export type LibrarySuspenseQueryHookResult = ReturnType<typeof useLibrarySuspenseQuery>;
+export type LibraryQueryResult = Apollo.QueryResult<LibraryQuery, LibraryQueryVariables>;

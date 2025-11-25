@@ -6,7 +6,6 @@ import { ChartBarLabelCustom } from '@/components/ui/chart-bar'
 import { Icons } from '@/components/ui/icons'
 import { ScriptCopyBtn } from '@/components/ui/script-copy-button'
 import { Separator } from '@/components/ui/separator'
-import { useFetchLibrary } from '@/hooks/useFetchLibrary'
 import { useSearch } from '@/hooks/useSearch'
 import { useVersions } from '@/hooks/useVersions'
 import { useVersionStats } from '@/hooks/useVersionStats'
@@ -17,74 +16,103 @@ import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 
+import { cn } from '@/lib/utils'
+import { useLibraryQuery } from '../../generated/graphql'
+
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface LibraryPageProps {}
 
 const LibraryPage: React.FC<LibraryPageProps> = () => {
   const params = useParams<{ name: string }>()
-  const { fetchLibrary, library, loading } = useFetchLibrary()
+  const { data: libraryQueryData, loading } = useLibraryQuery({
+    variables: { name: params.name || '' },
+  })
   const { versionStats, fetchVersionStats } = useVersionStats()
-  const versions = useVersions(library?.versions || {})
+  const versions = useVersions(libraryQueryData?.library?.versions ?? [])
   const [selectedVersion, setSelectedVersion] = useState<string | null>()
   const { search } = useSearch()
 
   useEffect(() => {
-    if (params.name && !library) {
-      fetchLibrary(params.name || '').then((lib) => {
-        setSelectedVersion(lib['dist-tags'].latest)
-        fetchVersionStats(params.name || '')
-      })
+    if (!selectedVersion) {
+      setSelectedVersion(libraryQueryData?.library?.lastVersion?.version)
     }
-  }, [fetchLibrary, fetchVersionStats, library, params.name])
+    if (params.name && !libraryQueryData?.library && !versionStats) {
+      fetchVersionStats(params.name || '')
+    }
+  }, [
+    fetchVersionStats,
+    libraryQueryData?.library,
+    params.name,
+    selectedVersion,
+    versionStats,
+  ])
 
   if (loading) {
     return <div>Loading...</div>
   }
 
-  if (!library) {
+  if (!libraryQueryData?.library) {
     return <div>No library found with name "{params.name}"</div>
   }
 
   return (
     <div>
       <Search
-        onChange={(res) => search(res)}
-        defaultValue={library.name}
-        className="mx-auto"
+        onChange={(q) => search(q)}
+        defaultValue={libraryQueryData?.library.name}
       />
       <div className="grid grid-cols-3 mt-6">
         <div className="col-span-2">
           <div className="flex flex-col gap-2 p-2">
             <div className="w-full flex justify-between items-center">
               <div className="flex gap-2 items-end">
-                <PackageIcon className="fill-lime-400" width={32} height={32} />
-                <h3 className="text-4xl">{library.name}</h3>
+                <PackageIcon
+                  className={cn(
+                    'stroke-1',
+                    libraryQueryData.library.integrated
+                      ? 'fill-green-500'
+                      : 'fill-amber-300'
+                  )}
+                  width={32}
+                  height={32}
+                />
+                <h3 className="text-4xl">{libraryQueryData?.library.name}</h3>
               </div>
               <div className="flex gap-2">
-                <Link href={library.homepage} target="_blank">
+                <Link
+                  href={libraryQueryData?.library.homepage ?? ''}
+                  target="_blank"
+                >
                   <Globe className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
                 </Link>
                 <Link
-                  href={library.repository?.url.replace('git+', '')}
+                  href={libraryQueryData?.library.repository?.replace(
+                    'git+',
+                    ''
+                  )}
                   target="_blank"
                 >
                   <Icons.gitHub className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
                 </Link>
                 <Link
-                  href={`https://npmjs.com/${library.name}`}
+                  href={`https://npmjs.com/${libraryQueryData?.library.name}`}
                   target="_blank"
                 >
                   <Icons.npm className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
                 </Link>
               </div>
             </div>
-            <p>{library.description}</p>
+            <p>{libraryQueryData?.library.description}</p>
             <div className="flex gap-2 text-muted-foreground">
-              <span className="font-mono">{library['dist-tags'].latest}</span>
+              <span className="font-mono">
+                {libraryQueryData?.library.lastVersion?.version}
+              </span>
               <span className="font-mono">•</span>
               <span className="font-mono">
                 Published{' '}
-                {moment(library.time[library['dist-tags'].latest]).fromNow()}
+                {moment(
+                  libraryQueryData?.library.lastVersion?.publishedAt
+                ).fromNow()}
               </span>
             </div>
           </div>
@@ -116,7 +144,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             <Versions
               versions={versions}
               selected={selectedVersion}
-              latest={library['dist-tags'].latest}
+              latest={libraryQueryData?.library.lastVersion?.version || ''}
               onChange={setSelectedVersion}
             />
             <ScriptCopyBtn
@@ -124,16 +152,16 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
               lightTheme="github-light"
               darkTheme="github-dark"
               commandMap={{
-                npm: `npm install ${library.name}@${selectedVersion}`,
-                yarn: `yarn add ${library.name}@${selectedVersion}`,
-                pnpm: `pnpm add ${library.name}@${selectedVersion}`,
-                bun: `bun add ${library.name}@${selectedVersion}`,
+                npm: `npm install ${libraryQueryData?.library.name}@${selectedVersion}`,
+                yarn: `yarn add ${libraryQueryData?.library.name}@${selectedVersion}`,
+                pnpm: `pnpm add ${libraryQueryData?.library.name}@${selectedVersion}`,
+                bun: `bun add ${libraryQueryData?.library.name}@${selectedVersion}`,
               }}
             />
           </div>
           <div className="border rounded-xl max-w-[16rem] flex flex-col gap-2 ml-8 p-4 border rounded-xl">
-            <Downloads library={library.name} />
-            <Bandwidth library={library.name} />
+            <Downloads library={libraryQueryData?.library.name || ''} />
+            <Bandwidth library={libraryQueryData?.library.name || ''} />
           </div>
         </div>
       </div>

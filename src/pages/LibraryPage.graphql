@@ -1,0 +1,18 @@
+query library($name: String!) {
+  library(name: $name) {
+    id
+    name
+    description
+    homepage
+    repository
+    integrated
+    lastVersion {
+      version
+      publishedAt
+    }
+    versions {
+      version
+      publishedAt
+    }
+  }
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { Bar, BarChart, LabelList, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
 import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
@@ -30,22 +30,15 @@ export const ChartBarLabelCustom: React.FC<{
         <p className="text-muted-foreground">{description}</p>
       </div>
       <ChartContainer config={config}>
-        <BarChart
-          accessibilityLayer
-          data={data}
-          layout="vertical"
-          margin={{
-            right: 80,
-          }}
-        >
-          <YAxis
+        <BarChart accessibilityLayer data={data} layout="horizontal">
+          <XAxis
             dataKey="label"
             type="category"
             tickLine={false}
             tickMargin={10}
             axisLine={false}
           />
-          <XAxis dataKey="value" type="number" hide />
+          <YAxis dataKey="value" type="number" hide />
           <ChartTooltip
             cursor={false}
             content={
@@ -53,7 +46,7 @@ export const ChartBarLabelCustom: React.FC<{
                 indicator="line"
                 formatter={(value) => (
                   <div className="flex gap-2 items-center">
-                    <ZapIcon width={20} className='text-green-600'/>
+                    <ZapIcon width={20} className="text-green-600" />
                     <div className="flex flex-col">
                       <p className="text-muted-foreground">Bandwidth</p>
                       <p>{filesize(value as number)}</p>
@@ -65,19 +58,11 @@ export const ChartBarLabelCustom: React.FC<{
           />
           <Bar
             dataKey="value"
-            layout="vertical"
+            layout="horizontal"
             fill="var(--color-value)"
             radius={4}
             height={40}
-          >
-            <LabelList
-              dataKey="formattedValue"
-              position="right"
-              offset={8}
-              className="fill-foreground"
-              fontSize={12}
-            />
-          </Bar>
+          />
         </BarChart>
       </ChartContainer>
     </div>
