@@ -32,40 +32,47 @@ const SearchPage: React.FC<SearchPageProps> = () => {
           {results.length === 0 ? (
             <p className="text-gray-300 text-center">No results</p>
           ) : (
-            results.map((result) => [
+            results.map((result, index) => [
               <div
-                key={result.id}
+                key={index}
                 className={cn(
                   'cursor-pointer flex-col my-1 p-4 border border-white hover:border-gray-300 rounded-xl',
-                  'hover:bg-green-400/20 hover:border-green-500 transition-all'
+                  result.integrated
+                    ? 'hover:bg-green-400/20 hover:border-green-500 transition-all'
+                    : 'hover:bg-gray-200/10 hover:border-gray-300 transition-all'
                 )}
                 onClick={() =>
                   navigate('/l/' + encodeURIComponent(result.name))
                 }
               >
                 <div className="flex justify-between items-center">
-                  <div className="flex gap-1 items-center">
-                    <PackageIcon className={cn('fill-amber-300 stroke-1')} />
-                    <h3 className="text-xl leading-4">{result.name}</h3>
+                  <div className="flex gap-1 items-end">
+                    <PackageIcon
+                      className={cn(
+                        'stroke-[1.5]',
+                        result.integrated ? 'fill-green-500' : 'fill-gray-200'
+                      )}
+                      width={24}
+                      height={24}
+                    />
+                    <h3 className="text-xl">{result.name}</h3>
                   </div>
                   <div className="flex gap-2">
                     <Globe
                       className={cn(
                         'h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer',
-                        'text-green-500'
+                        result.integrated && 'text-green-500'
                       )}
-                      onClick={() =>
-                        window.open(result.links.homepage, '_blank')
-                      }
+                      onClick={() => window.open(result.homepage, '_blank')}
                     />
                     <Icons.gitHub
                       className={cn(
                         'h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer',
-                        'text-green-500'
+                        result.integrated && 'text-green-500'
                       )}
                       onClick={() =>
                         window.open(
-                          result.links.repository?.replace('git+', ''),
+                          result.repository?.replace('git+', ''),
                           '_blank'
                         )
                       }
@@ -73,9 +80,16 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                     <Icons.npm
                       className={cn(
                         'h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer',
-                        'text-green-500'
+                        result.integrated && 'text-green-500'
                       )}
-                      onClick={() => window.open(result.links.npm, '_blank')}
+                      onClick={() =>
+                        window.open(
+                          `https://npmjs.com/${encodeURIComponent(
+                            result.name
+                          )}`,
+                          '_blank'
+                        )
+                      }
                     />
                   </div>
                 </div>
@@ -96,7 +110,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                   </p>
                 </div>
               </div>,
-              <Separator key={result.id + '-sep'} className="bg-muted my-2" />,
+              <Separator key={index + '-sep'} className="bg-muted my-2" />,
             ])
           )}
         </div>

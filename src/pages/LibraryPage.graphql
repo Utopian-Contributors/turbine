@@ -16,3 +16,54 @@ query library($name: String!) {
     }
   }
 }
+
+query libraryUsage($name: String!) {
+  libraryUsage(name: $name) {
+    downloads
+    bandwidth {
+      total
+      rank
+    }
+    prev {
+      downloads
+      bandwidth {
+        total
+        rank
+      }
+    }
+  }
+}
+
+query versionUsage($library: String!) {
+  versionUsage(library: $library) {
+    version
+    bandwidth
+  }
+}
+
+query versionIntegrations($library: String!) {
+  versionIntegrations(library: $library) {
+    ...VersionConfig
+  }
+}
+
+mutation integrateVersion($version: String!) {
+  integrateVersion(id: $version) {
+    id
+  }
+}
+
+fragment VersionConfig on VersionIntegrations {
+  integrated {
+    id
+    version
+  }
+  popular {
+    id
+    version
+  }
+  other {
+    id
+    version
+  }
+}

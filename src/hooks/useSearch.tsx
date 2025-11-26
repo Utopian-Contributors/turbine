@@ -1,23 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-
-export interface SearchResult {
-  id: number
-  name: string
-  description: string
-  latestVersion?: string
-  updated: string
-  downloads: number
-  links: {
-    repository?: string
-    npm?: string
-    homepage?: string
-  }
-}
+import {
+  useSearchLibraryLazyQuery,
+  type LibrarySearchResult,
+} from '../../generated/graphql'
 
 export const useSearch = (initialSearchTerm?: string) => {
   const navigate = useNavigate()
-  const [results, setResults] = useState<SearchResult[]>([])
+  const [searchLibraryQuery] = useSearchLibraryLazyQuery()
+  const [results, setResults] = useState<LibrarySearchResult[]>([])
   const [searchTimeout, setSearchTimeout] = useState<ReturnType<
     typeof setTimeout
   > | null>(null)
@@ -36,44 +27,16 @@ export const useSearch = (initialSearchTerm?: string) => {
       navigate('/search?q=' + term)
 
       setSearchTimeout(
-        setTimeout(() => {
-          fetch(`https://registry.npmjs.org/-/v1/search?text=${term}&size=10`)
-            .then((res) => res.json())
-            .then((data) => {
-              setResults(
-                data.objects.map(
-                  (
-                    obj: {
-                      downloads: { weekly: number }
-                      package: {
-                        name: string
-                        description: string
-                        version: string
-                        date: string
-                        links: {
-                          npm: string
-                          repository?: string
-                          homepage?: string
-                        }
-                      }
-                    },
-                    index: number
-                  ) => ({
-                    id: index,
-                    name: obj.package.name,
-                    description: obj.package.description,
-                    downloads: obj.downloads.weekly,
-                    latestVersion: obj.package.version,
-                    updated: obj.package.date,
-                    links: obj.package.links,
-                  })
-                )
-              )
-            })
-        }, 500)
+        setTimeout(
+          () =>
+            searchLibraryQuery({ variables: { term } }).then(({ data }) =>
+              setResults(data?.searchLibrary || [])
+            ),
+          500
+        )
       )
     },
-    [navigate, searchTimeout]
+    [navigate, searchLibraryQuery, searchTimeout]
   )
 
   useEffect(() => {

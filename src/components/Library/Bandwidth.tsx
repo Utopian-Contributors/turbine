@@ -1,29 +1,17 @@
-import { useUsageStats, type UsageStats } from '@/hooks/useUsageStats'
 import { cn } from '@/lib/utils'
 import { Link } from '@radix-ui/themes'
 import { filesize } from 'filesize'
+import type { LibraryUsage } from 'generated/graphql'
 import { MoveRight, TrendingDown, TrendingUp } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 interface UsageProps {
   library?: string
+  usage?: LibraryUsage['bandwidth']
+  prevUsage?: LibraryUsage['bandwidth']
 }
 
-const Usage: React.FC<UsageProps> = ({ library }) => {
-  const { fetchUsageStats, usage } = useUsageStats()
-  const [prevUsage, setPrevUsage] = useState<UsageStats | null>(null)
-
-  useEffect(() => {
-    if (library) {
-      fetchUsageStats(library).then(() => {
-        const previousMonth = 's-month'
-        fetchUsageStats(library, previousMonth).then((prevUsage) => {
-          setPrevUsage(prevUsage)
-        })
-      })
-    }
-  }, [library, fetchUsageStats])
-
+const Usage: React.FC<UsageProps> = ({ library, usage, prevUsage }) => {
   return (
     <div className="hidden md:flex flex-col items-start gap-1">
       <div className="flex gap-1 items-center">
@@ -37,30 +25,30 @@ const Usage: React.FC<UsageProps> = ({ library }) => {
         <p className="text-sm text-muted-foreground">(last week)</p>
       </div>
       <p className="text-4xl font-light">
-        {usage !== null ? filesize(usage.bandwidth.total) : 'Loading...'}
+        {usage?.total ? filesize(usage.total) : 'Loading...'}
       </p>
       {usage &&
-        usage?.bandwidth.total !== null &&
+        usage?.total !== null &&
         prevUsage &&
-        prevUsage?.bandwidth.total !== null && (
+        prevUsage?.total !== null && (
           <div
             className={cn(
               'flex gap-1',
-              usage.bandwidth.rank > prevUsage?.bandwidth.rank
+              usage.rank > prevUsage?.rank
                 ? 'text-green-500'
-                : usage.bandwidth.rank < prevUsage?.bandwidth.rank
+                : usage.rank < prevUsage?.rank
                 ? 'text-red-500'
                 : 'text-yellow-500'
             )}
           >
-            {usage.bandwidth.rank > prevUsage?.bandwidth.rank ? (
+            {usage.rank > prevUsage?.rank ? (
               <TrendingUp width={20} className="inline-block mb-1 mr-1" />
-            ) : usage.bandwidth.rank < prevUsage?.bandwidth.rank ? (
+            ) : usage.rank < prevUsage?.rank ? (
               <TrendingDown width={20} className="inline-block mb-1 mr-1" />
             ) : (
               <MoveRight width={20} className="inline-block mb-1 mr-1" />
             )}
-            <p>#{usage.bandwidth.rank}</p>
+            <p>#{usage.rank}</p>
           </div>
         )}
     </div>

@@ -1,0 +1,12 @@
+query searchLibrary($term: String!) {
+  searchLibrary(term: $term) {
+    name
+    description
+    latestVersion
+    integrated
+    homepage
+    downloads
+    updated
+    repository
+  }
+}

@@ -39,6 +39,15 @@ export type Library = {
   versions: Array<Version>;
 };
 
+/** Bandwidth statistics for a library */
+export type LibraryBandwidth = {
+  __typename?: 'LibraryBandwidth';
+  /** Rank of this library by bandwidth usage */
+  rank: Scalars['String']['output'];
+  /** Bandwidth used by this library in bytes */
+  total: Scalars['String']['output'];
+};
+
 export enum LibraryCategory {
   Animation = 'ANIMATION',
   Data = 'DATA',
@@ -50,8 +59,41 @@ export enum LibraryCategory {
   Utilities = 'UTILITIES'
 }
 
+/** Result of a searching for a library */
+export type LibrarySearchResult = {
+  __typename?: 'LibrarySearchResult';
+  /** Description of the library */
+  description: Scalars['String']['output'];
+  /** Number of weekly downloads */
+  downloads: Scalars['Int']['output'];
+  /** Homepage URL of the library */
+  homepage: Scalars['String']['output'];
+  /** Whether the library is integrated */
+  integrated: Scalars['Boolean']['output'];
+  /** Latest version of the library */
+  latestVersion: Scalars['String']['output'];
+  /** Name of the library */
+  name: Scalars['String']['output'];
+  /** Repository URL of the library */
+  repository: Scalars['String']['output'];
+  /** Last updated date of the library */
+  updated: Scalars['String']['output'];
+};
+
+/** Usage statistics for a library */
+export type LibraryUsage = {
+  __typename?: 'LibraryUsage';
+  /** Bandwidth stats by this library */
+  bandwidth: LibraryBandwidth;
+  /** The number of downloads */
+  downloads: Scalars['String']['output'];
+  /** Usage statistics for the previous equivalent timespan (e.g., previous week/month) */
+  prev: LibraryUsage;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  integrateVersion?: Maybe<Version>;
   login?: Maybe<User>;
   logout?: Maybe<User>;
   refreshToken?: Maybe<User>;
@@ -60,6 +102,11 @@ export type Mutation = {
   resetPassword?: Maybe<Scalars['Boolean']['output']>;
   sendResetLink?: Maybe<Scalars['Boolean']['output']>;
   verify?: Maybe<User>;
+};
+
+
+export type MutationIntegrateVersionArgs = {
+  id?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -92,13 +139,37 @@ export type MutationVerifyArgs = {
 export type Query = {
   __typename?: 'Query';
   library?: Maybe<Library>;
+  libraryUsage?: Maybe<LibraryUsage>;
   loggedIn: User;
+  searchLibrary?: Maybe<Array<LibrarySearchResult>>;
   users?: Maybe<Array<Maybe<User>>>;
+  versionIntegrations: VersionIntegrations;
+  versionUsage?: Maybe<Array<VersionUsage>>;
 };
 
 
 export type QueryLibraryArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryLibraryUsageArgs = {
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QuerySearchLibraryArgs = {
+  term?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryVersionIntegrationsArgs = {
+  library?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryVersionUsageArgs = {
+  library?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum Role {
@@ -135,6 +206,26 @@ export type Version = {
   publishedAt: Scalars['DateTime']['output'];
   size?: Maybe<Scalars['Int']['output']>;
   updatedAt: Scalars['DateTime']['output'];
+  version: Scalars['String']['output'];
+};
+
+/** Versions to integrate into the system */
+export type VersionIntegrations = {
+  __typename?: 'VersionIntegrations';
+  /** List of integrated versions */
+  integrated: Array<Version>;
+  /** List of all other versions to integrate */
+  other: Array<Version>;
+  /** List of popular versions to integrate */
+  popular: Array<Version>;
+};
+
+/** Usage statistics for most used versions of a library */
+export type VersionUsage = {
+  __typename?: 'VersionUsage';
+  /** Bandwidth used by this version in bytes */
+  bandwidth: Scalars['String']['output'];
+  /** The version string */
   version: Scalars['String']['output'];
 };
 
@@ -197,7 +288,59 @@ export type LibraryQueryVariables = Exact<{
 
 export type LibraryQuery = { __typename?: 'Query', library?: { __typename?: 'Library', id: string, name: string, description?: string | null, homepage?: string | null, repository?: string | null, integrated?: boolean | null, lastVersion?: { __typename?: 'Version', version: string, publishedAt: any } | null, versions: Array<{ __typename?: 'Version', version: string, publishedAt: any }> } | null };
 
+export type LibraryUsageQueryVariables = Exact<{
+  name: Scalars['String']['input'];
+}>;
 
+
+export type LibraryUsageQuery = { __typename?: 'Query', libraryUsage?: { __typename?: 'LibraryUsage', downloads: string, bandwidth: { __typename?: 'LibraryBandwidth', total: string, rank: string }, prev: { __typename?: 'LibraryUsage', downloads: string, bandwidth: { __typename?: 'LibraryBandwidth', total: string, rank: string } } } | null };
+
+export type VersionUsageQueryVariables = Exact<{
+  library: Scalars['String']['input'];
+}>;
+
+
+export type VersionUsageQuery = { __typename?: 'Query', versionUsage?: Array<{ __typename?: 'VersionUsage', version: string, bandwidth: string }> | null };
+
+export type VersionIntegrationsQueryVariables = Exact<{
+  library: Scalars['String']['input'];
+}>;
+
+
+export type VersionIntegrationsQuery = { __typename?: 'Query', versionIntegrations: { __typename?: 'VersionIntegrations', integrated: Array<{ __typename?: 'Version', id: string, version: string }>, popular: Array<{ __typename?: 'Version', id: string, version: string }>, other: Array<{ __typename?: 'Version', id: string, version: string }> } };
+
+export type IntegrateVersionMutationVariables = Exact<{
+  version: Scalars['String']['input'];
+}>;
+
+
+export type IntegrateVersionMutation = { __typename?: 'Mutation', integrateVersion?: { __typename?: 'Version', id: string } | null };
+
+export type VersionConfigFragment = { __typename?: 'VersionIntegrations', integrated: Array<{ __typename?: 'Version', id: string, version: string }>, popular: Array<{ __typename?: 'Version', id: string, version: string }>, other: Array<{ __typename?: 'Version', id: string, version: string }> };
+
+export type SearchLibraryQueryVariables = Exact<{
+  term: Scalars['String']['input'];
+}>;
+
+
+export type SearchLibraryQuery = { __typename?: 'Query', searchLibrary?: Array<{ __typename?: 'LibrarySearchResult', name: string, description: string, latestVersion: string, integrated: boolean, homepage: string, downloads: number, updated: string, repository: string }> | null };
+
+export const VersionConfigFragmentDoc = gql`
+    fragment VersionConfig on VersionIntegrations {
+  integrated {
+    id
+    version
+  }
+  popular {
+    id
+    version
+  }
+  other {
+    id
+    version
+  }
+}
+    `;
 export const LoggedInDocument = gql`
     query loggedIn {
   loggedIn {
@@ -525,3 +668,215 @@ export type LibraryQueryHookResult = ReturnType<typeof useLibraryQuery>;
 export type LibraryLazyQueryHookResult = ReturnType<typeof useLibraryLazyQuery>;
 export type LibrarySuspenseQueryHookResult = ReturnType<typeof useLibrarySuspenseQuery>;
 export type LibraryQueryResult = Apollo.QueryResult<LibraryQuery, LibraryQueryVariables>;
+export const LibraryUsageDocument = gql`
+    query libraryUsage($name: String!) {
+  libraryUsage(name: $name) {
+    downloads
+    bandwidth {
+      total
+      rank
+    }
+    prev {
+      downloads
+      bandwidth {
+        total
+        rank
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useLibraryUsageQuery__
+ *
+ * To run a query within a React component, call `useLibraryUsageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLibraryUsageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLibraryUsageQuery({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useLibraryUsageQuery(baseOptions: Apollo.QueryHookOptions<LibraryUsageQuery, LibraryUsageQueryVariables> & ({ variables: LibraryUsageQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LibraryUsageQuery, LibraryUsageQueryVariables>(LibraryUsageDocument, options);
+      }
+export function useLibraryUsageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LibraryUsageQuery, LibraryUsageQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LibraryUsageQuery, LibraryUsageQueryVariables>(LibraryUsageDocument, options);
+        }
+export function useLibraryUsageSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LibraryUsageQuery, LibraryUsageQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LibraryUsageQuery, LibraryUsageQueryVariables>(LibraryUsageDocument, options);
+        }
+export type LibraryUsageQueryHookResult = ReturnType<typeof useLibraryUsageQuery>;
+export type LibraryUsageLazyQueryHookResult = ReturnType<typeof useLibraryUsageLazyQuery>;
+export type LibraryUsageSuspenseQueryHookResult = ReturnType<typeof useLibraryUsageSuspenseQuery>;
+export type LibraryUsageQueryResult = Apollo.QueryResult<LibraryUsageQuery, LibraryUsageQueryVariables>;
+export const VersionUsageDocument = gql`
+    query versionUsage($library: String!) {
+  versionUsage(library: $library) {
+    version
+    bandwidth
+  }
+}
+    `;
+
+/**
+ * __useVersionUsageQuery__
+ *
+ * To run a query within a React component, call `useVersionUsageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useVersionUsageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useVersionUsageQuery({
+ *   variables: {
+ *      library: // value for 'library'
+ *   },
+ * });
+ */
+export function useVersionUsageQuery(baseOptions: Apollo.QueryHookOptions<VersionUsageQuery, VersionUsageQueryVariables> & ({ variables: VersionUsageQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<VersionUsageQuery, VersionUsageQueryVariables>(VersionUsageDocument, options);
+      }
+export function useVersionUsageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<VersionUsageQuery, VersionUsageQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<VersionUsageQuery, VersionUsageQueryVariables>(VersionUsageDocument, options);
+        }
+export function useVersionUsageSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<VersionUsageQuery, VersionUsageQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<VersionUsageQuery, VersionUsageQueryVariables>(VersionUsageDocument, options);
+        }
+export type VersionUsageQueryHookResult = ReturnType<typeof useVersionUsageQuery>;
+export type VersionUsageLazyQueryHookResult = ReturnType<typeof useVersionUsageLazyQuery>;
+export type VersionUsageSuspenseQueryHookResult = ReturnType<typeof useVersionUsageSuspenseQuery>;
+export type VersionUsageQueryResult = Apollo.QueryResult<VersionUsageQuery, VersionUsageQueryVariables>;
+export const VersionIntegrationsDocument = gql`
+    query versionIntegrations($library: String!) {
+  versionIntegrations(library: $library) {
+    ...VersionConfig
+  }
+}
+    ${VersionConfigFragmentDoc}`;
+
+/**
+ * __useVersionIntegrationsQuery__
+ *
+ * To run a query within a React component, call `useVersionIntegrationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useVersionIntegrationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useVersionIntegrationsQuery({
+ *   variables: {
+ *      library: // value for 'library'
+ *   },
+ * });
+ */
+export function useVersionIntegrationsQuery(baseOptions: Apollo.QueryHookOptions<VersionIntegrationsQuery, VersionIntegrationsQueryVariables> & ({ variables: VersionIntegrationsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<VersionIntegrationsQuery, VersionIntegrationsQueryVariables>(VersionIntegrationsDocument, options);
+      }
+export function useVersionIntegrationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<VersionIntegrationsQuery, VersionIntegrationsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<VersionIntegrationsQuery, VersionIntegrationsQueryVariables>(VersionIntegrationsDocument, options);
+        }
+export function useVersionIntegrationsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<VersionIntegrationsQuery, VersionIntegrationsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<VersionIntegrationsQuery, VersionIntegrationsQueryVariables>(VersionIntegrationsDocument, options);
+        }
+export type VersionIntegrationsQueryHookResult = ReturnType<typeof useVersionIntegrationsQuery>;
+export type VersionIntegrationsLazyQueryHookResult = ReturnType<typeof useVersionIntegrationsLazyQuery>;
+export type VersionIntegrationsSuspenseQueryHookResult = ReturnType<typeof useVersionIntegrationsSuspenseQuery>;
+export type VersionIntegrationsQueryResult = Apollo.QueryResult<VersionIntegrationsQuery, VersionIntegrationsQueryVariables>;
+export const IntegrateVersionDocument = gql`
+    mutation integrateVersion($version: String!) {
+  integrateVersion(id: $version) {
+    id
+  }
+}
+    `;
+export type IntegrateVersionMutationFn = Apollo.MutationFunction<IntegrateVersionMutation, IntegrateVersionMutationVariables>;
+
+/**
+ * __useIntegrateVersionMutation__
+ *
+ * To run a mutation, you first call `useIntegrateVersionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useIntegrateVersionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [integrateVersionMutation, { data, loading, error }] = useIntegrateVersionMutation({
+ *   variables: {
+ *      version: // value for 'version'
+ *   },
+ * });
+ */
+export function useIntegrateVersionMutation(baseOptions?: Apollo.MutationHookOptions<IntegrateVersionMutation, IntegrateVersionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<IntegrateVersionMutation, IntegrateVersionMutationVariables>(IntegrateVersionDocument, options);
+      }
+export type IntegrateVersionMutationHookResult = ReturnType<typeof useIntegrateVersionMutation>;
+export type IntegrateVersionMutationResult = Apollo.MutationResult<IntegrateVersionMutation>;
+export type IntegrateVersionMutationOptions = Apollo.BaseMutationOptions<IntegrateVersionMutation, IntegrateVersionMutationVariables>;
+export const SearchLibraryDocument = gql`
+    query searchLibrary($term: String!) {
+  searchLibrary(term: $term) {
+    name
+    description
+    latestVersion
+    integrated
+    homepage
+    downloads
+    updated
+    repository
+  }
+}
+    `;
+
+/**
+ * __useSearchLibraryQuery__
+ *
+ * To run a query within a React component, call `useSearchLibraryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchLibraryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchLibraryQuery({
+ *   variables: {
+ *      term: // value for 'term'
+ *   },
+ * });
+ */
+export function useSearchLibraryQuery(baseOptions: Apollo.QueryHookOptions<SearchLibraryQuery, SearchLibraryQueryVariables> & ({ variables: SearchLibraryQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchLibraryQuery, SearchLibraryQueryVariables>(SearchLibraryDocument, options);
+      }
+export function useSearchLibraryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchLibraryQuery, SearchLibraryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchLibraryQuery, SearchLibraryQueryVariables>(SearchLibraryDocument, options);
+        }
+export function useSearchLibrarySuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SearchLibraryQuery, SearchLibraryQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SearchLibraryQuery, SearchLibraryQueryVariables>(SearchLibraryDocument, options);
+        }
+export type SearchLibraryQueryHookResult = ReturnType<typeof useSearchLibraryQuery>;
+export type SearchLibraryLazyQueryHookResult = ReturnType<typeof useSearchLibraryLazyQuery>;
+export type SearchLibrarySuspenseQueryHookResult = ReturnType<typeof useSearchLibrarySuspenseQuery>;
+export type SearchLibraryQueryResult = Apollo.QueryResult<SearchLibraryQuery, SearchLibraryQueryVariables>;

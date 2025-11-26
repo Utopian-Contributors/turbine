@@ -8,7 +8,6 @@ import { ScriptCopyBtn } from '@/components/ui/script-copy-button'
 import { Separator } from '@/components/ui/separator'
 import { useSearch } from '@/hooks/useSearch'
 import { useVersions } from '@/hooks/useVersions'
-import { useVersionStats } from '@/hooks/useVersionStats'
 import { Link } from '@radix-ui/themes'
 import { filesize } from 'filesize'
 import { Globe, PackageIcon } from 'lucide-react'
@@ -16,8 +15,16 @@ import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 
+import VersionConfig from '@/components/Library/VersionConfig'
 import { cn } from '@/lib/utils'
-import { useLibraryQuery } from '../../generated/graphql'
+import {
+  Role,
+  useLibraryQuery,
+  useLibraryUsageQuery,
+  useLoggedInQuery,
+  useVersionIntegrationsQuery,
+  useVersionUsageQuery,
+} from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface LibraryPageProps {}
@@ -27,25 +34,25 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
   const { data: libraryQueryData, loading } = useLibraryQuery({
     variables: { name: params.name || '' },
   })
-  const { versionStats, fetchVersionStats } = useVersionStats()
-  const versions = useVersions(libraryQueryData?.library?.versions ?? [])
-  const [selectedVersion, setSelectedVersion] = useState<string | null>()
+  const { data: libraryUsageQueryData } = useLibraryUsageQuery({
+    variables: { name: params.name || '' },
+  })
+  const { data: versionUsageQueryData } = useVersionUsageQuery({
+    variables: { library: params.name || '' },
+  })
+  const { data: versionIntegrationsQueryData } = useVersionIntegrationsQuery({
+    variables: { library: params.name || '' },
+  })
+  const { data: loggedInQueryData } = useLoggedInQuery()
   const { search } = useSearch()
 
+  const versions = useVersions(libraryQueryData?.library?.versions ?? [])
+  const [selectedVersion, setSelectedVersion] = useState<string | null>()
   useEffect(() => {
     if (!selectedVersion) {
       setSelectedVersion(libraryQueryData?.library?.lastVersion?.version)
     }
-    if (params.name && !libraryQueryData?.library && !versionStats) {
-      fetchVersionStats(params.name || '')
-    }
-  }, [
-    fetchVersionStats,
-    libraryQueryData?.library,
-    params.name,
-    selectedVersion,
-    versionStats,
-  ])
+  }, [libraryQueryData?.library, params.name, selectedVersion])
 
   if (loading) {
     return <div>Loading...</div>
@@ -65,18 +72,18 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
         <div className="col-span-2">
           <div className="flex flex-col gap-2 p-2">
             <div className="w-full flex justify-between items-center">
-              <div className="flex gap-2 items-end">
+              <div className="flex gap-1 items-end">
                 <PackageIcon
                   className={cn(
-                    'stroke-1',
+                    'stroke-[1.5]',
                     libraryQueryData.library.integrated
                       ? 'fill-green-500'
-                      : 'fill-amber-300'
+                      : 'fill-gray-200'
                   )}
                   width={32}
                   height={32}
                 />
-                <h3 className="text-4xl">{libraryQueryData?.library.name}</h3>
+                <h1 className="text-3xl">{libraryQueryData?.library.name}</h1>
               </div>
               <div className="flex gap-2">
                 <Link
@@ -117,15 +124,24 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             </div>
           </div>
           <Separator className="my-6" />
-          {versionStats ? (
+          {(versionIntegrationsQueryData?.versionIntegrations.integrated
+            .length ||
+            loggedInQueryData?.loggedIn.role === Role.Admin) && (
+            <VersionConfig
+              library={params.name || ''}
+              isAdmin={loggedInQueryData?.loggedIn.role === Role.Admin}
+              versionConfig={versionIntegrationsQueryData?.versionIntegrations}
+            />
+          )}
+          {versionUsageQueryData?.versionUsage ? (
             <ChartBarLabelCustom
               classname="mt-4"
               label="Popular versions"
               description="Top 10 versions by bandwidth usage in the last week"
-              data={versionStats.map((stat) => ({
+              data={versionUsageQueryData?.versionUsage.map((stat) => ({
                 label: stat.version,
-                value: stat.bandwidth,
-                formattedValue: filesize(stat.bandwidth),
+                value: Number(stat.bandwidth),
+                formattedValue: filesize(Number(stat.bandwidth)),
               }))}
               config={{
                 value: {
@@ -160,8 +176,18 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             />
           </div>
           <div className="border rounded-xl max-w-[16rem] flex flex-col gap-2 ml-8 p-4 border rounded-xl">
-            <Downloads library={libraryQueryData?.library.name || ''} />
-            <Bandwidth library={libraryQueryData?.library.name || ''} />
+            <Downloads
+              library={libraryQueryData?.library.name || ''}
+              downloads={libraryUsageQueryData?.libraryUsage?.downloads || ''}
+              prevDownloads={
+                libraryUsageQueryData?.libraryUsage?.prev?.downloads || ''
+              }
+            />
+            <Bandwidth
+              library={libraryQueryData?.library.name || ''}
+              usage={libraryUsageQueryData?.libraryUsage?.bandwidth}
+              prevUsage={libraryUsageQueryData?.libraryUsage?.prev?.bandwidth}
+            />
           </div>
         </div>
       </div>

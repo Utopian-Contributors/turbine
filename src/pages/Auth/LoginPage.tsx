@@ -9,8 +9,10 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate()
 
   const [login, loginResult] = useLoginMutation({
-    onCompleted: (data) => {
+    onCompleted: (data, options) => {
       if (data.login?.accessToken) {
+        options?.client?.cache.reset()
+
         // Save the access token to local storage
         localStorage.setItem('access_token', data.login?.accessToken)
 

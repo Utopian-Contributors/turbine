@@ -1,6 +1,6 @@
 'use client'
 
-import { Bar, BarChart, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, LabelList, XAxis, YAxis } from 'recharts'
 
 import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
@@ -26,11 +26,16 @@ export const ChartBarLabelCustom: React.FC<{
   return (
     <div className={cn('border rounded-xl space-y-4 p-4', classname)}>
       <div>
-        <h1 className="text-lg">{label}</h1>
-        <p className="text-muted-foreground">{description}</p>
+        <h1 className="text-md">{label}</h1>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <ChartContainer config={config}>
-        <BarChart accessibilityLayer data={data} layout="horizontal">
+        <BarChart
+          accessibilityLayer
+          data={data}
+          layout="horizontal"
+          margin={{ top: 24 }}
+        >
           <XAxis
             dataKey="label"
             type="category"
@@ -62,7 +67,9 @@ export const ChartBarLabelCustom: React.FC<{
             fill="var(--color-value)"
             radius={4}
             height={40}
-          />
+          >
+            <LabelList dataKey="formattedValue" position="top" />
+          </Bar>
         </BarChart>
       </ChartContainer>
     </div>
