@@ -8,22 +8,27 @@ import { ScriptCopyBtn } from '@/components/ui/script-copy-button'
 import { Separator } from '@/components/ui/separator'
 import { useSearch } from '@/hooks/useSearch'
 import { useVersions } from '@/hooks/useVersions'
-import { Link } from '@radix-ui/themes'
 import { filesize } from 'filesize'
 import { Globe, PackageIcon } from 'lucide-react'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import VersionConfig from '@/components/Library/VersionConfig'
 import { cn } from '@/lib/utils'
 import {
+  LibraryDocument,
   Role,
+  SearchLibraryDocument,
   useLibraryQuery,
   useLibraryUsageQuery,
   useLoggedInQuery,
+  useToggleIntegrateVersionMutation,
   useVersionIntegrationsQuery,
   useVersionUsageQuery,
+  VersionIntegrationsDocument,
+  VersionUsageDocument,
 } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -42,6 +47,23 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
   })
   const { data: versionIntegrationsQueryData } = useVersionIntegrationsQuery({
     variables: { library: params.name || '' },
+  })
+  const [toggleIntegrateVersion] = useToggleIntegrateVersionMutation({
+    refetchQueries: [
+      {
+        query: VersionIntegrationsDocument,
+        variables: {
+          library: params.name || '',
+        },
+      },
+      { query: SearchLibraryDocument },
+      {
+        query: VersionUsageDocument,
+        variables: { library: params.name || '' },
+      },
+      { query: LibraryDocument, variables: { name: params.name || '' } },
+    ],
+    awaitRefetchQueries: true,
   })
   const { data: loggedInQueryData } = useLoggedInQuery()
   const { search } = useSearch()
@@ -72,12 +94,12 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
         <div className="col-span-2">
           <div className="flex flex-col gap-2 p-2">
             <div className="w-full flex justify-between items-center">
-              <div className="flex gap-1 items-end">
+              <div className="flex gap-2 items-end">
                 <PackageIcon
                   className={cn(
                     'stroke-[1.5]',
                     libraryQueryData.library.integrated
-                      ? 'fill-green-500'
+                      ? 'text-green-800 fill-green-500'
                       : 'fill-gray-200'
                   )}
                   width={32}
@@ -86,23 +108,27 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                 <h1 className="text-3xl">{libraryQueryData?.library.name}</h1>
               </div>
               <div className="flex gap-2">
+                {libraryQueryData.library.homepage && (
+                  <Link
+                    to={libraryQueryData?.library.homepage ?? ''}
+                    target="_blank"
+                  >
+                    <Globe className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
+                  </Link>
+                )}
+                {libraryQueryData?.library.repository && (
+                  <Link
+                    to={libraryQueryData?.library.repository?.replace(
+                      'git+',
+                      ''
+                    )}
+                    target="_blank"
+                  >
+                    <Icons.gitHub className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
+                  </Link>
+                )}
                 <Link
-                  href={libraryQueryData?.library.homepage ?? ''}
-                  target="_blank"
-                >
-                  <Globe className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
-                </Link>
-                <Link
-                  href={libraryQueryData?.library.repository?.replace(
-                    'git+',
-                    ''
-                  )}
-                  target="_blank"
-                >
-                  <Icons.gitHub className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
-                </Link>
-                <Link
-                  href={`https://npmjs.com/${libraryQueryData?.library.name}`}
+                  to={`https://npmjs.com/${libraryQueryData?.library.name}`}
                   target="_blank"
                 >
                   <Icons.npm className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
@@ -110,7 +136,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
               </div>
             </div>
             <p>{libraryQueryData?.library.description}</p>
-            <div className="flex gap-2 text-muted-foreground">
+            <div className="flex gap-2 text-sm text-muted-foreground">
               <span className="font-mono">
                 {libraryQueryData?.library.lastVersion?.version}
               </span>
@@ -121,6 +147,12 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                   libraryQueryData?.library.lastVersion?.publishedAt
                 ).fromNow()}
               </span>
+              <span className="font-mono">•</span>
+              {libraryQueryData?.library.lastVersion?.size && (
+                <span className="font-mono">
+                  {filesize(libraryQueryData?.library.lastVersion?.size)}
+                </span>
+              )}
             </div>
           </div>
           <Separator className="my-6" />
@@ -128,7 +160,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             .length ||
             loggedInQueryData?.loggedIn.role === Role.Admin) && (
             <VersionConfig
-              library={params.name || ''}
+              toggleIntegrateVersion={toggleIntegrateVersion}
               isAdmin={loggedInQueryData?.loggedIn.role === Role.Admin}
               versionConfig={versionIntegrationsQueryData?.versionIntegrations}
             />
@@ -136,12 +168,14 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
           {versionUsageQueryData?.versionUsage ? (
             <ChartBarLabelCustom
               classname="mt-4"
-              label="Popular versions"
               description="Top 10 versions by bandwidth usage in the last week"
               data={versionUsageQueryData?.versionUsage.map((stat) => ({
                 label: stat.version,
                 value: Number(stat.bandwidth),
                 formattedValue: filesize(Number(stat.bandwidth)),
+                fill: stat.integrated
+                  ? 'var(--color-green-500)'
+                  : 'var(--color-gray-500)',
               }))}
               config={{
                 value: {

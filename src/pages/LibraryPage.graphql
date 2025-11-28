@@ -8,6 +8,7 @@ query library($name: String!) {
     integrated
     lastVersion {
       version
+      size
       publishedAt
     }
     versions {
@@ -36,6 +37,7 @@ query libraryUsage($name: String!) {
 
 query versionUsage($library: String!) {
   versionUsage(library: $library) {
+    integrated
     version
     bandwidth
   }
@@ -47,8 +49,8 @@ query versionIntegrations($library: String!) {
   }
 }
 
-mutation integrateVersion($version: String!) {
-  integrateVersion(id: $version) {
+mutation toggleIntegrateVersion($version: String!) {
+  toggleIntegrateVersion(id: $version) {
     id
   }
 }
@@ -57,13 +59,16 @@ fragment VersionConfig on VersionIntegrations {
   integrated {
     id
     version
+    size
   }
   popular {
     id
     version
+    size
   }
   other {
     id
     version
+    size
   }
 }

@@ -17,16 +17,14 @@ export interface ChartData {
 }
 
 export const ChartBarLabelCustom: React.FC<{
-  label: string
   description: string
   data: ChartData[]
   config: ChartConfig
   classname?: string
-}> = ({ label, description, data, config, classname }) => {
+}> = ({ description, data, config, classname }) => {
   return (
     <div className={cn('border rounded-xl space-y-4 p-4', classname)}>
       <div>
-        <h1 className="text-md">{label}</h1>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <ChartContainer config={config}>

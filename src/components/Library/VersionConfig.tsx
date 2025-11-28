@@ -2,10 +2,7 @@ import { cn } from '@/lib/utils'
 import React, { useState } from 'react'
 
 import {
-    LibraryDocument,
-    SearchLibraryDocument,
-    useIntegrateVersionMutation,
-    VersionIntegrationsDocument,
+    useToggleIntegrateVersionMutation,
     type VersionConfigFragment,
 } from '../../../generated/graphql'
 
@@ -19,11 +16,11 @@ const Version: React.FC<{
     <div
       onClick={onClick}
       className={cn(
-        'rounded-full px-3 py-1 font-light',
+        'border rounded-sm px-2 text-md font-light',
         integrated
-          ? 'bg-green-500 text-background'
-          : 'border text-muted-foreground hover:text-foreground',
-        isAdmin ? 'cursor-pointer hover:border-gray-400' : 'cursor-default'
+          ? 'border-transparent bg-green-500 text-background'
+          : 'hover:shadow-xs transition-shadow duration-300 text-muted-foreground hover:text-foreground',
+        isAdmin ? 'cursor-pointer' : 'cursor-default'
       )}
     >
       {version}
@@ -33,66 +30,49 @@ const Version: React.FC<{
 
 interface VersionConfigProps {
   versionConfig?: VersionConfigFragment
+  toggleIntegrateVersion: ReturnType<
+    typeof useToggleIntegrateVersionMutation
+  >[0]
   isAdmin?: boolean
-  library: string
 }
 
 const VersionConfig: React.FC<VersionConfigProps> = ({
   versionConfig,
   isAdmin,
-  library,
+  toggleIntegrateVersion,
 }) => {
   const [showAll, setShowAll] = useState(false)
-  const [integrateVersion] = useIntegrateVersionMutation({
-    refetchQueries: [
-      {
-        query: VersionIntegrationsDocument,
-        variables: {
-          library,
-        },
-      },
-      { query: SearchLibraryDocument },
-      { query: LibraryDocument, variables: { name: library } },
-    ],
-  })
 
   return (
     <div className="border rounded-xl space-y-4 p-4">
-      {versionConfig?.integrated.length ? (
-        <div className="flex flex-col gap-2">
-          <h3 className="text-md">Integrated</h3>
-          <div className="flex flex-flow gap-1">
-            {versionConfig.integrated.map((integrated) => (
-              <Version
-                key={integrated.id}
-                version={integrated.version}
-                integrated
-                isAdmin={isAdmin}
-                onClick={() => {
-                  integrateVersion({ variables: { version: integrated.id } })
-                }}
-              />
-            ))}
-          </div>
+      <div className="flex flex-col gap-2">
+        <h2 className="text-lg">Popular Versions</h2>
+        <div className="flex flex-flow flex-wrap gap-2">
+          {versionConfig?.integrated.map((integrated) => (
+            <Version
+              key={integrated.id}
+              version={integrated.version}
+              integrated
+              isAdmin={isAdmin}
+              onClick={() => {
+                toggleIntegrateVersion({
+                  variables: { version: integrated.id },
+                })
+              }}
+            />
+          ))}
+          {versionConfig?.popular.map((popular) => (
+            <Version
+              key={popular.id}
+              version={popular.version}
+              isAdmin={isAdmin}
+              onClick={() => {
+                toggleIntegrateVersion({ variables: { version: popular.id } })
+              }}
+            />
+          ))}
         </div>
-      ) : null}
-      {isAdmin && versionConfig?.popular.length ? (
-        <div className="flex flex-col gap-2">
-          <h3 className="text-md">Popular</h3>
-          <div className="flex flex-flow flex-wrap gap-1">
-            {versionConfig.popular.map((popular) => (
-              <Version
-                key={popular.id}
-                version={popular.version}
-                isAdmin={isAdmin}
-                onClick={() => {
-                  integrateVersion({ variables: { version: popular.id } })
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      ) : null}
+      </div>
       {isAdmin && showAll ? (
         <button
           className="cursor-pointer text-sm underline"
@@ -111,14 +91,14 @@ const VersionConfig: React.FC<VersionConfigProps> = ({
       {isAdmin && showAll && versionConfig?.other.length ? (
         <div className="flex flex-col gap-2">
           <h3 className="text-md">All Versions</h3>
-          <div className="flex flex-flow flex-wrap gap-1">
+          <div className="flex flex-flow flex-wrap gap-2">
             {versionConfig.other.map((other) => (
               <Version
                 key={other.id}
                 version={other.version}
                 isAdmin={isAdmin}
                 onClick={() => {
-                  integrateVersion({ variables: { version: other.id } })
+                  toggleIntegrateVersion({ variables: { version: other.id } })
                 }}
               />
             ))}

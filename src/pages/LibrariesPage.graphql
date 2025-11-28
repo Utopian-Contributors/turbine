@@ -1,0 +1,19 @@
+query bigLibraries {
+  bigLibraries {
+    id
+    name
+    description
+    integrated
+    homepage
+    repository
+    integrated
+    lastVersion {
+      id
+      version
+    }
+    versions {
+      id
+      version
+    }
+  }
+}

@@ -87,7 +87,7 @@ export function ScriptCopyBtn({
           >
             <pre
               className={cn(
-                'w-full text-sm bg-transparent p-2 px-4 font-mono overflow-x-auto scrollbar-hide',
+                'w-full text-sm bg-transparent mr-3 p-2 px-3 font-mono overflow-x-auto scrollbar-hide',
                 copied ? 'text-white' : 'text-black dark:text-white'
               )}
             >

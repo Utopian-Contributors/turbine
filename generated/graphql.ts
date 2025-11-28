@@ -67,7 +67,7 @@ export type LibrarySearchResult = {
   /** Number of weekly downloads */
   downloads: Scalars['Int']['output'];
   /** Homepage URL of the library */
-  homepage: Scalars['String']['output'];
+  homepage?: Maybe<Scalars['String']['output']>;
   /** Whether the library is integrated */
   integrated: Scalars['Boolean']['output'];
   /** Latest version of the library */
@@ -75,7 +75,7 @@ export type LibrarySearchResult = {
   /** Name of the library */
   name: Scalars['String']['output'];
   /** Repository URL of the library */
-  repository: Scalars['String']['output'];
+  repository?: Maybe<Scalars['String']['output']>;
   /** Last updated date of the library */
   updated: Scalars['String']['output'];
 };
@@ -93,7 +93,6 @@ export type LibraryUsage = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  integrateVersion?: Maybe<Version>;
   login?: Maybe<User>;
   logout?: Maybe<User>;
   refreshToken?: Maybe<User>;
@@ -101,12 +100,8 @@ export type Mutation = {
   resendVerificationCode?: Maybe<Scalars['Boolean']['output']>;
   resetPassword?: Maybe<Scalars['Boolean']['output']>;
   sendResetLink?: Maybe<Scalars['Boolean']['output']>;
+  toggleIntegrateVersion?: Maybe<Version>;
   verify?: Maybe<User>;
-};
-
-
-export type MutationIntegrateVersionArgs = {
-  id?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -132,12 +127,18 @@ export type MutationSendResetLinkArgs = {
 };
 
 
+export type MutationToggleIntegrateVersionArgs = {
+  id?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationVerifyArgs = {
   code?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Query = {
   __typename?: 'Query';
+  bigLibraries?: Maybe<Array<Library>>;
   library?: Maybe<Library>;
   libraryUsage?: Maybe<LibraryUsage>;
   loggedIn: User;
@@ -225,6 +226,8 @@ export type VersionUsage = {
   __typename?: 'VersionUsage';
   /** Bandwidth used by this version in bytes */
   bandwidth: Scalars['String']['output'];
+  /** Whether the version is integrated */
+  integrated: Scalars['Boolean']['output'];
   /** The version string */
   version: Scalars['String']['output'];
 };
@@ -281,12 +284,17 @@ export type ResendCodeMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type ResendCodeMutation = { __typename?: 'Mutation', resendVerificationCode?: boolean | null };
 
+export type BigLibrariesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BigLibrariesQuery = { __typename?: 'Query', bigLibraries?: Array<{ __typename?: 'Library', id: string, name: string, description?: string | null, integrated?: boolean | null, homepage?: string | null, repository?: string | null, lastVersion?: { __typename?: 'Version', id: string, version: string } | null, versions: Array<{ __typename?: 'Version', id: string, version: string }> }> | null };
+
 export type LibraryQueryVariables = Exact<{
   name: Scalars['String']['input'];
 }>;
 
 
-export type LibraryQuery = { __typename?: 'Query', library?: { __typename?: 'Library', id: string, name: string, description?: string | null, homepage?: string | null, repository?: string | null, integrated?: boolean | null, lastVersion?: { __typename?: 'Version', version: string, publishedAt: any } | null, versions: Array<{ __typename?: 'Version', version: string, publishedAt: any }> } | null };
+export type LibraryQuery = { __typename?: 'Query', library?: { __typename?: 'Library', id: string, name: string, description?: string | null, homepage?: string | null, repository?: string | null, integrated?: boolean | null, lastVersion?: { __typename?: 'Version', version: string, size?: number | null, publishedAt: any } | null, versions: Array<{ __typename?: 'Version', version: string, publishedAt: any }> } | null };
 
 export type LibraryUsageQueryVariables = Exact<{
   name: Scalars['String']['input'];
@@ -300,44 +308,47 @@ export type VersionUsageQueryVariables = Exact<{
 }>;
 
 
-export type VersionUsageQuery = { __typename?: 'Query', versionUsage?: Array<{ __typename?: 'VersionUsage', version: string, bandwidth: string }> | null };
+export type VersionUsageQuery = { __typename?: 'Query', versionUsage?: Array<{ __typename?: 'VersionUsage', integrated: boolean, version: string, bandwidth: string }> | null };
 
 export type VersionIntegrationsQueryVariables = Exact<{
   library: Scalars['String']['input'];
 }>;
 
 
-export type VersionIntegrationsQuery = { __typename?: 'Query', versionIntegrations: { __typename?: 'VersionIntegrations', integrated: Array<{ __typename?: 'Version', id: string, version: string }>, popular: Array<{ __typename?: 'Version', id: string, version: string }>, other: Array<{ __typename?: 'Version', id: string, version: string }> } };
+export type VersionIntegrationsQuery = { __typename?: 'Query', versionIntegrations: { __typename?: 'VersionIntegrations', integrated: Array<{ __typename?: 'Version', id: string, version: string, size?: number | null }>, popular: Array<{ __typename?: 'Version', id: string, version: string, size?: number | null }>, other: Array<{ __typename?: 'Version', id: string, version: string, size?: number | null }> } };
 
-export type IntegrateVersionMutationVariables = Exact<{
+export type ToggleIntegrateVersionMutationVariables = Exact<{
   version: Scalars['String']['input'];
 }>;
 
 
-export type IntegrateVersionMutation = { __typename?: 'Mutation', integrateVersion?: { __typename?: 'Version', id: string } | null };
+export type ToggleIntegrateVersionMutation = { __typename?: 'Mutation', toggleIntegrateVersion?: { __typename?: 'Version', id: string } | null };
 
-export type VersionConfigFragment = { __typename?: 'VersionIntegrations', integrated: Array<{ __typename?: 'Version', id: string, version: string }>, popular: Array<{ __typename?: 'Version', id: string, version: string }>, other: Array<{ __typename?: 'Version', id: string, version: string }> };
+export type VersionConfigFragment = { __typename?: 'VersionIntegrations', integrated: Array<{ __typename?: 'Version', id: string, version: string, size?: number | null }>, popular: Array<{ __typename?: 'Version', id: string, version: string, size?: number | null }>, other: Array<{ __typename?: 'Version', id: string, version: string, size?: number | null }> };
 
 export type SearchLibraryQueryVariables = Exact<{
   term: Scalars['String']['input'];
 }>;
 
 
-export type SearchLibraryQuery = { __typename?: 'Query', searchLibrary?: Array<{ __typename?: 'LibrarySearchResult', name: string, description: string, latestVersion: string, integrated: boolean, homepage: string, downloads: number, updated: string, repository: string }> | null };
+export type SearchLibraryQuery = { __typename?: 'Query', searchLibrary?: Array<{ __typename?: 'LibrarySearchResult', name: string, description: string, latestVersion: string, integrated: boolean, homepage?: string | null, downloads: number, updated: string, repository?: string | null }> | null };
 
 export const VersionConfigFragmentDoc = gql`
     fragment VersionConfig on VersionIntegrations {
   integrated {
     id
     version
+    size
   }
   popular {
     id
     version
+    size
   }
   other {
     id
     version
+    size
   }
 }
     `;
@@ -615,6 +626,59 @@ export function useResendCodeMutation(baseOptions?: Apollo.MutationHookOptions<R
 export type ResendCodeMutationHookResult = ReturnType<typeof useResendCodeMutation>;
 export type ResendCodeMutationResult = Apollo.MutationResult<ResendCodeMutation>;
 export type ResendCodeMutationOptions = Apollo.BaseMutationOptions<ResendCodeMutation, ResendCodeMutationVariables>;
+export const BigLibrariesDocument = gql`
+    query bigLibraries {
+  bigLibraries {
+    id
+    name
+    description
+    integrated
+    homepage
+    repository
+    integrated
+    lastVersion {
+      id
+      version
+    }
+    versions {
+      id
+      version
+    }
+  }
+}
+    `;
+
+/**
+ * __useBigLibrariesQuery__
+ *
+ * To run a query within a React component, call `useBigLibrariesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBigLibrariesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBigLibrariesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useBigLibrariesQuery(baseOptions?: Apollo.QueryHookOptions<BigLibrariesQuery, BigLibrariesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<BigLibrariesQuery, BigLibrariesQueryVariables>(BigLibrariesDocument, options);
+      }
+export function useBigLibrariesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<BigLibrariesQuery, BigLibrariesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<BigLibrariesQuery, BigLibrariesQueryVariables>(BigLibrariesDocument, options);
+        }
+export function useBigLibrariesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<BigLibrariesQuery, BigLibrariesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<BigLibrariesQuery, BigLibrariesQueryVariables>(BigLibrariesDocument, options);
+        }
+export type BigLibrariesQueryHookResult = ReturnType<typeof useBigLibrariesQuery>;
+export type BigLibrariesLazyQueryHookResult = ReturnType<typeof useBigLibrariesLazyQuery>;
+export type BigLibrariesSuspenseQueryHookResult = ReturnType<typeof useBigLibrariesSuspenseQuery>;
+export type BigLibrariesQueryResult = Apollo.QueryResult<BigLibrariesQuery, BigLibrariesQueryVariables>;
 export const LibraryDocument = gql`
     query library($name: String!) {
   library(name: $name) {
@@ -626,6 +690,7 @@ export const LibraryDocument = gql`
     integrated
     lastVersion {
       version
+      size
       publishedAt
     }
     versions {
@@ -722,6 +787,7 @@ export type LibraryUsageQueryResult = Apollo.QueryResult<LibraryUsageQuery, Libr
 export const VersionUsageDocument = gql`
     query versionUsage($library: String!) {
   versionUsage(library: $library) {
+    integrated
     version
     bandwidth
   }
@@ -800,39 +866,39 @@ export type VersionIntegrationsQueryHookResult = ReturnType<typeof useVersionInt
 export type VersionIntegrationsLazyQueryHookResult = ReturnType<typeof useVersionIntegrationsLazyQuery>;
 export type VersionIntegrationsSuspenseQueryHookResult = ReturnType<typeof useVersionIntegrationsSuspenseQuery>;
 export type VersionIntegrationsQueryResult = Apollo.QueryResult<VersionIntegrationsQuery, VersionIntegrationsQueryVariables>;
-export const IntegrateVersionDocument = gql`
-    mutation integrateVersion($version: String!) {
-  integrateVersion(id: $version) {
+export const ToggleIntegrateVersionDocument = gql`
+    mutation toggleIntegrateVersion($version: String!) {
+  toggleIntegrateVersion(id: $version) {
     id
   }
 }
     `;
-export type IntegrateVersionMutationFn = Apollo.MutationFunction<IntegrateVersionMutation, IntegrateVersionMutationVariables>;
+export type ToggleIntegrateVersionMutationFn = Apollo.MutationFunction<ToggleIntegrateVersionMutation, ToggleIntegrateVersionMutationVariables>;
 
 /**
- * __useIntegrateVersionMutation__
+ * __useToggleIntegrateVersionMutation__
  *
- * To run a mutation, you first call `useIntegrateVersionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useIntegrateVersionMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useToggleIntegrateVersionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleIntegrateVersionMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [integrateVersionMutation, { data, loading, error }] = useIntegrateVersionMutation({
+ * const [toggleIntegrateVersionMutation, { data, loading, error }] = useToggleIntegrateVersionMutation({
  *   variables: {
  *      version: // value for 'version'
  *   },
  * });
  */
-export function useIntegrateVersionMutation(baseOptions?: Apollo.MutationHookOptions<IntegrateVersionMutation, IntegrateVersionMutationVariables>) {
+export function useToggleIntegrateVersionMutation(baseOptions?: Apollo.MutationHookOptions<ToggleIntegrateVersionMutation, ToggleIntegrateVersionMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<IntegrateVersionMutation, IntegrateVersionMutationVariables>(IntegrateVersionDocument, options);
+        return Apollo.useMutation<ToggleIntegrateVersionMutation, ToggleIntegrateVersionMutationVariables>(ToggleIntegrateVersionDocument, options);
       }
-export type IntegrateVersionMutationHookResult = ReturnType<typeof useIntegrateVersionMutation>;
-export type IntegrateVersionMutationResult = Apollo.MutationResult<IntegrateVersionMutation>;
-export type IntegrateVersionMutationOptions = Apollo.BaseMutationOptions<IntegrateVersionMutation, IntegrateVersionMutationVariables>;
+export type ToggleIntegrateVersionMutationHookResult = ReturnType<typeof useToggleIntegrateVersionMutation>;
+export type ToggleIntegrateVersionMutationResult = Apollo.MutationResult<ToggleIntegrateVersionMutation>;
+export type ToggleIntegrateVersionMutationOptions = Apollo.BaseMutationOptions<ToggleIntegrateVersionMutation, ToggleIntegrateVersionMutationVariables>;
 export const SearchLibraryDocument = gql`
     query searchLibrary($term: String!) {
   searchLibrary(term: $term) {

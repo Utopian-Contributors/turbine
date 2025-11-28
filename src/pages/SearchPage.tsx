@@ -36,9 +36,9 @@ const SearchPage: React.FC<SearchPageProps> = () => {
               <div
                 key={index}
                 className={cn(
-                  'cursor-pointer flex-col my-1 p-4 border border-white hover:border-gray-300 rounded-xl',
+                  'cursor-pointer hover:shadow-md transition-shadow duration-300 flex-col my-1 p-4 border border-white hover:border-gray-300 rounded-xl',
                   result.integrated
-                    ? 'hover:bg-green-400/20 hover:border-green-500 transition-all'
+                    ? 'hover:bg-green-200/10 hover:border-green-400 transition-all'
                     : 'hover:bg-gray-200/10 hover:border-gray-300 transition-all'
                 )}
                 onClick={() =>
@@ -50,7 +50,9 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                     <PackageIcon
                       className={cn(
                         'stroke-[1.5]',
-                        result.integrated ? 'fill-green-500' : 'fill-gray-200'
+                        result.integrated
+                          ? 'text-green-800 fill-green-500'
+                          : 'fill-gray-200'
                       )}
                       width={24}
                       height={24}
@@ -63,7 +65,11 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                         'h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer',
                         result.integrated && 'text-green-500'
                       )}
-                      onClick={() => window.open(result.homepage, '_blank')}
+                      onClick={() => {
+                        if (result.homepage) {
+                          window.open(result.homepage, '_blank')
+                        }
+                      }}
                     />
                     <Icons.gitHub
                       className={cn(
