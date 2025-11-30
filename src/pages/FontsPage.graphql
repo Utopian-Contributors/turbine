@@ -1,0 +1,10 @@
+query popularFonts {
+  popularFonts {
+    id
+    name
+    menu
+    tags
+    category
+    publishedAt
+  }
+}

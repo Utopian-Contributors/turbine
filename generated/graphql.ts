@@ -24,6 +24,33 @@ export type CreateUserInput = {
   password: Scalars['String']['input'];
 };
 
+export type Font = {
+  __typename?: 'Font';
+  category: FontCategory;
+  files: Array<FontFile>;
+  id: Scalars['ID']['output'];
+  menu: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  publishedAt: Scalars['DateTime']['output'];
+  tags: Array<Scalars['String']['output']>;
+  variants: Array<Scalars['String']['output']>;
+};
+
+export enum FontCategory {
+  Display = 'DISPLAY',
+  Handwriting = 'HANDWRITING',
+  Monospace = 'MONOSPACE',
+  SansSerif = 'SANS_SERIF',
+  Serif = 'SERIF'
+}
+
+export type FontFile = {
+  __typename?: 'FontFile';
+  id: Scalars['ID']['output'];
+  url: Scalars['String']['output'];
+  variant: Scalars['String']['output'];
+};
+
 export type Library = {
   __typename?: 'Library';
   category?: Maybe<LibraryCategory>;
@@ -139,13 +166,20 @@ export type MutationVerifyArgs = {
 export type Query = {
   __typename?: 'Query';
   bigLibraries?: Maybe<Array<Library>>;
+  font?: Maybe<Font>;
   library?: Maybe<Library>;
   libraryUsage?: Maybe<LibraryUsage>;
   loggedIn: User;
+  popularFonts?: Maybe<Array<Font>>;
   searchLibrary?: Maybe<Array<LibrarySearchResult>>;
   users?: Maybe<Array<Maybe<User>>>;
   versionIntegrations: VersionIntegrations;
   versionUsage?: Maybe<Array<VersionUsage>>;
+};
+
+
+export type QueryFontArgs = {
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -283,6 +317,18 @@ export type ResendCodeMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ResendCodeMutation = { __typename?: 'Mutation', resendVerificationCode?: boolean | null };
+
+export type FontQueryVariables = Exact<{
+  name: Scalars['String']['input'];
+}>;
+
+
+export type FontQuery = { __typename?: 'Query', font?: { __typename?: 'Font', id: string, name: string, category: FontCategory, tags: Array<string>, menu: string, variants: Array<string>, files: Array<{ __typename?: 'FontFile', variant: string, url: string }> } | null };
+
+export type PopularFontsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PopularFontsQuery = { __typename?: 'Query', popularFonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, publishedAt: any }> | null };
 
 export type BigLibrariesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -626,6 +672,99 @@ export function useResendCodeMutation(baseOptions?: Apollo.MutationHookOptions<R
 export type ResendCodeMutationHookResult = ReturnType<typeof useResendCodeMutation>;
 export type ResendCodeMutationResult = Apollo.MutationResult<ResendCodeMutation>;
 export type ResendCodeMutationOptions = Apollo.BaseMutationOptions<ResendCodeMutation, ResendCodeMutationVariables>;
+export const FontDocument = gql`
+    query font($name: String!) {
+  font(name: $name) {
+    id
+    name
+    category
+    tags
+    menu
+    variants
+    files {
+      variant
+      url
+    }
+  }
+}
+    `;
+
+/**
+ * __useFontQuery__
+ *
+ * To run a query within a React component, call `useFontQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFontQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFontQuery({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useFontQuery(baseOptions: Apollo.QueryHookOptions<FontQuery, FontQueryVariables> & ({ variables: FontQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FontQuery, FontQueryVariables>(FontDocument, options);
+      }
+export function useFontLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FontQuery, FontQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FontQuery, FontQueryVariables>(FontDocument, options);
+        }
+export function useFontSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FontQuery, FontQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<FontQuery, FontQueryVariables>(FontDocument, options);
+        }
+export type FontQueryHookResult = ReturnType<typeof useFontQuery>;
+export type FontLazyQueryHookResult = ReturnType<typeof useFontLazyQuery>;
+export type FontSuspenseQueryHookResult = ReturnType<typeof useFontSuspenseQuery>;
+export type FontQueryResult = Apollo.QueryResult<FontQuery, FontQueryVariables>;
+export const PopularFontsDocument = gql`
+    query popularFonts {
+  popularFonts {
+    id
+    name
+    menu
+    tags
+    category
+    publishedAt
+  }
+}
+    `;
+
+/**
+ * __usePopularFontsQuery__
+ *
+ * To run a query within a React component, call `usePopularFontsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePopularFontsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePopularFontsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePopularFontsQuery(baseOptions?: Apollo.QueryHookOptions<PopularFontsQuery, PopularFontsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PopularFontsQuery, PopularFontsQueryVariables>(PopularFontsDocument, options);
+      }
+export function usePopularFontsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PopularFontsQuery, PopularFontsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PopularFontsQuery, PopularFontsQueryVariables>(PopularFontsDocument, options);
+        }
+export function usePopularFontsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PopularFontsQuery, PopularFontsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PopularFontsQuery, PopularFontsQueryVariables>(PopularFontsDocument, options);
+        }
+export type PopularFontsQueryHookResult = ReturnType<typeof usePopularFontsQuery>;
+export type PopularFontsLazyQueryHookResult = ReturnType<typeof usePopularFontsLazyQuery>;
+export type PopularFontsSuspenseQueryHookResult = ReturnType<typeof usePopularFontsSuspenseQuery>;
+export type PopularFontsQueryResult = Apollo.QueryResult<PopularFontsQuery, PopularFontsQueryVariables>;
 export const BigLibrariesDocument = gql`
     query bigLibraries {
   bigLibraries {

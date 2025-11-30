@@ -24,7 +24,6 @@ import {
 import LogoSilhouette from './components/icons/logoSilhouette'
 import { Button } from './components/ui/button'
 import { Separator } from './components/ui/separator'
-import { useSearch } from './hooks/useSearch'
 
 interface SidebarItem {
   title: string
@@ -57,7 +56,6 @@ const items: SidebarItem[] = [
 
 const RootPage: React.FC = () => {
   const navigate = useNavigate()
-  const { search } = useSearch()
   const { data: loggedInQueryData } = useLoggedInQuery()
 
   useEffect(() => {

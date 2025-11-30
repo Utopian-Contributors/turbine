@@ -14,7 +14,7 @@ const LibrariesPage: React.FC<LibrariesPageProps> = () => {
   const { search } = useSearch()
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto">
       <title>Turbine | Libraries</title>
       <Search onChange={(res) => search(res)} />
       <div className="grid grid-cols-2 gap-4 mt-8">

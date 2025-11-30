@@ -20,7 +20,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
   const { results, search } = useSearch(initialSearchTerm)
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto">
       <title>Turbine | Search</title>
       <div className="w-[600px] mx-auto">
         <Search

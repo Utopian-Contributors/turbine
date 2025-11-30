@@ -11,6 +11,8 @@ import {
 } from './pages/Auth'
 import Logout from './pages/Auth/Logout'
 import { NotFoundPage } from './pages/Error/404Page'
+import FontPage from './pages/FontPage'
+import FontsPage from './pages/FontsPage'
 import HomePage from './pages/HomePage'
 import LibrariesPage from './pages/LibrariesPage'
 import LibraryPage from './pages/LibraryPage'
@@ -37,6 +39,11 @@ const router = createBrowserRouter([
         path: 'l/:name',
         element: <LibraryPage />,
       },
+      {
+        path: 'fonts',
+        element: <FontsPage />,
+      },
+      { path: 'fonts/:font', element: <FontPage /> },
     ],
     errorElement: <NotFoundPage />,
   },

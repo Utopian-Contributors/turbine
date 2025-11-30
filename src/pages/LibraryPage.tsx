@@ -85,7 +85,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
   }
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto">
       <Search
         onChange={(q) => search(q)}
         defaultValue={libraryQueryData?.library.name}

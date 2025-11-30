@@ -1,0 +1,14 @@
+query font($name: String!) {
+  font(name: $name) {
+    id
+    name
+    category
+    tags
+    menu
+    variants
+    files {
+      variant
+      url
+    }
+  }
+}
