@@ -1,4 +1,4 @@
-import { CopyIcon } from 'lucide-react'
+import { Check, CopyIcon } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 import type { FontCategory } from '../../../generated/graphql'
 import { Button } from '../ui/button'
@@ -12,14 +12,23 @@ interface FontEmbedConfigProps {
 
 const getFontVariantName = (variant: string): string => {
   if (variant === 'regular') return '400 Regular'
+  if (variant === 'italic') return '400 Italic'
   if (variant === '200') return '200 Extra Light'
+  if (variant === '200italic') return '200 Italic Extra Light'
   if (variant === '300') return '300 Light'
+  if (variant === '300italic') return '300 Italic Light'
   if (variant === '400') return '400 Regular'
+  if (variant === '400italic') return '400 Italic Regular'
   if (variant === '500') return '500 Medium'
+  if (variant === '500italic') return '500 Italic Medium'
   if (variant === '600') return '600 Semi Bold'
+  if (variant === '600italic') return '600 Italic Semi Bold'
   if (variant === '700') return '700 Bold'
+  if (variant === '700italic') return '700 Italic Bold'
   if (variant === '800') return '800 Extra Bold'
+  if (variant === '800italic') return '800 Italic Extra Bold'
   if (variant === '900') return '900 Black'
+  if (variant === '900italic') return '900 ItalicBlack'
   return variant
 }
 
@@ -31,6 +40,8 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
   const [italicMode, setItalicMode] = useState<'include' | 'exclude'>('include')
   const [weightMode, setWeightMode] = useState<'full' | 'single'>('full')
   const [weightValue, setWeightValue] = useState<number>(400)
+  const [copiedEmbed, setCopiedEmbed] = useState(false)
+  const [copiedCSS, setCopiedCSS] = useState(false)
 
   // Parse variants to extract available weights
   const availableWeights = useMemo(() => {
@@ -61,22 +72,21 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
   const generateEmbedUrl = () => {
     let params = ''
 
+    const minWeight = availableWeights[0]
+    const maxWeight = availableWeights[availableWeights.length - 1]
+
     if (italicMode === 'include' && weightMode === 'full') {
-      // Full italic range (0-1) and full weight range
-      const allCombinations = availableWeights.flatMap((w) => [
-        `0,${w}`,
-        `1,${w}`,
-      ])
-      params = `ital,wght@${allCombinations.join(';')}`
+      // Full italic range (0-1) and full weight range using range syntax
+      params = `ital,wght@0,${minWeight}..${maxWeight};1,${minWeight}..${maxWeight}`
     } else if (italicMode === 'exclude' && weightMode === 'full') {
       // Exclude italic value, full weight range
-      params = `wght@${availableWeights.join(';')}`
+      params = `wght@${minWeight}..${maxWeight}`
     } else if (italicMode === 'include' && weightMode === 'single') {
       // Full italic range, single weight
       params = `ital,wght@0,${weightValue};1,${weightValue}`
     } else {
       // Exclude italic, single weight
-      params = `wght@0,${weightValue}`
+      params = `wght@${weightValue}`
     }
 
     return `https://fonts.googleapis.com/css2?family=${fontName.replace(
@@ -86,8 +96,8 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-8">
-      <div className="space-y-4">
+    <div className="grid grid-cols-2 gap-6">
+      <div className="px-2 space-y-4 max-h-[calc(100vh-107px-5rem)] overflow-y-auto">
         {weightMode === 'full' ? (
           files.map((file) => (
             <style>
@@ -101,7 +111,7 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
         ) : selectedFile ? (
           <style>
             {`@font-face {
-              font-family: "${fontName}";
+              font-family: "${fontName}-${selectedFile.variant}";
               src: url("${selectedFile.url}");
               font-display: block;
             }`}
@@ -113,25 +123,25 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
               .sort((a, b) => {
                 let weightA = 0
                 let weightB = 0
-                if (a.variant === 'regular') {
+                if (a.variant === 'regular' || a.variant === 'italic') {
                   weightA = 400
                 } else {
-                  weightA = parseInt(a.variant)
+                  weightA = parseInt(a.variant.replace('italic', ''))
                 }
-                if (b.variant === 'regular') {
+                if (b.variant === 'regular' || b.variant === 'italic') {
                   weightB = 400
                 } else {
-                  weightB = parseInt(b.variant)
+                  weightB = parseInt(b.variant.replace('italic', ''))
                 }
                 return weightA - weightB
               })
               .map((file) => (
                 <div className="flex flex-col gap-2">
-                  <span className="text-xs">
+                  <span className="text-xs text-muted-foreground">
                     {getFontVariantName(file.variant)}
                   </span>
                   <span
-                    className="text-2xl"
+                    className="text-xl"
                     style={{ fontFamily: `${fontName}-${file.variant}` }}
                   >
                     Joyful, bold coders maximize the web's unique sparkle
@@ -140,12 +150,20 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
                 </div>
               ))}
           </div>
-        ) : (
-          <span className="text-2xl" style={{ fontFamily: fontName }}>
-            Joyful, bold coders maximize the web's unique sparkle without hazy
-            gatekeeper quotas.
-          </span>
-        )}
+        ) : selectedFile ? (
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-muted-foreground">
+              {getFontVariantName(selectedFile.variant)}
+            </span>
+            <span
+              className="text-xl"
+              style={{ fontFamily: `${fontName}-${selectedFile.variant}` }}
+            >
+              Joyful, bold coders maximize the web's unique sparkle without hazy
+              gatekeeper quotas.
+            </span>
+          </div>
+        ) : null}
       </div>
       <div className="h-fit border p-4 rounded-lg flex flex-col gap-6">
         {/* Italic Configuration */}
@@ -216,16 +234,24 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
             <Button
               size="sm"
               variant="ghost"
-              className="flex items-center gap-2"
+              className={`flex items-center gap-2 transition-colors ${
+                copiedEmbed ? 'text-green-600 hover:text-green-600' : ''
+              }`}
               onClick={() => {
                 const embedCode = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="${generateEmbedUrl()}" rel="stylesheet">`
                 navigator.clipboard.writeText(embedCode)
+                setCopiedEmbed(true)
+                setTimeout(() => setCopiedEmbed(false), 2000)
               }}
             >
-              <CopyIcon className="h-4 w-4" />
-              Copy
+              {copiedEmbed ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <CopyIcon className="h-4 w-4" />
+              )}
+              {copiedEmbed ? 'Copied!' : 'Copy'}
             </Button>
           </div>
           <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto text-xs">
@@ -240,21 +266,33 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
             <Button
               size="sm"
               variant="ghost"
-              className="flex items-center gap-2"
+              className={`flex items-center gap-2 transition-colors ${
+                copiedCSS ? 'text-green-600 hover:text-green-600' : ''
+              }`}
               onClick={() => {
-                const embedCode = `<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="${generateEmbedUrl()}" rel="stylesheet">`
-                navigator.clipboard.writeText(embedCode)
+                const cssCode = `.${fontName.replace(/ /g, '-').toLowerCase()} {
+  font-family: "${fontName}", ${category?.replace('_', ' ').toLowerCase()};
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
+`
+                navigator.clipboard.writeText(cssCode)
+                setCopiedCSS(true)
+                setTimeout(() => setCopiedCSS(false), 2000)
               }}
             >
-              <CopyIcon className="h-4 w-4" />
-              Copy
+              {copiedCSS ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <CopyIcon className="h-4 w-4" />
+              )}
+              {copiedCSS ? 'Copied!' : 'Copy'}
             </Button>
           </div>
           <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto text-xs">
             {`.${fontName.replace(/ /g, '-').toLowerCase()} {
-  font-family: "${fontName}", ${category};
+  font-family: "${fontName}", ${category?.replace('_', ' ').toLowerCase()};
   font-optical-sizing: auto;
   font-weight: <weight>;
   font-style: normal;

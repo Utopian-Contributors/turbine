@@ -24,6 +24,7 @@ const FontPage: React.FC<FontPageProps> = () => {
           <FontEmbedConfig 
             files={fontQueryData.font.files}
             fontName={fontQueryData.font.name} 
+            category={fontQueryData.font.category}
             variants={fontQueryData.font.variants}
           />
         )}
