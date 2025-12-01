@@ -4,6 +4,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import { cn } from '@/lib/utils'
+import { PackageIcon } from 'lucide-react'
 import { useBigLibrariesQuery } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -30,8 +31,20 @@ const LibrariesPage: React.FC<LibrariesPageProps> = () => {
                   : undefined
               )}
             >
-              <h2 className="text-lg">{lib.name}</h2>
-              <p className="text-md truncate text-muted-foreground">
+              <div className="flex gap-1 items-center">
+                <PackageIcon
+                  className={cn(
+                    'stroke-[1.5]',
+                    lib.integrated
+                      ? 'text-green-800 fill-green-500'
+                      : 'fill-gray-200'
+                  )}
+                  width={24}
+                  height={24}
+                />
+                <h3 className="text-xl">{lib.name}</h3>
+              </div>
+              <p className="text-md text-muted-foreground my-2">
                 {lib.description}
               </p>
             </Link>
