@@ -1,4 +1,5 @@
 import Search from '@/components/blocks/search'
+import FontDisplay from '@/components/Font/FontDisplay'
 import { Icons } from '@/components/ui/icons'
 import { Separator } from '@/components/ui/separator'
 import { useSearch } from '@/hooks/useSearch'
@@ -7,7 +8,7 @@ import { abbreviateNumber } from 'js-abbreviation-number'
 import { Globe, PackageIcon } from 'lucide-react'
 import moment from 'moment'
 import React from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface SearchPageProps {}
@@ -17,7 +18,8 @@ const SearchPage: React.FC<SearchPageProps> = () => {
   const location = useLocation()
 
   const initialSearchTerm = new URLSearchParams(location.search).get('q') || ''
-  const { results, search } = useSearch(initialSearchTerm)
+  const { librarySearchResults, fontSearchResults, search } =
+    useSearch(initialSearchTerm)
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -29,10 +31,31 @@ const SearchPage: React.FC<SearchPageProps> = () => {
           autoFocus
         />
         <div className="max-w-[60ch] flex flex-col gap-1 mt-6">
-          {results.length === 0 ? (
+          {fontSearchResults?.length !== 0 &&
+            fontSearchResults?.map(
+              (font, index) =>
+                font && [
+                  <Link
+                    key={font.id}
+                    to={`/fonts/${font.name}`}
+                    className={cn(
+                      'cursor-pointer hover:shadow-md transition-shadow duration-300 flex-col my-1 p-4 border border-white hover:border-gray-300 rounded-xl',
+                      font.integrated
+                        ? 'hover:bg-green-200/10 hover:border-green-400 transition-all'
+                        : 'hover:bg-gray-200/10 hover:border-gray-300 transition-all'
+                    )}
+                  >
+                    <FontDisplay font={font} />
+                  </Link>,
+                  <Separator key={index + '-sep'} className="bg-muted my-2" />,
+                ]
+            )}
+        </div>
+        <div className="max-w-[60ch] flex flex-col gap-1 mt-1">
+          {librarySearchResults.length === 0 ? (
             <p className="text-gray-300 text-center">No results</p>
           ) : (
-            results.map((result, index) => [
+            librarySearchResults.map((result, index) => [
               <div
                 key={index}
                 className={cn(

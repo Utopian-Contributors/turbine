@@ -10,3 +10,19 @@ query searchLibrary($term: String!) {
     repository
   }
 }
+
+query searchFonts($term: String!) {
+  searchFonts(term: $term) {
+    ...FontSearchResult
+  }
+}
+
+fragment FontSearchResult on Font {
+  id
+  name
+  menu
+  tags
+  category
+  integrated
+  publishedAt
+}

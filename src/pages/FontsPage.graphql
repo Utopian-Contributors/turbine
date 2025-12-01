@@ -5,6 +5,7 @@ query popularFonts {
     menu
     tags
     category
+    integrated
     publishedAt
   }
 }

@@ -1,9 +1,11 @@
+import { cn } from '@/lib/utils'
 import type { Font } from 'generated/graphql'
 import { toHeaderCase } from 'js-convert-case'
+import { TypeOutlineIcon } from 'lucide-react'
 import React from 'react'
 
 interface FontDisplayProps {
-  font: Pick<Font, 'name' | 'menu' | 'category' | 'tags'>
+  font: Pick<Font, 'name' | 'menu' | 'category' | 'tags' | 'integrated'>
 }
 
 const FontDisplay: React.FC<FontDisplayProps> = ({ font }) => {
@@ -19,7 +21,15 @@ const FontDisplay: React.FC<FontDisplayProps> = ({ font }) => {
     <div className="flex flex-col gap-2">
       <style>{fontFace}</style>
       <div className="flex items-center gap-2">
-        <h1 className="text-4xl" style={{ fontFamily: `${font.name}-menu` }}>
+        <TypeOutlineIcon
+          className={cn(
+            'stroke-[1.5]',
+            font.integrated ? 'text-green-800 fill-green-500' : 'fill-gray-200'
+          )}
+          width={20}
+          height={20}
+        />
+        <h1 className="text-xl" style={{ fontFamily: `${font.name}-menu` }}>
           {font.name}
         </h1>
       </div>

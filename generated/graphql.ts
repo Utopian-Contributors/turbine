@@ -29,6 +29,7 @@ export type Font = {
   category: FontCategory;
   files: Array<FontFile>;
   id: Scalars['ID']['output'];
+  integrated: Scalars['Boolean']['output'];
   menu: Scalars['String']['output'];
   name: Scalars['String']['output'];
   publishedAt: Scalars['DateTime']['output'];
@@ -171,6 +172,7 @@ export type Query = {
   libraryUsage?: Maybe<LibraryUsage>;
   loggedIn: User;
   popularFonts?: Maybe<Array<Font>>;
+  searchFonts?: Maybe<Array<Font>>;
   searchLibrary?: Maybe<Array<LibrarySearchResult>>;
   users?: Maybe<Array<Maybe<User>>>;
   versionIntegrations: VersionIntegrations;
@@ -190,6 +192,11 @@ export type QueryLibraryArgs = {
 
 export type QueryLibraryUsageArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QuerySearchFontsArgs = {
+  term?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -328,7 +335,7 @@ export type FontQuery = { __typename?: 'Query', font?: { __typename?: 'Font', id
 export type PopularFontsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PopularFontsQuery = { __typename?: 'Query', popularFonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, publishedAt: any }> | null };
+export type PopularFontsQuery = { __typename?: 'Query', popularFonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, integrated: boolean, publishedAt: any }> | null };
 
 export type BigLibrariesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -379,6 +386,15 @@ export type SearchLibraryQueryVariables = Exact<{
 
 export type SearchLibraryQuery = { __typename?: 'Query', searchLibrary?: Array<{ __typename?: 'LibrarySearchResult', name: string, description: string, latestVersion: string, integrated: boolean, homepage?: string | null, downloads: number, updated: string, repository?: string | null }> | null };
 
+export type SearchFontsQueryVariables = Exact<{
+  term: Scalars['String']['input'];
+}>;
+
+
+export type SearchFontsQuery = { __typename?: 'Query', searchFonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, integrated: boolean, publishedAt: any }> | null };
+
+export type FontSearchResultFragment = { __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, integrated: boolean, publishedAt: any };
+
 export const VersionConfigFragmentDoc = gql`
     fragment VersionConfig on VersionIntegrations {
   integrated {
@@ -396,6 +412,17 @@ export const VersionConfigFragmentDoc = gql`
     version
     size
   }
+}
+    `;
+export const FontSearchResultFragmentDoc = gql`
+    fragment FontSearchResult on Font {
+  id
+  name
+  menu
+  tags
+  category
+  integrated
+  publishedAt
 }
     `;
 export const LoggedInDocument = gql`
@@ -729,6 +756,7 @@ export const PopularFontsDocument = gql`
     menu
     tags
     category
+    integrated
     publishedAt
   }
 }
@@ -1085,3 +1113,43 @@ export type SearchLibraryQueryHookResult = ReturnType<typeof useSearchLibraryQue
 export type SearchLibraryLazyQueryHookResult = ReturnType<typeof useSearchLibraryLazyQuery>;
 export type SearchLibrarySuspenseQueryHookResult = ReturnType<typeof useSearchLibrarySuspenseQuery>;
 export type SearchLibraryQueryResult = Apollo.QueryResult<SearchLibraryQuery, SearchLibraryQueryVariables>;
+export const SearchFontsDocument = gql`
+    query searchFonts($term: String!) {
+  searchFonts(term: $term) {
+    ...FontSearchResult
+  }
+}
+    ${FontSearchResultFragmentDoc}`;
+
+/**
+ * __useSearchFontsQuery__
+ *
+ * To run a query within a React component, call `useSearchFontsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchFontsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchFontsQuery({
+ *   variables: {
+ *      term: // value for 'term'
+ *   },
+ * });
+ */
+export function useSearchFontsQuery(baseOptions: Apollo.QueryHookOptions<SearchFontsQuery, SearchFontsQueryVariables> & ({ variables: SearchFontsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchFontsQuery, SearchFontsQueryVariables>(SearchFontsDocument, options);
+      }
+export function useSearchFontsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchFontsQuery, SearchFontsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchFontsQuery, SearchFontsQueryVariables>(SearchFontsDocument, options);
+        }
+export function useSearchFontsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SearchFontsQuery, SearchFontsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SearchFontsQuery, SearchFontsQueryVariables>(SearchFontsDocument, options);
+        }
+export type SearchFontsQueryHookResult = ReturnType<typeof useSearchFontsQuery>;
+export type SearchFontsLazyQueryHookResult = ReturnType<typeof useSearchFontsLazyQuery>;
+export type SearchFontsSuspenseQueryHookResult = ReturnType<typeof useSearchFontsSuspenseQuery>;
+export type SearchFontsQueryResult = Apollo.QueryResult<SearchFontsQuery, SearchFontsQueryVariables>;

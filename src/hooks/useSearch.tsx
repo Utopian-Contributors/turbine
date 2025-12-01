@@ -1,14 +1,22 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import {
+  useSearchFontsLazyQuery,
   useSearchLibraryLazyQuery,
-  type LibrarySearchResult,
+  type FontSearchResultFragment,
+  type LibrarySearchResult
 } from '../../generated/graphql'
 
 export const useSearch = (initialSearchTerm?: string) => {
   const navigate = useNavigate()
   const [searchLibraryQuery] = useSearchLibraryLazyQuery()
-  const [results, setResults] = useState<LibrarySearchResult[]>([])
+  const [searchFonts] = useSearchFontsLazyQuery()
+  const [fontSearchResults, setFontSearchResults] = useState<
+    FontSearchResultFragment[]
+  >([])
+  const [librarySearchResults, setLibrarySearchResults] = useState<
+    LibrarySearchResult[]
+  >([])
   const [searchTimeout, setSearchTimeout] = useState<ReturnType<
     typeof setTimeout
   > | null>(null)
@@ -16,7 +24,8 @@ export const useSearch = (initialSearchTerm?: string) => {
   const search = useCallback(
     (term: string) => {
       if (term.trim().length === 0) {
-        setResults([])
+        setLibrarySearchResults([])
+        setFontSearchResults([])
         return
       }
 
@@ -27,16 +36,17 @@ export const useSearch = (initialSearchTerm?: string) => {
       navigate('/search?q=' + term)
 
       setSearchTimeout(
-        setTimeout(
-          () =>
-            searchLibraryQuery({ variables: { term } }).then(({ data }) =>
-              setResults(data?.searchLibrary || [])
-            ),
-          500
-        )
+        setTimeout(() => {
+          searchFonts({ variables: { term } }).then(({ data }) =>
+            setFontSearchResults(data?.searchFonts || [])
+          )
+          searchLibraryQuery({ variables: { term } }).then(({ data }) =>
+            setLibrarySearchResults(data?.searchLibrary || [])
+          )
+        }, 500)
       )
     },
-    [navigate, searchLibraryQuery, searchTimeout]
+    [navigate, searchFonts, searchLibraryQuery, searchTimeout]
   )
 
   useEffect(() => {
@@ -46,5 +56,5 @@ export const useSearch = (initialSearchTerm?: string) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialSearchTerm])
 
-  return { results, search }
+  return { librarySearchResults, fontSearchResults, search }
 }

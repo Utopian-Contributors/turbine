@@ -17,7 +17,7 @@ const LibrariesPage: React.FC<LibrariesPageProps> = () => {
     <div className="max-w-6xl mx-auto">
       <title>Turbine | Libraries</title>
       <Search onChange={(res) => search(res)} />
-      <div className="grid grid-cols-2 gap-4 mt-8">
+      <div className="max-w-xl mx-auto flex flex-col gap-4 mt-8">
         {bigLibrariesQueryData?.bigLibraries?.map((lib) => {
           return (
             <Link
@@ -27,7 +27,7 @@ const LibrariesPage: React.FC<LibrariesPageProps> = () => {
                 'cursor-pointer hover:shadow-md transition-shadow duration-300 border rounded-lg p-4',
                 lib.integrated
                   ? 'hover:bg-green-200/10 hover:border-green-400 transition-all'
-                  : 'hover:bg-gray-200/20 hover:border-gray-300 transition-all'
+                  : undefined
               )}
             >
               <h2 className="text-lg">{lib.name}</h2>
