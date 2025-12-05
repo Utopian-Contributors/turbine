@@ -36,7 +36,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
             autoFocus
           />
           <div className="w-fit flex mx-auto gap-4">
-            <div className="cursor-pointer backdrop-blur-xs border border-gray-300 hover:bg-gray-300/10 rounded-lg p-2 mt-2 mb-2 flex items-center">
+            <div className="cursor-pointer backdrop-blur-xs hover:bg-gray-300/10 rounded-lg p-2 mt-2 mb-2 flex items-center">
               <Checkbox
                 id="showFonts"
                 defaultChecked={showFonts}
@@ -68,9 +68,12 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                           : 'hover:bg-gray-200/10 hover:border-gray-300 transition-all'
                       )}
                     >
-                      <FontDisplay font={font} />
+                      <FontDisplay font={font} list />
                     </Link>,
-                    <Separator key={index + '-sep'} className='bg-muted my-2' />,
+                    <Separator
+                      key={index + '-sep'}
+                      className="bg-muted my-2"
+                    />,
                   ]
               )}
           </div>

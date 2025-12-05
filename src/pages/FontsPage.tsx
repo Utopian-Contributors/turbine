@@ -1,11 +1,11 @@
 import Search from '@/components/blocks/search'
 import FontDisplay from '@/components/Font/FontDisplay'
+import { Separator } from '@/components/ui/separator'
 import { useSearch } from '@/hooks/useSearch'
+import { cn } from '@/lib/utils'
 import React from 'react'
 import { Link } from 'react-router-dom'
-import {
-  usePopularFontsQuery
-} from '../../generated/graphql'
+import { usePopularFontsQuery } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface FontsPageProps {}
@@ -21,13 +21,21 @@ const FontsPage: React.FC<FontsPageProps> = () => {
         {popularFontsQueryData?.popularFonts &&
           popularFontsQueryData?.popularFonts?.map(
             (font) =>
-              font && (
+              font && [
                 <Link key={font.id} to={`/fonts/${font.name}`}>
-                  <div className="cursor-pointer border rounded-lg p-4 hover:bg-gray-200/20">
-                    <FontDisplay font={font} />
+                  <div
+                    className={cn(
+                      'cursor-pointer border border-transparent rounded-lg p-4 hover:bg-gray-200/20',
+                      font.integrated
+                        ? 'hover:bg-green-200/10 hover:border-green-400 transition-all'
+                        : 'hover:bg-gray-200/10 hover:border-gray-300 transition-all'
+                    )}
+                  >
+                    <FontDisplay font={font} list />
                   </div>
-                </Link>
-              )
+                </Link>,
+                <Separator key={`sep-${font.id}`} className="bg-muted" />,
+              ]
           )}
       </div>
     </div>

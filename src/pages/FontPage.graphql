@@ -13,3 +13,10 @@ query font($name: String!) {
     }
   }
 }
+
+mutation toggleFontIntegration($id: String!) {
+  toggleFontIntegration(id: $id) {
+    id
+    integrated
+  }
+}

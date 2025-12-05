@@ -128,6 +128,7 @@ export type Mutation = {
   resendVerificationCode?: Maybe<Scalars['Boolean']['output']>;
   resetPassword?: Maybe<Scalars['Boolean']['output']>;
   sendResetLink?: Maybe<Scalars['Boolean']['output']>;
+  toggleFontIntegration?: Maybe<Font>;
   toggleIntegrateVersion?: Maybe<Version>;
   verify?: Maybe<User>;
 };
@@ -152,6 +153,11 @@ export type MutationResetPasswordArgs = {
 
 export type MutationSendResetLinkArgs = {
   email: Scalars['String']['input'];
+};
+
+
+export type MutationToggleFontIntegrationArgs = {
+  id?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -331,6 +337,13 @@ export type FontQueryVariables = Exact<{
 
 
 export type FontQuery = { __typename?: 'Query', font?: { __typename?: 'Font', id: string, name: string, category: FontCategory, tags: Array<string>, menu: string, integrated: boolean, variants: Array<string>, files: Array<{ __typename?: 'FontFile', variant: string, url: string }> } | null };
+
+export type ToggleFontIntegrationMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type ToggleFontIntegrationMutation = { __typename?: 'Mutation', toggleFontIntegration?: { __typename?: 'Font', id: string, integrated: boolean } | null };
 
 export type PopularFontsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -749,6 +762,40 @@ export type FontQueryHookResult = ReturnType<typeof useFontQuery>;
 export type FontLazyQueryHookResult = ReturnType<typeof useFontLazyQuery>;
 export type FontSuspenseQueryHookResult = ReturnType<typeof useFontSuspenseQuery>;
 export type FontQueryResult = Apollo.QueryResult<FontQuery, FontQueryVariables>;
+export const ToggleFontIntegrationDocument = gql`
+    mutation toggleFontIntegration($id: String!) {
+  toggleFontIntegration(id: $id) {
+    id
+    integrated
+  }
+}
+    `;
+export type ToggleFontIntegrationMutationFn = Apollo.MutationFunction<ToggleFontIntegrationMutation, ToggleFontIntegrationMutationVariables>;
+
+/**
+ * __useToggleFontIntegrationMutation__
+ *
+ * To run a mutation, you first call `useToggleFontIntegrationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleFontIntegrationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleFontIntegrationMutation, { data, loading, error }] = useToggleFontIntegrationMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useToggleFontIntegrationMutation(baseOptions?: Apollo.MutationHookOptions<ToggleFontIntegrationMutation, ToggleFontIntegrationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ToggleFontIntegrationMutation, ToggleFontIntegrationMutationVariables>(ToggleFontIntegrationDocument, options);
+      }
+export type ToggleFontIntegrationMutationHookResult = ReturnType<typeof useToggleFontIntegrationMutation>;
+export type ToggleFontIntegrationMutationResult = Apollo.MutationResult<ToggleFontIntegrationMutation>;
+export type ToggleFontIntegrationMutationOptions = Apollo.BaseMutationOptions<ToggleFontIntegrationMutation, ToggleFontIntegrationMutationVariables>;
 export const PopularFontsDocument = gql`
     query popularFonts {
   popularFonts {

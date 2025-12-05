@@ -175,12 +175,14 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
           </div>
           <div className="flex gap-2">
             <Button
+              size="sm"
               onClick={() => setItalicMode('include')}
               variant={italicMode === 'include' ? 'outline' : 'ghost'}
             >
               Include
             </Button>
             <Button
+              size="sm"
               onClick={() => setItalicMode('exclude')}
               variant={italicMode === 'exclude' ? 'outline' : 'ghost'}
             >
@@ -197,12 +199,14 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
             </div>
             <div className="flex gap-2">
               <Button
+                size="sm"
                 onClick={() => setWeightMode('full')}
                 variant={weightMode === 'full' ? 'outline' : 'ghost'}
               >
                 Full axis
               </Button>
               <Button
+                size="sm"
                 onClick={() => setWeightMode('single')}
                 variant={weightMode === 'single' ? 'outline' : 'ghost'}
               >
