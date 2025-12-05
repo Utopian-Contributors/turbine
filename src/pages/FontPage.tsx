@@ -9,7 +9,6 @@ interface FontPageProps {}
 
 const FontPage: React.FC<FontPageProps> = () => {
   const { font } = useParams<{ font: string }>()
-  console.debug(font)
   const { data: fontQueryData } = useFontQuery({
     variables: { name: font || '' },
   })

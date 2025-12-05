@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import type { Font } from 'generated/graphql'
 import { toHeaderCase } from 'js-convert-case'
-import { TypeOutlineIcon } from 'lucide-react'
+import { FileTypeCorner } from 'lucide-react'
 import React from 'react'
 
 interface FontDisplayProps {
@@ -21,9 +21,9 @@ const FontDisplay: React.FC<FontDisplayProps> = ({ font }) => {
     <div className="flex flex-col gap-2">
       <style>{fontFace}</style>
       <div className="flex items-center gap-2">
-        <TypeOutlineIcon
+        <FileTypeCorner
           className={cn(
-            'stroke-[1.5]',
+            'stroke-2',
             font.integrated ? 'text-green-800 fill-green-500' : 'fill-gray-200'
           )}
           width={20}

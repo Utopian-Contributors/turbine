@@ -330,7 +330,7 @@ export type FontQueryVariables = Exact<{
 }>;
 
 
-export type FontQuery = { __typename?: 'Query', font?: { __typename?: 'Font', id: string, name: string, category: FontCategory, tags: Array<string>, menu: string, variants: Array<string>, files: Array<{ __typename?: 'FontFile', variant: string, url: string }> } | null };
+export type FontQuery = { __typename?: 'Query', font?: { __typename?: 'Font', id: string, name: string, category: FontCategory, tags: Array<string>, menu: string, integrated: boolean, variants: Array<string>, files: Array<{ __typename?: 'FontFile', variant: string, url: string }> } | null };
 
 export type PopularFontsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -707,6 +707,7 @@ export const FontDocument = gql`
     category
     tags
     menu
+    integrated
     variants
     files {
       variant

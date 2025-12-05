@@ -5,6 +5,7 @@ query font($name: String!) {
     category
     tags
     menu
+    integrated
     variants
     files {
       variant

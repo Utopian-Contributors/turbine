@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { CircleXIcon } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import React, { useRef } from 'react'
 import { Input } from '../ui/input'
 
@@ -21,7 +21,9 @@ const Search: React.FC<SearchProps> = ({
   return (
     <div className="w-[420px] relative transform -translate-x-1/2 left-1/2 flex gap-1 items-center">
       <Input
-        className={cn(`w-[420px] m-0 p-6 text-lg rounded-full ${className}`)}
+        className={cn(
+          `w-[420px] bg-transparent backdrop-blur-xs m-0 p-6 text-lg rounded-full ${className}`
+        )}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search npm packages"
         defaultValue={defaultValue}
@@ -29,16 +31,18 @@ const Search: React.FC<SearchProps> = ({
         {...props}
       />
       {ref.current?.value ? (
-        <CircleXIcon
-          className="cursor-pointer relative right-12 fill-gray-300 text-white"
-          onClick={() => {
-            onChange('')
-            if (ref.current) {
-              ref.current.value = ''
-              ref.current.focus()
-            }
-          }}
-        />
+        <div className='relative right-12 p-1 bg-primary/4 rounded-full'>
+          <XIcon
+            className="h-4 w-4 cursor-pointer text-gray-500/50"
+            onClick={() => {
+              onChange('')
+              if (ref.current) {
+                ref.current.value = ''
+                ref.current.focus()
+              }
+            }}
+          />
+        </div>
       ) : null}
     </div>
   )

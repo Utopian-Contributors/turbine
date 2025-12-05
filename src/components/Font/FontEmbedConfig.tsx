@@ -13,6 +13,8 @@ interface FontEmbedConfigProps {
 const getFontVariantName = (variant: string): string => {
   if (variant === 'regular') return '400 Regular'
   if (variant === 'italic') return '400 Italic'
+  if (variant === '100') return '100 Thin'
+  if (variant === '100italic') return '100 Italic Thin'
   if (variant === '200') return '200 Extra Light'
   if (variant === '200italic') return '200 Italic Extra Light'
   if (variant === '300') return '300 Light'
