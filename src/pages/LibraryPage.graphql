@@ -72,3 +72,40 @@ fragment VersionConfig on VersionIntegrations {
     size
   }
 }
+
+query versionFiles($library: String!) {
+  versionFileIntegrations(library: $library) {
+    ...VersionFileConfig
+  }
+}
+
+mutation toggleIntegrateVersionFile($versionFile: String!) {
+  toggleIntegrateVersionFile(id: $versionFile) {
+    id
+  }
+}
+
+fragment VersionFileConfig on VersionFileIntegrations {
+  integrated {
+      file {
+        ...VersionFile
+      }
+      bandwidth
+    }
+    popular {
+      file {
+        ...VersionFile
+      }
+      bandwidth
+    }
+}
+
+fragment VersionFile on VersionFile {
+  id
+  path
+  integrated
+  version {
+    id
+    version
+  }
+}

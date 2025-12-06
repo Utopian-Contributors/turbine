@@ -130,6 +130,7 @@ export type Mutation = {
   sendResetLink?: Maybe<Scalars['Boolean']['output']>;
   toggleFontIntegration?: Maybe<Font>;
   toggleIntegrateVersion?: Maybe<Version>;
+  toggleIntegrateVersionFile?: Maybe<VersionFile>;
   verify?: Maybe<User>;
 };
 
@@ -166,6 +167,11 @@ export type MutationToggleIntegrateVersionArgs = {
 };
 
 
+export type MutationToggleIntegrateVersionFileArgs = {
+  id?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationVerifyArgs = {
   code?: InputMaybe<Scalars['String']['input']>;
 };
@@ -181,6 +187,7 @@ export type Query = {
   searchFonts?: Maybe<Array<Font>>;
   searchLibrary?: Maybe<Array<LibrarySearchResult>>;
   users?: Maybe<Array<Maybe<User>>>;
+  versionFileIntegrations: VersionFileIntegrations;
   versionIntegrations: VersionIntegrations;
   versionUsage?: Maybe<Array<VersionUsage>>;
 };
@@ -208,6 +215,11 @@ export type QuerySearchFontsArgs = {
 
 export type QuerySearchLibraryArgs = {
   term?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryVersionFileIntegrationsArgs = {
+  library?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -255,6 +267,31 @@ export type Version = {
   size?: Maybe<Scalars['Int']['output']>;
   updatedAt: Scalars['DateTime']['output'];
   version: Scalars['String']['output'];
+};
+
+export type VersionFile = {
+  __typename?: 'VersionFile';
+  id: Scalars['ID']['output'];
+  integrated: Scalars['Boolean']['output'];
+  path: Scalars['String']['output'];
+  version: Version;
+};
+
+/** Version files to integrate into the system */
+export type VersionFileIntegrations = {
+  __typename?: 'VersionFileIntegrations';
+  /** List of integrated version files */
+  integrated: Array<VersionFileUsage>;
+  /** List of popular version files to integrate */
+  popular: Array<VersionFileUsage>;
+};
+
+/** Version files to integrate into the system */
+export type VersionFileUsage = {
+  __typename?: 'VersionFileUsage';
+  /** Bandwidth used by this file in bytes */
+  bandwidth: Scalars['String']['output'];
+  file: VersionFile;
 };
 
 /** Versions to integrate into the system */
@@ -392,6 +429,24 @@ export type ToggleIntegrateVersionMutation = { __typename?: 'Mutation', toggleIn
 
 export type VersionConfigFragment = { __typename?: 'VersionIntegrations', integrated: Array<{ __typename?: 'Version', id: string, version: string, size?: number | null }>, popular: Array<{ __typename?: 'Version', id: string, version: string, size?: number | null }>, other: Array<{ __typename?: 'Version', id: string, version: string, size?: number | null }> };
 
+export type VersionFilesQueryVariables = Exact<{
+  library: Scalars['String']['input'];
+}>;
+
+
+export type VersionFilesQuery = { __typename?: 'Query', versionFileIntegrations: { __typename?: 'VersionFileIntegrations', integrated: Array<{ __typename?: 'VersionFileUsage', bandwidth: string, file: { __typename?: 'VersionFile', id: string, path: string, integrated: boolean, version: { __typename?: 'Version', id: string, version: string } } }>, popular: Array<{ __typename?: 'VersionFileUsage', bandwidth: string, file: { __typename?: 'VersionFile', id: string, path: string, integrated: boolean, version: { __typename?: 'Version', id: string, version: string } } }> } };
+
+export type ToggleIntegrateVersionFileMutationVariables = Exact<{
+  versionFile: Scalars['String']['input'];
+}>;
+
+
+export type ToggleIntegrateVersionFileMutation = { __typename?: 'Mutation', toggleIntegrateVersionFile?: { __typename?: 'VersionFile', id: string } | null };
+
+export type VersionFileConfigFragment = { __typename?: 'VersionFileIntegrations', integrated: Array<{ __typename?: 'VersionFileUsage', bandwidth: string, file: { __typename?: 'VersionFile', id: string, path: string, integrated: boolean, version: { __typename?: 'Version', id: string, version: string } } }>, popular: Array<{ __typename?: 'VersionFileUsage', bandwidth: string, file: { __typename?: 'VersionFile', id: string, path: string, integrated: boolean, version: { __typename?: 'Version', id: string, version: string } } }> };
+
+export type VersionFileFragment = { __typename?: 'VersionFile', id: string, path: string, integrated: boolean, version: { __typename?: 'Version', id: string, version: string } };
+
 export type SearchLibraryQueryVariables = Exact<{
   term: Scalars['String']['input'];
 }>;
@@ -427,6 +482,33 @@ export const VersionConfigFragmentDoc = gql`
   }
 }
     `;
+export const VersionFileFragmentDoc = gql`
+    fragment VersionFile on VersionFile {
+  id
+  path
+  integrated
+  version {
+    id
+    version
+  }
+}
+    `;
+export const VersionFileConfigFragmentDoc = gql`
+    fragment VersionFileConfig on VersionFileIntegrations {
+  integrated {
+    file {
+      ...VersionFile
+    }
+    bandwidth
+  }
+  popular {
+    file {
+      ...VersionFile
+    }
+    bandwidth
+  }
+}
+    ${VersionFileFragmentDoc}`;
 export const FontSearchResultFragmentDoc = gql`
     fragment FontSearchResult on Font {
   id
@@ -1114,6 +1196,79 @@ export function useToggleIntegrateVersionMutation(baseOptions?: Apollo.MutationH
 export type ToggleIntegrateVersionMutationHookResult = ReturnType<typeof useToggleIntegrateVersionMutation>;
 export type ToggleIntegrateVersionMutationResult = Apollo.MutationResult<ToggleIntegrateVersionMutation>;
 export type ToggleIntegrateVersionMutationOptions = Apollo.BaseMutationOptions<ToggleIntegrateVersionMutation, ToggleIntegrateVersionMutationVariables>;
+export const VersionFilesDocument = gql`
+    query versionFiles($library: String!) {
+  versionFileIntegrations(library: $library) {
+    ...VersionFileConfig
+  }
+}
+    ${VersionFileConfigFragmentDoc}`;
+
+/**
+ * __useVersionFilesQuery__
+ *
+ * To run a query within a React component, call `useVersionFilesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useVersionFilesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useVersionFilesQuery({
+ *   variables: {
+ *      library: // value for 'library'
+ *   },
+ * });
+ */
+export function useVersionFilesQuery(baseOptions: Apollo.QueryHookOptions<VersionFilesQuery, VersionFilesQueryVariables> & ({ variables: VersionFilesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<VersionFilesQuery, VersionFilesQueryVariables>(VersionFilesDocument, options);
+      }
+export function useVersionFilesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<VersionFilesQuery, VersionFilesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<VersionFilesQuery, VersionFilesQueryVariables>(VersionFilesDocument, options);
+        }
+export function useVersionFilesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<VersionFilesQuery, VersionFilesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<VersionFilesQuery, VersionFilesQueryVariables>(VersionFilesDocument, options);
+        }
+export type VersionFilesQueryHookResult = ReturnType<typeof useVersionFilesQuery>;
+export type VersionFilesLazyQueryHookResult = ReturnType<typeof useVersionFilesLazyQuery>;
+export type VersionFilesSuspenseQueryHookResult = ReturnType<typeof useVersionFilesSuspenseQuery>;
+export type VersionFilesQueryResult = Apollo.QueryResult<VersionFilesQuery, VersionFilesQueryVariables>;
+export const ToggleIntegrateVersionFileDocument = gql`
+    mutation toggleIntegrateVersionFile($versionFile: String!) {
+  toggleIntegrateVersionFile(id: $versionFile) {
+    id
+  }
+}
+    `;
+export type ToggleIntegrateVersionFileMutationFn = Apollo.MutationFunction<ToggleIntegrateVersionFileMutation, ToggleIntegrateVersionFileMutationVariables>;
+
+/**
+ * __useToggleIntegrateVersionFileMutation__
+ *
+ * To run a mutation, you first call `useToggleIntegrateVersionFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleIntegrateVersionFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleIntegrateVersionFileMutation, { data, loading, error }] = useToggleIntegrateVersionFileMutation({
+ *   variables: {
+ *      versionFile: // value for 'versionFile'
+ *   },
+ * });
+ */
+export function useToggleIntegrateVersionFileMutation(baseOptions?: Apollo.MutationHookOptions<ToggleIntegrateVersionFileMutation, ToggleIntegrateVersionFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ToggleIntegrateVersionFileMutation, ToggleIntegrateVersionFileMutationVariables>(ToggleIntegrateVersionFileDocument, options);
+      }
+export type ToggleIntegrateVersionFileMutationHookResult = ReturnType<typeof useToggleIntegrateVersionFileMutation>;
+export type ToggleIntegrateVersionFileMutationResult = Apollo.MutationResult<ToggleIntegrateVersionFileMutation>;
+export type ToggleIntegrateVersionFileMutationOptions = Apollo.BaseMutationOptions<ToggleIntegrateVersionFileMutation, ToggleIntegrateVersionFileMutationVariables>;
 export const SearchLibraryDocument = gql`
     query searchLibrary($term: String!) {
   searchLibrary(term: $term) {

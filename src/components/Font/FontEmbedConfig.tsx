@@ -167,7 +167,7 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
           </div>
         ) : null}
       </div>
-      <div className="h-fit border p-4 rounded-lg flex flex-col gap-6">
+      <div className="bg-gradient-to-t from-primary/2 to-card h-fit border p-4 rounded-lg flex flex-col gap-6">
         {/* Italic Configuration */}
         <div className="flex justify-between gap-2">
           <div className="flex items-center gap-2">

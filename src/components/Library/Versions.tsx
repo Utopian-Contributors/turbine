@@ -1,14 +1,14 @@
 import React from 'react'
 import { Label } from '../ui/label'
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectSeparator,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 } from '../ui/select'
 
 interface VersionsProps {

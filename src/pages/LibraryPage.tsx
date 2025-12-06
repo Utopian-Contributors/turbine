@@ -16,6 +16,7 @@ import { useParams } from 'react-router'
 import { Link } from 'react-router-dom'
 
 import VersionConfig from '@/components/Library/VersionConfig'
+import VersionFileConfig from '@/components/Library/VersionFileConfig'
 import { cn } from '@/lib/utils'
 import {
   LibraryDocument,
@@ -25,6 +26,7 @@ import {
   useLibraryUsageQuery,
   useLoggedInQuery,
   useToggleIntegrateVersionMutation,
+  useVersionFilesLazyQuery,
   useVersionIntegrationsQuery,
   useVersionUsageQuery,
   VersionIntegrationsDocument,
@@ -48,6 +50,10 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
   const { data: versionIntegrationsQueryData } = useVersionIntegrationsQuery({
     variables: { library: params.name || '' },
   })
+  const [versionFilesQuery, { data: versionFilesQueryData }] =
+    useVersionFilesLazyQuery({
+      variables: { library: params.name || '' },
+    })
   const [toggleIntegrateVersion] = useToggleIntegrateVersionMutation({
     refetchQueries: [
       {
@@ -74,7 +80,16 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
     if (!selectedVersion) {
       setSelectedVersion(libraryQueryData?.library?.lastVersion?.version)
     }
-  }, [libraryQueryData?.library, params.name, selectedVersion])
+    if (versionIntegrationsQueryData?.versionIntegrations?.popular.length) {
+      versionFilesQuery()
+    }
+  }, [
+    libraryQueryData?.library,
+    params.name,
+    selectedVersion,
+    versionFilesQuery,
+    versionIntegrationsQueryData?.versionIntegrations?.popular.length,
+  ])
 
   if (loading) {
     return <div>Loading...</div>
@@ -165,9 +180,19 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
               versionConfig={versionIntegrationsQueryData?.versionIntegrations}
             />
           )}
+          {versionFilesQueryData?.versionFileIntegrations &&
+          libraryUsageQueryData?.libraryUsage?.bandwidth.total ? (
+            <VersionFileConfig
+              versionFileConfig={versionFilesQueryData?.versionFileIntegrations}
+              totalBandwidth={Number(
+                libraryUsageQueryData?.libraryUsage?.bandwidth.total
+              )}
+              isAdmin={loggedInQueryData?.loggedIn.role === Role.Admin}
+            />
+          ) : null}
           {versionUsageQueryData?.versionUsage ? (
             <ChartBarLabelCustom
-              classname="mt-4"
+              classname="bg-gradient-to-t from-primary/2 to-card mt-4"
               description="Top 10 versions by bandwidth usage in the last week"
               data={versionUsageQueryData?.versionUsage.map((stat) => ({
                 label: stat.version,
@@ -190,7 +215,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
           ) : null}
         </div>
         <div className="col-span-1 gap-4 flex flex-col">
-          <div className="border rounded-xl flex flex-col gap-2 mx-8 p-4">
+          <div className="bg-gradient-to-t from-primary/2 to-card border rounded-xl flex flex-col gap-2 mx-8 p-4">
             <Versions
               versions={versions}
               selected={selectedVersion}
@@ -209,7 +234,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
               }}
             />
           </div>
-          <div className="border rounded-xl max-w-[16rem] flex flex-col gap-2 ml-8 p-4 border rounded-xl">
+          <div className="bg-gradient-to-t from-primary/2 to-card border rounded-xl max-w-[16rem] flex flex-col gap-2 ml-8 p-4 border rounded-xl">
             <Downloads
               library={libraryQueryData?.library.name || ''}
               downloads={libraryUsageQueryData?.libraryUsage?.downloads || ''}
