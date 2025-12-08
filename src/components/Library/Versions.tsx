@@ -1,5 +1,4 @@
 import React from 'react'
-import { Label } from '../ui/label'
 import {
   Select,
   SelectContent,
@@ -27,7 +26,6 @@ const Versions: React.FC<VersionsProps> = ({
 }) => {
   return (
     <div className="space-y-2 w-full">
-      <Label htmlFor="versions">Version</Label>
       <Select value={selected ?? undefined} onValueChange={onChange}>
         <SelectTrigger id="versions">
           <SelectValue placeholder="Select version" />

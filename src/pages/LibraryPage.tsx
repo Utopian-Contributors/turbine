@@ -9,14 +9,24 @@ import { Separator } from '@/components/ui/separator'
 import { useSearch } from '@/hooks/useSearch'
 import { useVersions } from '@/hooks/useVersions'
 import { filesize } from 'filesize'
-import { Globe, PackageIcon } from 'lucide-react'
+import { Check, CopyIcon, Globe, PackageIcon } from 'lucide-react'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import { Link } from 'react-router-dom'
 
 import VersionConfig from '@/components/Library/VersionConfig'
 import VersionFileConfig from '@/components/Library/VersionFileConfig'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import {
   LibraryDocument,
@@ -32,6 +42,12 @@ import {
   VersionIntegrationsDocument,
   VersionUsageDocument,
 } from '../../generated/graphql'
+
+const generateEmbedUrl = (library: string, version: string, path: string) => {
+  return `https://cdn.jsdelivr.net/npm/${library}@${version}/${
+    path.startsWith('/') ? path.slice(1) : path
+  }`
+}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface LibraryPageProps {}
@@ -76,12 +92,22 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
 
   const versions = useVersions(libraryQueryData?.library?.versions ?? [])
   const [selectedVersion, setSelectedVersion] = useState<string | null>()
+  const [selectedFileVersion, setSelectedFileVersion] = useState<
+    string | null
+  >()
+  const [copiedEmbed, setCopiedEmbed] = useState(false)
+
   useEffect(() => {
     if (!selectedVersion) {
       setSelectedVersion(libraryQueryData?.library?.lastVersion?.version)
     }
     if (versionIntegrationsQueryData?.versionIntegrations?.popular.length) {
-      versionFilesQuery()
+      versionFilesQuery().then((versionFilesQueryData) => {
+        setSelectedFileVersion(
+          versionFilesQueryData.data?.versionFileIntegrations.integrated[0].file
+            .version.version || null
+        )
+      })
     }
   }, [
     libraryQueryData?.library,
@@ -90,6 +116,32 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
     versionFilesQuery,
     versionIntegrationsQueryData?.versionIntegrations?.popular.length,
   ])
+
+  const selectedFileEmbedUrl = useMemo(() => {
+    const selectedFile =
+      versionFilesQueryData?.versionFileIntegrations.integrated.find(
+        ({ file }) => file.version.version === selectedFileVersion
+      )
+    if (
+      !libraryQueryData?.library?.name ||
+      !selectedFileVersion ||
+      !selectedFile
+    ) {
+      return ''
+    }
+
+    return generateEmbedUrl(
+      libraryQueryData?.library?.name || '',
+      selectedFileVersion,
+      selectedFile?.file.path
+    )
+  }, [
+    libraryQueryData?.library?.name,
+    selectedFileVersion,
+    versionFilesQueryData?.versionFileIntegrations.integrated,
+  ])
+
+  console.debug(selectedFileVersion)
 
   if (loading) {
     return <div>Loading...</div>
@@ -171,48 +223,156 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             </div>
           </div>
           <Separator className="my-6" />
-          {(versionIntegrationsQueryData?.versionIntegrations.integrated
-            .length ||
-            loggedInQueryData?.loggedIn.role === Role.Admin) && (
-            <VersionConfig
-              toggleIntegrateVersion={toggleIntegrateVersion}
-              isAdmin={loggedInQueryData?.loggedIn.role === Role.Admin}
-              versionConfig={versionIntegrationsQueryData?.versionIntegrations}
-            />
-          )}
-          {versionFilesQueryData?.versionFileIntegrations &&
-          libraryUsageQueryData?.libraryUsage?.bandwidth.total ? (
-            <VersionFileConfig
-              versionFileConfig={versionFilesQueryData?.versionFileIntegrations}
-              totalBandwidth={Number(
-                libraryUsageQueryData?.libraryUsage?.bandwidth.total
-              )}
-              isAdmin={loggedInQueryData?.loggedIn.role === Role.Admin}
-            />
-          ) : null}
-          {versionUsageQueryData?.versionUsage ? (
-            <ChartBarLabelCustom
-              classname="bg-gradient-to-t from-primary/2 to-card mt-4"
-              description="Top 10 versions by bandwidth usage in the last week"
-              data={versionUsageQueryData?.versionUsage.map((stat) => ({
-                label: stat.version,
-                value: Number(stat.bandwidth),
-                formattedValue: filesize(Number(stat.bandwidth)),
-                fill: stat.integrated
-                  ? 'var(--color-green-500)'
-                  : 'var(--color-gray-500)',
-              }))}
-              config={{
-                value: {
-                  label: 'Bandwidth',
-                  color: 'gray',
-                },
-                label: {
-                  color: 'var(--background)',
-                },
-              }}
-            />
-          ) : null}
+          <Card className="bg-gradient-to-t from-primary/2 to-card border rounded-xl">
+            <Tabs defaultValue="popular">
+              <CardContent>
+                <TabsList className="mb-2">
+                  <TabsTrigger value="popular">Popular</TabsTrigger>
+                  <TabsTrigger value="stats">Stats</TabsTrigger>
+                </TabsList>
+                <TabsContent value="popular">
+                  {(versionIntegrationsQueryData?.versionIntegrations.integrated
+                    .length ||
+                    loggedInQueryData?.loggedIn.role === Role.Admin) && (
+                    <VersionConfig
+                      toggleIntegrateVersion={toggleIntegrateVersion}
+                      isAdmin={loggedInQueryData?.loggedIn.role === Role.Admin}
+                      versionConfig={
+                        versionIntegrationsQueryData?.versionIntegrations
+                      }
+                    />
+                  )}
+                </TabsContent>
+                <TabsContent value="stats">
+                  {versionUsageQueryData?.versionUsage ? (
+                    <ChartBarLabelCustom
+                      description="Top 10 versions by bandwidth usage in the last week"
+                      data={versionUsageQueryData?.versionUsage.map((stat) => ({
+                        label: stat.version,
+                        value: Number(stat.bandwidth),
+                        formattedValue: filesize(Number(stat.bandwidth)),
+                        fill: stat.integrated
+                          ? 'var(--color-green-500)'
+                          : 'var(--color-gray-500)',
+                      }))}
+                      config={{
+                        value: {
+                          label: 'Bandwidth',
+                          color: 'gray',
+                        },
+                        label: {
+                          color: 'var(--background)',
+                        },
+                      }}
+                    />
+                  ) : null}
+                </TabsContent>
+              </CardContent>
+            </Tabs>
+          </Card>
+          <Card className="bg-gradient-to-t from-primary/2 to-card mt-4">
+            <Tabs defaultValue="files">
+              <CardContent>
+                {versionFilesQueryData?.versionFileIntegrations.integrated[0]
+                  ?.file.path && (
+                  <TabsList className="mb-2">
+                    <TabsTrigger value="files">Files</TabsTrigger>
+                    <TabsTrigger value="integrate">Integrate</TabsTrigger>
+                  </TabsList>
+                )}
+                <TabsContent value="files">
+                  {versionFilesQueryData?.versionFileIntegrations &&
+                  libraryUsageQueryData?.libraryUsage?.bandwidth.total ? (
+                    <VersionFileConfig
+                      versionFileConfig={
+                        versionFilesQueryData?.versionFileIntegrations
+                      }
+                      totalBandwidth={Number(
+                        libraryUsageQueryData?.libraryUsage?.bandwidth.total
+                      )}
+                      isAdmin={loggedInQueryData?.loggedIn.role === Role.Admin}
+                    />
+                  ) : null}
+                </TabsContent>
+                {versionFilesQueryData?.versionFileIntegrations.integrated[0]
+                  ?.file &&
+                  selectedFileEmbedUrl && (
+                    <TabsContent value="integrate">
+                      <Select
+                        onValueChange={(value) => setSelectedFileVersion(value)}
+                        defaultValue={
+                          versionFilesQueryData.versionFileIntegrations
+                            .integrated[0].file.version.version
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue
+                            placeholder="Select Version"
+                            className="w-full"
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {versionFilesQueryData.versionFileIntegrations.integrated.map(
+                            ({ file }) => (
+                              <SelectItem
+                                key={file.id}
+                                value={file.version.version}
+                              >
+                                <div className="flex gap-1">
+                                  <span className="text-primary">
+                                    {file.version.version}
+                                  </span>
+                                  <span className="text-muted-foreground">
+                                    {file.path}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <div
+                        className="cursor-pointer flex flex-col gap-2 group"
+                        onClick={() => {
+                          const embedCode = `<script
+  crossorigin
+  src="${selectedFileEmbedUrl}"
+></script>`
+                          navigator.clipboard.writeText(embedCode)
+                          setCopiedEmbed(true)
+                          setTimeout(() => setCopiedEmbed(false), 2000)
+                        }}
+                      >
+                        <div className="relative flex items-center justify-end">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className={`absolute right-1 top-3 flex items-center gap-2 transition-colors ${
+                              copiedEmbed
+                                ? 'text-green-600 hover:text-green-600'
+                                : ''
+                            }`}
+                          >
+                            {copiedEmbed ? (
+                              <Check className="h-4 w-4" />
+                            ) : (
+                              <CopyIcon className="h-4 w-4" />
+                            )}
+                            {copiedEmbed ? 'Copied!' : null}
+                          </Button>
+                        </div>
+                        <pre className="bg-gray-100 group-hover:bg-gray-200 p-4 rounded-md overflow-x-auto text-xs">
+                          {`<script
+  crossorigin
+  src="${selectedFileEmbedUrl}"
+></script>`}
+                        </pre>
+                      </div>
+                    </TabsContent>
+                  )}
+              </CardContent>
+            </Tabs>
+          </Card>
         </div>
         <div className="col-span-1 gap-4 flex flex-col">
           <div className="bg-gradient-to-t from-primary/2 to-card border rounded-xl flex flex-col gap-2 mx-8 p-4">

@@ -23,7 +23,7 @@ export const ChartBarLabelCustom: React.FC<{
   classname?: string
 }> = ({ description, data, config, classname }) => {
   return (
-    <div className={cn('border rounded-xl space-y-4 p-4', classname)}>
+    <div className={cn('space-y-4 px-2 py-1', classname)}>
       <div>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>

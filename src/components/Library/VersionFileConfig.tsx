@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
 import React, { useMemo, useState } from 'react'
 import {
+    LibraryDocument,
     useToggleIntegrateVersionFileMutation,
     VersionFilesDocument,
     type ToggleIntegrateVersionFileMutationFn,
@@ -29,26 +30,27 @@ const VersionFile: React.FC<{
   return (
     <div
       key={file.id}
-      className="cursor-pointer hover:bg-gray-100 rounded-sm w-full flex items-center p-2"
+      className={cn(
+        'w-full flex items-center p-2 transition-all duration-200',
+        file.integrated ? undefined : 'opacity-40 hover:opacity-100',
+        isAdmin ? 'cursor-pointer hover:bg-gray-100 rounded-sm ' : undefined
+      )}
       onClick={() => {
         if (isAdmin) toggleIntegrate({ variables: { versionFile: file.id } })
       }}
     >
-      <div className="group w-full flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-2">
         <div className="flex justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm">{file.path}</span>
             <span className="text-xs text-muted-foreground">
               {file.version.version}
             </span>
-            {isAdmin && (
-              <div className="hidden group-hover:inline text-xs text-gray-300">
-                {file.integrated ? 'Click to remove' : 'Click to add'}
-              </div>
-            )}
           </div>
           <div className="flex gap-2">
-            <span className="text-sm text-muted-foreground">{filesize(bandwidth)}</span>
+            <span className="text-sm text-muted-foreground">
+              {filesize(bandwidth)}
+            </span>
             <span className="text-sm">
               {((Number(bandwidth) / totalBandwidth) * 100).toFixed(1)}%
             </span>
@@ -70,7 +72,7 @@ const VersionFileConfig: React.FC<VersionFileConfigProps> = ({
   isAdmin,
 }) => {
   const [toggleIntegrate] = useToggleIntegrateVersionFileMutation({
-    refetchQueries: [VersionFilesDocument],
+    refetchQueries: [VersionFilesDocument, LibraryDocument],
   })
   const [showAll, setShowAll] = useState(false)
 
@@ -109,8 +111,7 @@ const VersionFileConfig: React.FC<VersionFileConfigProps> = ({
   ])
 
   return (
-    <div className="bg-gradient-to-t from-primary/2 to-card mt-4 border rounded-xl flex flex-col p-2 pb-6">
-      <h3 className="p-2">Popular CDN files</h3>
+    <div className="flex flex-col">
       <div className="flex flex-col">
         {versionFileConfig?.integrated.map(({ file, bandwidth }) => (
           <VersionFile
@@ -125,17 +126,17 @@ const VersionFileConfig: React.FC<VersionFileConfigProps> = ({
         {popular}
         {isAdmin && showAll ? (
           <button
-            className="cursor-pointer text-sm underline mt-2"
+            className="w-full cursor-pointer hover:bg-gray-100 rounded-sm text-sm text-muted-foreground hover:text-primary mt-2 py-2"
             onClick={() => setShowAll(false)}
           >
             Show Less
           </button>
         ) : isAdmin ? (
           <button
-            className="cursor-pointer text-sm underline mt-2"
+            className="w-full cursor-pointer hover:bg-gray-100 rounded-sm text-sm text-muted-foreground hover:text-primary mt-2 py-2"
             onClick={() => setShowAll(true)}
           >
-            Show All Versions
+            Show All Files
           </button>
         ) : null}
       </div>

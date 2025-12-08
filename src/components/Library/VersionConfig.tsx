@@ -44,45 +44,42 @@ const VersionConfig: React.FC<VersionConfigProps> = ({
   const [showAll, setShowAll] = useState(false)
 
   return (
-    <div className="flex flex-col items-center bg-gradient-to-t from-primary/2 to-card border rounded-xl p-2">
-      <div className="flex flex-col gap-2">
-        <h2 className="p-2">Popular Versions</h2>
-        <div className="flex flex-flow flex-wrap gap-2 px-2">
-          {versionConfig?.integrated.map((integrated) => (
-            <Version
-              key={integrated.id}
-              version={integrated.version}
-              integrated
-              isAdmin={isAdmin}
-              onClick={() => {
-                toggleIntegrateVersion({
-                  variables: { version: integrated.id },
-                })
-              }}
-            />
-          ))}
-          {versionConfig?.popular.map((popular) => (
-            <Version
-              key={popular.id}
-              version={popular.version}
-              isAdmin={isAdmin}
-              onClick={() => {
-                toggleIntegrateVersion({ variables: { version: popular.id } })
-              }}
-            />
-          ))}
-        </div>
+    <div className="flex flex-col items-center">
+      <div className="self-start flex flex-flow flex-wrap gap-2 p-1">
+        {versionConfig?.integrated.map((integrated) => (
+          <Version
+            key={integrated.id}
+            version={integrated.version}
+            integrated
+            isAdmin={isAdmin}
+            onClick={() => {
+              toggleIntegrateVersion({
+                variables: { version: integrated.id },
+              })
+            }}
+          />
+        ))}
+        {versionConfig?.popular.map((popular) => (
+          <Version
+            key={popular.id}
+            version={popular.version}
+            isAdmin={isAdmin}
+            onClick={() => {
+              toggleIntegrateVersion({ variables: { version: popular.id } })
+            }}
+          />
+        ))}
       </div>
       {isAdmin && showAll ? (
         <button
-          className="cursor-pointer text-sm underline mt-2"
+          className="w-full cursor-pointer hover:bg-gray-100 rounded-sm text-sm text-muted-foreground hover:text-primary mt-2 py-2"
           onClick={() => setShowAll(false)}
         >
           Show Less
         </button>
       ) : isAdmin && versionConfig && versionConfig.other.length > 0 ? (
         <button
-          className="cursor-pointer text-sm underline mt-2"
+          className="w-full cursor-pointer hover:bg-gray-100 rounded-sm text-sm text-muted-foreground hover:text-primary mt-2 py-2"
           onClick={() => setShowAll(true)}
         >
           Show All Versions

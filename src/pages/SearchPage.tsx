@@ -28,7 +28,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
   return (
     <div className="w-full">
       <title>Turbine | Search</title>
-      <div className="w-fit mx-auto">
+      <div className="w-2xl mx-auto">
         <div className="sticky top-0 pt-4 pb-2 z-10">
           <Search
             onChange={(res) => search(res)}
@@ -53,7 +53,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
           </div>
         </div>
         {showFonts && (
-          <div className="max-w-[60ch] flex flex-col gap-1">
+          <div className="w-full flex flex-col gap-1">
             {fontSearchResults?.length !== 0 &&
               fontSearchResults?.map(
                 (font, index) =>
@@ -78,7 +78,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
               )}
           </div>
         )}
-        <div className="max-w-[60ch] flex flex-col gap-1 mt-1">
+        <div className="w-full flex flex-col gap-1 mt-1">
           {librarySearchResults.length === 0 ? (
             <p className="text-gray-300 text-center">No results</p>
           ) : (
