@@ -141,8 +141,6 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
     versionFilesQueryData?.versionFileIntegrations.integrated,
   ])
 
-  console.debug(selectedFileVersion)
-
   if (loading) {
     return <div>Loading...</div>
   }
@@ -223,17 +221,17 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             </div>
           </div>
           <Separator className="my-6" />
-          <Card className="bg-gradient-to-t from-primary/2 to-card border rounded-xl">
-            <Tabs defaultValue="popular">
-              <CardContent>
-                <TabsList className="mb-2">
-                  <TabsTrigger value="popular">Popular</TabsTrigger>
-                  <TabsTrigger value="stats">Stats</TabsTrigger>
-                </TabsList>
-                <TabsContent value="popular">
-                  {(versionIntegrationsQueryData?.versionIntegrations.integrated
-                    .length ||
-                    loggedInQueryData?.loggedIn.role === Role.Admin) && (
+          {(versionIntegrationsQueryData?.versionIntegrations.integrated
+            .length ||
+            loggedInQueryData?.loggedIn.role === Role.Admin) && (
+            <Card className="bg-gradient-to-t from-primary/2 to-card border rounded-xl">
+              <Tabs defaultValue="popular">
+                <CardContent>
+                  <TabsList className="mb-2">
+                    <TabsTrigger value="popular">Popular</TabsTrigger>
+                    <TabsTrigger value="stats">Stats</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="popular">
                     <VersionConfig
                       toggleIntegrateVersion={toggleIntegrateVersion}
                       isAdmin={loggedInQueryData?.loggedIn.role === Role.Admin}
@@ -241,35 +239,37 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                         versionIntegrationsQueryData?.versionIntegrations
                       }
                     />
-                  )}
-                </TabsContent>
-                <TabsContent value="stats">
-                  {versionUsageQueryData?.versionUsage ? (
-                    <ChartBarLabelCustom
-                      description="Top 10 versions by bandwidth usage in the last week"
-                      data={versionUsageQueryData?.versionUsage.map((stat) => ({
-                        label: stat.version,
-                        value: Number(stat.bandwidth),
-                        formattedValue: filesize(Number(stat.bandwidth)),
-                        fill: stat.integrated
-                          ? 'var(--color-green-500)'
-                          : 'var(--color-gray-500)',
-                      }))}
-                      config={{
-                        value: {
-                          label: 'Bandwidth',
-                          color: 'gray',
-                        },
-                        label: {
-                          color: 'var(--background)',
-                        },
-                      }}
-                    />
-                  ) : null}
-                </TabsContent>
-              </CardContent>
-            </Tabs>
-          </Card>
+                  </TabsContent>
+                  <TabsContent value="stats">
+                    {versionUsageQueryData?.versionUsage ? (
+                      <ChartBarLabelCustom
+                        description="Top 10 versions by bandwidth usage in the last week"
+                        data={versionUsageQueryData?.versionUsage.map(
+                          (stat) => ({
+                            label: stat.version,
+                            value: Number(stat.bandwidth),
+                            formattedValue: filesize(Number(stat.bandwidth)),
+                            fill: stat.integrated
+                              ? 'var(--color-green-500)'
+                              : 'var(--color-gray-500)',
+                          })
+                        )}
+                        config={{
+                          value: {
+                            label: 'Bandwidth',
+                            color: 'gray',
+                          },
+                          label: {
+                            color: 'var(--background)',
+                          },
+                        }}
+                      />
+                    ) : null}
+                  </TabsContent>
+                </CardContent>
+              </Tabs>
+            </Card>
+          )}
           <Card className="bg-gradient-to-t from-primary/2 to-card mt-4">
             <Tabs defaultValue="files">
               <CardContent>

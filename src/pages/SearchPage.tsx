@@ -29,7 +29,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
     <div className="w-full">
       <title>Turbine | Search</title>
       <div className="w-2xl mx-auto">
-        <div className="sticky top-0 pt-4 pb-2 z-10">
+        <div className="sticky top-0 pb-2 z-10">
           <Search
             onChange={(res) => search(res)}
             defaultValue={initialSearchTerm}

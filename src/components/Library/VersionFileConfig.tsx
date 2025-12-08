@@ -27,6 +27,21 @@ const VersionFile: React.FC<{
   isAdmin?: boolean
   toggleIntegrate: ToggleIntegrateVersionFileMutationFn
 }> = ({ file, bandwidth, totalBandwidth, isAdmin, toggleIntegrate }) => {
+  const bandwidthPercent = useMemo(() => {
+    let zeros = 0
+    const percent = (Number(bandwidth) / totalBandwidth) * 100
+    for (let i = 0; i < String(percent).length; i++) {
+      if (String(percent)[i] === '.') {
+        continue
+      }
+      if (String(percent)[i] === '0') {
+        zeros++
+      } else {
+        break
+      }
+    }
+    return percent > 1 ? percent.toFixed(2) : percent.toFixed(zeros + 1)
+  }, [bandwidth, totalBandwidth])
   return (
     <div
       key={file.id}
@@ -51,9 +66,7 @@ const VersionFile: React.FC<{
             <span className="text-sm text-muted-foreground">
               {filesize(bandwidth)}
             </span>
-            <span className="text-sm">
-              {((Number(bandwidth) / totalBandwidth) * 100).toFixed(1)}%
-            </span>
+            <span className="text-sm">{bandwidthPercent}%</span>
           </div>
         </div>
         <Progress
