@@ -1,10 +1,12 @@
 import {
   Github,
   HomeIcon,
+  LayoutGridIcon,
   LogOutIcon,
   PackageIcon,
   SearchIcon,
-  TypeIcon,
+  StarIcon,
+  TypeIcon
 } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
@@ -41,6 +43,16 @@ const items: SidebarItem[] = [
     title: 'Search',
     url: '/search',
     icon: <SearchIcon />,
+  },
+  {
+    title: 'Spotlight',
+    url: '/spotlight',
+    icon: <StarIcon />,
+  },
+  {
+    title: 'Apps',
+    url: '/apps',
+    icon: <LayoutGridIcon />,
   },
   {
     title: 'Libraries',
