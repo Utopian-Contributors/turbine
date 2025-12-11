@@ -308,8 +308,8 @@ export type VersionIntegrations = {
 /** Usage statistics for most used versions of a library */
 export type VersionUsage = {
   __typename?: 'VersionUsage';
-  /** Bandwidth used by this version in bytes */
-  bandwidth: Scalars['String']['output'];
+  /** Npm downloads of this version */
+  downloads: Scalars['String']['output'];
   /** Whether the version is integrated */
   integrated: Scalars['Boolean']['output'];
   /** The version string */
@@ -411,7 +411,7 @@ export type VersionUsageQueryVariables = Exact<{
 }>;
 
 
-export type VersionUsageQuery = { __typename?: 'Query', versionUsage?: Array<{ __typename?: 'VersionUsage', integrated: boolean, version: string, bandwidth: string }> | null };
+export type VersionUsageQuery = { __typename?: 'Query', versionUsage?: Array<{ __typename?: 'VersionUsage', integrated: boolean, version: string, downloads: string }> | null };
 
 export type VersionIntegrationsQueryVariables = Exact<{
   library: Scalars['String']['input'];
@@ -1086,7 +1086,7 @@ export const VersionUsageDocument = gql`
   versionUsage(library: $library) {
     integrated
     version
-    bandwidth
+    downloads
   }
 }
     `;

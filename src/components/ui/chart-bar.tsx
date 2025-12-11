@@ -3,7 +3,7 @@
 import { Bar, BarChart, LabelList, XAxis, YAxis } from 'recharts'
 
 import { cn } from '@/lib/utils'
-import { filesize } from 'filesize'
+import { abbreviateNumber } from 'js-abbreviation-number'
 import { ZapIcon } from 'lucide-react'
 import type { ChartConfig } from './chart'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from './chart'
@@ -51,8 +51,8 @@ export const ChartBarLabelCustom: React.FC<{
                   <div className="flex gap-2 items-center">
                     <ZapIcon width={20} className="text-green-600" />
                     <div className="flex flex-col">
-                      <p className="text-muted-foreground">Bandwidth</p>
-                      <p>{filesize(value as number)}</p>
+                      <p className="text-muted-foreground">Downloads</p>
+                      <p>{abbreviateNumber(value as number)}</p>
                     </div>
                   </div>
                 )}

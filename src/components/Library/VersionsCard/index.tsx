@@ -1,12 +1,12 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { ChartBarLabelCustom } from '@/components/ui/chart-bar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { filesize } from 'filesize'
 import type {
   useToggleIntegrateVersionMutation,
   VersionIntegrationsQuery,
   VersionUsageQuery,
 } from 'generated/graphql'
+import { abbreviateNumber } from 'js-abbreviation-number'
 import React from 'react'
 import VersionConfig from '../VersionConfig'
 
@@ -43,18 +43,20 @@ const VersionsCard: React.FC<VersionsCardProps> = ({
           <TabsContent value="stats">
             {usage ? (
               <ChartBarLabelCustom
-                description="Top 10 versions by bandwidth usage in the last week"
-                data={usage.map((stat) => ({
-                  label: stat.version,
-                  value: Number(stat.bandwidth),
-                  formattedValue: filesize(Number(stat.bandwidth)),
-                  fill: stat.integrated
-                    ? 'var(--color-green-500)'
-                    : 'var(--color-gray-500)',
-                }))}
+                description="Top 10 versions by npm downloads in the last week"
+                data={[...usage]
+                  .sort((a, b) => Number(b.downloads) - Number(a.downloads))
+                  .map((stat) => ({
+                    label: stat.version,
+                    value: Number(stat.downloads),
+                    formattedValue: abbreviateNumber(Number(stat.downloads)),
+                    fill: stat.integrated
+                      ? 'var(--color-green-500)'
+                      : 'var(--color-gray-500)',
+                  }))}
                 config={{
                   value: {
-                    label: 'Bandwidth',
+                    label: 'Downloads',
                     color: 'gray',
                   },
                   label: {

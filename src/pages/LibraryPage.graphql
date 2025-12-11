@@ -39,7 +39,7 @@ query versionUsage($library: String!) {
   versionUsage(library: $library) {
     integrated
     version
-    bandwidth
+    downloads
   }
 }
 

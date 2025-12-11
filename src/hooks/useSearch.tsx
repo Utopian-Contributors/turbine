@@ -4,7 +4,7 @@ import {
   useSearchFontsLazyQuery,
   useSearchLibraryLazyQuery,
   type FontSearchResultFragment,
-  type LibrarySearchResult
+  type LibrarySearchResult,
 } from '../../generated/graphql'
 
 export const useSearch = (initialSearchTerm?: string) => {
@@ -33,7 +33,11 @@ export const useSearch = (initialSearchTerm?: string) => {
         clearTimeout(searchTimeout)
       }
 
-      navigate('/search?q=' + term)
+      if (location.pathname !== '/search') {
+        navigate('/search?q=' + term)
+      } else {
+        navigate('/search?q=' + term, { replace: true })
+      }
 
       setSearchTimeout(
         setTimeout(() => {

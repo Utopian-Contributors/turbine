@@ -10,7 +10,7 @@ import { useVersions } from '@/hooks/useVersions'
 import { filesize } from 'filesize'
 import { Globe, PackageIcon } from 'lucide-react'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import { Link } from 'react-router-dom'
 
@@ -99,6 +99,14 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
     versionIntegrationsQueryData?.versionIntegrations?.popular.length,
   ])
 
+  const title = useMemo(() => {
+    if (libraryQueryData?.library?.name) {
+      return `Turbine | ${libraryQueryData?.library?.name}`
+    } else {
+      return 'Turbine | Library'
+    }
+  }, [libraryQueryData?.library?.name])
+
   if (loading) {
     return <div>Loading...</div>
   }
@@ -109,6 +117,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
 
   return (
     <div className="max-w-6xl mx-auto">
+      <title>{title}</title>
       <Search
         onChange={(q) => search(q)}
         defaultValue={libraryQueryData?.library.name}
