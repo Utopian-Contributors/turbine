@@ -1,5 +1,5 @@
 import { SearchWebsite } from '@/components/ui/search-website'
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Bundle from '@/components/Measurement/Bundle'
 import Environments from '@/components/Measurement/Environments'
@@ -7,10 +7,17 @@ import AutoProgress from '@/components/ui/auto-progress'
 import { Button } from '@/components/ui/button'
 import { Icons } from '@/components/ui/icons'
 import PreloadImage from '@/components/ui/preload-image-cover'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { motion } from 'framer-motion'
-import { EyeOff, Repeat } from 'lucide-react'
+import { toHeaderCase } from 'js-convert-case'
+import { Clock, EyeOff, Repeat } from 'lucide-react'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import {
   ConnectionType,
@@ -18,6 +25,7 @@ import {
   MeasurementsDocument,
   MeasurementStatus,
   useCreateMeasurementMutation,
+  useMeasurementDevicesQuery,
   useMeasurementsLazyQuery,
 } from '../../generated/graphql'
 
@@ -38,6 +46,20 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       new URL(searchParams.get('path') ?? '/', `https://${params.host}`).href,
     [searchParams, params]
   )
+
+  const [selectedDevice, setSelectedDevice] = useState<string | null>(null)
+  const { data: measurementDevicesData } = useMeasurementDevicesQuery()
+  const [selectedConnection, setSelectedConnection] = useState<ConnectionType>(
+    ConnectionType.Wifi
+  )
+
+  useEffect(() => {
+    if (!selectedDevice && measurementDevicesData?.measurementDevices?.length) {
+      setSelectedDevice(
+        measurementDevicesData.measurementDevices[0]?.id || null
+      )
+    }
+  }, [measurementDevicesData, selectedDevice])
 
   const [measurementsQuery, { data: measurementsQueryData, refetch }] =
     useMeasurementsLazyQuery()
@@ -279,6 +301,59 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 >
                   <Repeat size={16} /> Re-measure
                 </Button>
+                <div className="flex gap-2 mb-4">
+                  <Select
+                    onValueChange={(value) => setSelectedDevice(value)}
+                    defaultValue={selectedDevice || undefined}
+                  >
+                    <SelectTrigger>
+                      {toHeaderCase(
+                        measurementDevicesData?.measurementDevices?.find(
+                          (device) => device.id === selectedDevice
+                        )?.type || 'Select device'
+                      )}
+                    </SelectTrigger>
+                    <SelectContent>
+                      {measurementDevicesData?.measurementDevices?.map(
+                        (device) => (
+                          <SelectItem value={device.id}>
+                            {toHeaderCase(device.type)}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    onValueChange={(value) =>
+                      setSelectedConnection(value as ConnectionType)
+                    }
+                    defaultValue={selectedConnection}
+                  >
+                    <SelectTrigger>
+                      {toHeaderCase(selectedConnection)
+                        .replace('3g', '3G')
+                        .replace('4g', '4G')
+                        .replace('Wifi', 'WiFi')}
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[
+                        ConnectionType.Wifi,
+                        ConnectionType.Fast_4G,
+                        ConnectionType.Slow_4G,
+                        ConnectionType.Fast_3G,
+                        ConnectionType.Slow_3G,
+                        ConnectionType.Offline,
+                      ].map((connection) => (
+                        <SelectItem value={connection}>
+                          {toHeaderCase(connection)
+                            .replace('3g', '3G')
+                            .replace('4g', '4G')
+                            .replace('Wifi', 'WiFi')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button className="flex gap-2 bg-gray-900 hover:bg-gray-700">
                   <Icons.twitter className="w-[16px] h-[16px] fill-white" />
                   Share
@@ -315,15 +390,30 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     transition={{ duration: 0.5 }}
                     className="flex gap-4 py-4 px-1 overflow-x-auto"
                   >
-                    {measurement.screenshots.map((img) => (
+                    {measurement.screenshots.map((img, index) => (
                       <div
                         style={{
                           backgroundImage: `url(${
-                            import.meta.env.VITE_SCREENSHOTS_FOLDER
-                          }${img})`,
+                            new URL(
+                              img,
+                              import.meta.env.VITE_SCREENSHOTS_FOLDER
+                            ).href
+                          })`,
                         }}
                         className="flex-shrink-0 w-60 h-40 bg-gray-100 bg-contain bg-center bg-no-repeat rounded-lg ring ring-gray-200 overflow-hidden"
-                      />
+                      >
+                        <div className="relative flex items-center gap-1 w-fit left-1 top-2 border rounded-full bg-background/80 px-2 py-1">
+                          <Clock className="w-3 h-3" />
+                          <span className="text-sm">
+                            {index === measurement.screenshots!.length - 1
+                              ? 'Final'
+                              : `${img
+                                  .split('/')
+                                  .pop()
+                                  ?.replace('.webp', '')}s`}
+                          </span>
+                        </div>
+                      </div>
                     ))}
                   </motion.div>
                 )}
