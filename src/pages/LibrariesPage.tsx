@@ -15,9 +15,9 @@ const LibrariesPage: React.FC<LibrariesPageProps> = () => {
   const { search } = useSearch()
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="pt-6 max-w-6xl mx-auto">
       <title>Turbine | Libraries</title>
-      <Search onChange={(res) => search(res)} />
+      <Search placeholder='Search npm packages' onChange={(res) => search(res)} />
       <div className="max-w-xl mx-auto flex flex-col gap-4 mt-8">
         {bigLibrariesQueryData?.bigLibraries?.map((lib) => {
           return (

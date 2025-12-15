@@ -7,7 +7,7 @@ interface HomePageProps {}
 
 const HomePage: React.FC<HomePageProps> = () => {
   return (
-    <div>
+    <div className='pt-6'>
       <title>Turbine | Home</title>
       <header className="flex h-(--header-height) items-center gap-2">
         <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">

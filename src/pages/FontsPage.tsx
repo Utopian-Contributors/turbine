@@ -14,10 +14,10 @@ const FontsPage: React.FC<FontsPageProps> = () => {
   const { data: popularFontsQueryData } = usePopularFontsQuery()
   const { search } = useSearch()
   return (
-    <div>
+    <div className='pt-6'>
       <title>Turbine | Fonts</title>
-      <Search onChange={(res) => search(res)} />
-      <div className="max-w-xl mx-auto flex flex-col gap-4 mt-6">
+      <Search placeholder='Search fonts' onChange={(res) => search(res)} />
+      <div className="pt-6 max-w-xl mx-auto flex flex-col gap-4 mt-6">
         {popularFontsQueryData?.popularFonts &&
           popularFontsQueryData?.popularFonts?.map(
             (font) =>

@@ -18,11 +18,42 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
+export type BundledFile = {
+  __typename?: 'BundledFile';
+  cacheControl?: Maybe<Scalars['String']['output']>;
+  clientHeight?: Maybe<Scalars['Int']['output']>;
+  clientWidth?: Maybe<Scalars['Int']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  elapsed: Scalars['Int']['output'];
+  height?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
+  size?: Maybe<Scalars['String']['output']>;
+  type: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  url: Scalars['String']['output'];
+  width?: Maybe<Scalars['Int']['output']>;
+};
+
+export enum ConnectionType {
+  Fast_3G = 'FAST_3G',
+  Fast_4G = 'FAST_4G',
+  Offline = 'OFFLINE',
+  Slow_3G = 'SLOW_3G',
+  Slow_4G = 'SLOW_4G',
+  Wifi = 'WIFI'
+}
+
 export type CreateUserInput = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
   password: Scalars['String']['input'];
 };
+
+export enum DeviceType {
+  Desktop = 'DESKTOP',
+  Mobile = 'MOBILE',
+  Tablet = 'TABLET'
+}
 
 export type Font = {
   __typename?: 'Font';
@@ -119,8 +150,43 @@ export type LibraryUsage = {
   prev: LibraryUsage;
 };
 
+export type Measurement = {
+  __typename?: 'Measurement';
+  bundledFiles: Array<BundledFile>;
+  connectionType: ConnectionType;
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  device: MeasurementDevice;
+  elapsed?: Maybe<Scalars['Int']['output']>;
+  host?: Maybe<WebsiteHost>;
+  icon?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  redirect?: Maybe<Scalars['String']['output']>;
+  screenshots?: Maybe<Array<Scalars['String']['output']>>;
+  status: MeasurementStatus;
+  thumbnail?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  url: Scalars['String']['output'];
+};
+
+export type MeasurementDevice = {
+  __typename?: 'MeasurementDevice';
+  height: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  type: DeviceType;
+  width: Scalars['Int']['output'];
+};
+
+export enum MeasurementStatus {
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  Pending = 'PENDING'
+}
+
 export type Mutation = {
   __typename?: 'Mutation';
+  createMeasurement?: Maybe<Measurement>;
   login?: Maybe<User>;
   logout?: Maybe<User>;
   refreshToken?: Maybe<User>;
@@ -132,6 +198,14 @@ export type Mutation = {
   toggleIntegrateVersion?: Maybe<Version>;
   toggleIntegrateVersionFile?: Maybe<VersionFile>;
   verify?: Maybe<User>;
+};
+
+
+export type MutationCreateMeasurementArgs = {
+  connection?: InputMaybe<ConnectionType>;
+  device?: InputMaybe<DeviceType>;
+  remeasure?: InputMaybe<Scalars['Boolean']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -183,6 +257,8 @@ export type Query = {
   library?: Maybe<Library>;
   libraryUsage?: Maybe<LibraryUsage>;
   loggedIn: User;
+  measurementDevices?: Maybe<Array<MeasurementDevice>>;
+  measurements?: Maybe<Array<Measurement>>;
   popularFonts?: Maybe<Array<Font>>;
   searchFonts?: Maybe<Array<Font>>;
   searchLibrary?: Maybe<Array<LibrarySearchResult>>;
@@ -205,6 +281,11 @@ export type QueryLibraryArgs = {
 
 export type QueryLibraryUsageArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryMeasurementsArgs = {
+  url?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -314,6 +395,13 @@ export type VersionUsage = {
   integrated: Scalars['Boolean']['output'];
   /** The version string */
   version: Scalars['String']['output'];
+};
+
+export type WebsiteHost = {
+  __typename?: 'WebsiteHost';
+  host: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  measurements: Array<Measurement>;
 };
 
 export type LoggedInQueryVariables = Exact<{ [key: string]: never; }>;
@@ -447,6 +535,30 @@ export type VersionFileConfigFragment = { __typename?: 'VersionFileIntegrations'
 
 export type VersionFileFragment = { __typename?: 'VersionFile', id: string, path: string, integrated: boolean, version: { __typename?: 'Version', id: string, version: string } };
 
+export type MeasurementsQueryVariables = Exact<{
+  url?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type MeasurementsQuery = { __typename?: 'Query', measurements?: Array<{ __typename?: 'Measurement', id: string, url: string, redirect?: string | null, title?: string | null, description?: string | null, status: MeasurementStatus, elapsed?: number | null, screenshots?: Array<string> | null, connectionType: ConnectionType, icon?: string | null, thumbnail?: string | null, device: { __typename?: 'MeasurementDevice', id: string, type: DeviceType, width: number, height: number }, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, cacheControl?: string | null, elapsed: number, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> }> | null };
+
+export type MeasurementDevicesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeasurementDevicesQuery = { __typename?: 'Query', measurementDevices?: Array<{ __typename?: 'MeasurementDevice', id: string, type: DeviceType, width: number, height: number }> | null };
+
+export type CreateMeasurementMutationVariables = Exact<{
+  url: Scalars['String']['input'];
+  remeasure?: InputMaybe<Scalars['Boolean']['input']>;
+  device?: InputMaybe<DeviceType>;
+  connection?: InputMaybe<ConnectionType>;
+}>;
+
+
+export type CreateMeasurementMutation = { __typename?: 'Mutation', createMeasurement?: { __typename?: 'Measurement', id: string, url: string, redirect?: string | null, title?: string | null, description?: string | null, status: MeasurementStatus, elapsed?: number | null, icon?: string | null, thumbnail?: string | null, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, cacheControl?: string | null, elapsed: number, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> } | null };
+
+export type MeasuredFileFragment = { __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, cacheControl?: string | null, elapsed: number, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null };
+
 export type SearchLibraryQueryVariables = Exact<{
   term: Scalars['String']['input'];
 }>;
@@ -509,6 +621,20 @@ export const VersionFileConfigFragmentDoc = gql`
   }
 }
     ${VersionFileFragmentDoc}`;
+export const MeasuredFileFragmentDoc = gql`
+    fragment MeasuredFile on BundledFile {
+  id
+  url
+  size
+  type
+  cacheControl
+  elapsed
+  width
+  height
+  clientWidth
+  clientHeight
+}
+    `;
 export const FontSearchResultFragmentDoc = gql`
     fragment FontSearchResult on Font {
   id
@@ -1269,6 +1395,159 @@ export function useToggleIntegrateVersionFileMutation(baseOptions?: Apollo.Mutat
 export type ToggleIntegrateVersionFileMutationHookResult = ReturnType<typeof useToggleIntegrateVersionFileMutation>;
 export type ToggleIntegrateVersionFileMutationResult = Apollo.MutationResult<ToggleIntegrateVersionFileMutation>;
 export type ToggleIntegrateVersionFileMutationOptions = Apollo.BaseMutationOptions<ToggleIntegrateVersionFileMutation, ToggleIntegrateVersionFileMutationVariables>;
+export const MeasurementsDocument = gql`
+    query measurements($url: String) {
+  measurements(url: $url) {
+    id
+    url
+    redirect
+    title
+    description
+    status
+    elapsed
+    device {
+      id
+      type
+      width
+      height
+    }
+    screenshots
+    connectionType
+    bundledFiles {
+      ...MeasuredFile
+    }
+    icon
+    thumbnail
+  }
+}
+    ${MeasuredFileFragmentDoc}`;
+
+/**
+ * __useMeasurementsQuery__
+ *
+ * To run a query within a React component, call `useMeasurementsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeasurementsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeasurementsQuery({
+ *   variables: {
+ *      url: // value for 'url'
+ *   },
+ * });
+ */
+export function useMeasurementsQuery(baseOptions?: Apollo.QueryHookOptions<MeasurementsQuery, MeasurementsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeasurementsQuery, MeasurementsQueryVariables>(MeasurementsDocument, options);
+      }
+export function useMeasurementsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeasurementsQuery, MeasurementsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeasurementsQuery, MeasurementsQueryVariables>(MeasurementsDocument, options);
+        }
+export function useMeasurementsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MeasurementsQuery, MeasurementsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MeasurementsQuery, MeasurementsQueryVariables>(MeasurementsDocument, options);
+        }
+export type MeasurementsQueryHookResult = ReturnType<typeof useMeasurementsQuery>;
+export type MeasurementsLazyQueryHookResult = ReturnType<typeof useMeasurementsLazyQuery>;
+export type MeasurementsSuspenseQueryHookResult = ReturnType<typeof useMeasurementsSuspenseQuery>;
+export type MeasurementsQueryResult = Apollo.QueryResult<MeasurementsQuery, MeasurementsQueryVariables>;
+export const MeasurementDevicesDocument = gql`
+    query measurementDevices {
+  measurementDevices {
+    id
+    type
+    width
+    height
+  }
+}
+    `;
+
+/**
+ * __useMeasurementDevicesQuery__
+ *
+ * To run a query within a React component, call `useMeasurementDevicesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeasurementDevicesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeasurementDevicesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMeasurementDevicesQuery(baseOptions?: Apollo.QueryHookOptions<MeasurementDevicesQuery, MeasurementDevicesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeasurementDevicesQuery, MeasurementDevicesQueryVariables>(MeasurementDevicesDocument, options);
+      }
+export function useMeasurementDevicesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeasurementDevicesQuery, MeasurementDevicesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeasurementDevicesQuery, MeasurementDevicesQueryVariables>(MeasurementDevicesDocument, options);
+        }
+export function useMeasurementDevicesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MeasurementDevicesQuery, MeasurementDevicesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MeasurementDevicesQuery, MeasurementDevicesQueryVariables>(MeasurementDevicesDocument, options);
+        }
+export type MeasurementDevicesQueryHookResult = ReturnType<typeof useMeasurementDevicesQuery>;
+export type MeasurementDevicesLazyQueryHookResult = ReturnType<typeof useMeasurementDevicesLazyQuery>;
+export type MeasurementDevicesSuspenseQueryHookResult = ReturnType<typeof useMeasurementDevicesSuspenseQuery>;
+export type MeasurementDevicesQueryResult = Apollo.QueryResult<MeasurementDevicesQuery, MeasurementDevicesQueryVariables>;
+export const CreateMeasurementDocument = gql`
+    mutation createMeasurement($url: String!, $remeasure: Boolean, $device: DeviceType, $connection: ConnectionType) {
+  createMeasurement(
+    url: $url
+    remeasure: $remeasure
+    device: $device
+    connection: $connection
+  ) {
+    id
+    url
+    redirect
+    title
+    description
+    status
+    elapsed
+    bundledFiles {
+      ...MeasuredFile
+    }
+    icon
+    thumbnail
+  }
+}
+    ${MeasuredFileFragmentDoc}`;
+export type CreateMeasurementMutationFn = Apollo.MutationFunction<CreateMeasurementMutation, CreateMeasurementMutationVariables>;
+
+/**
+ * __useCreateMeasurementMutation__
+ *
+ * To run a mutation, you first call `useCreateMeasurementMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateMeasurementMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createMeasurementMutation, { data, loading, error }] = useCreateMeasurementMutation({
+ *   variables: {
+ *      url: // value for 'url'
+ *      remeasure: // value for 'remeasure'
+ *      device: // value for 'device'
+ *      connection: // value for 'connection'
+ *   },
+ * });
+ */
+export function useCreateMeasurementMutation(baseOptions?: Apollo.MutationHookOptions<CreateMeasurementMutation, CreateMeasurementMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateMeasurementMutation, CreateMeasurementMutationVariables>(CreateMeasurementDocument, options);
+      }
+export type CreateMeasurementMutationHookResult = ReturnType<typeof useCreateMeasurementMutation>;
+export type CreateMeasurementMutationResult = Apollo.MutationResult<CreateMeasurementMutation>;
+export type CreateMeasurementMutationOptions = Apollo.BaseMutationOptions<CreateMeasurementMutation, CreateMeasurementMutationVariables>;
 export const SearchLibraryDocument = gql`
     query searchLibrary($term: String!) {
   searchLibrary(term: $term) {

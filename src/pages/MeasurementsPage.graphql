@@ -1,0 +1,63 @@
+query measurements($url: String) {
+  measurements(url: $url) {
+    id
+    url
+    redirect
+    title
+    description
+    status
+    elapsed
+    device {
+      id
+      type
+      width
+      height
+    }
+    screenshots
+    connectionType
+    bundledFiles {
+      ...MeasuredFile
+    }
+    icon
+    thumbnail
+  }
+}
+
+query measurementDevices {
+  measurementDevices {
+    id
+    type
+    width
+    height
+  }
+}
+
+mutation createMeasurement($url: String!, $remeasure: Boolean, $device: DeviceType, $connection: ConnectionType) {
+  createMeasurement(url: $url, remeasure: $remeasure, device: $device, connection: $connection) {
+    id
+    url
+    redirect
+    title
+    description
+    status
+    elapsed
+    bundledFiles {
+      ...MeasuredFile
+    }
+    icon
+    thumbnail
+  }
+}
+
+fragment MeasuredFile on BundledFile {
+  id
+  url
+  size
+  type
+  cacheControl
+  elapsed
+  width
+  height
+  clientWidth
+  clientHeight
+}

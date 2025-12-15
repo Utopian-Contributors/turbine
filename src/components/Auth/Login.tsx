@@ -88,7 +88,6 @@ const Login: React.FC<{
           )}
           <Field>
             <Button
-              className="bg-green-600 hover:bg-green-700"
               type="submit"
               onClick={() => handleSubmit()}
             >

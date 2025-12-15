@@ -12,7 +12,6 @@ export default defineConfig({
     splashScreen({
       logoSrc: 'logo.svg',
       loaderType: 'none',
-      minDurationMs: 1000,
     }),
   ],
   server: { port: 3000 },

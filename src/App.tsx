@@ -16,6 +16,8 @@ import FontsPage from './pages/FontsPage'
 import HomePage from './pages/HomePage'
 import LibrariesPage from './pages/LibrariesPage'
 import LibraryPage from './pages/LibraryPage'
+import MeasurePage from './pages/MeasurePage'
+import MeasurementsPage from './pages/MeasurementsPage'
 import SearchPage from './pages/SearchPage'
 
 const router = createBrowserRouter([
@@ -30,6 +32,14 @@ const router = createBrowserRouter([
       {
         path: 'home',
         element: <HomePage />,
+      },
+      {
+        path: 'measurements/:host/',
+        element: <MeasurementsPage />,
+      },
+      {
+        path: 'measure',
+        element: <MeasurePage />,
       },
       {
         path: 'libraries',

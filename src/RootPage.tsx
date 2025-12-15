@@ -1,11 +1,10 @@
 import {
   Github,
   HomeIcon,
-  LayoutGridIcon,
   LogOutIcon,
   PackageIcon,
+  Scale,
   SearchIcon,
-  StarIcon,
   TypeIcon
 } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
@@ -44,16 +43,17 @@ const items: SidebarItem[] = [
     url: '/search',
     icon: <SearchIcon />,
   },
-  {
-    title: 'Spotlight',
-    url: '/spotlight',
-    icon: <StarIcon />,
-  },
-  {
-    title: 'Apps',
-    url: '/apps',
-    icon: <LayoutGridIcon />,
-  },
+  { title: 'Measure', url: '/measure', icon: <Scale /> },
+  // {
+  //   title: 'Spotlight',
+  //   url: '/spotlight',
+  //   icon: <StarIcon />,
+  // },
+  // {
+  //   title: 'Apps',
+  //   url: '/apps',
+  //   icon: <LayoutGridIcon />,
+  // },
   {
     title: 'Libraries',
     url: '/libraries',
@@ -130,7 +130,7 @@ const RootPage: React.FC = () => {
             ) : (
               <div className="grid grid-cols-2 gap-2 w-full">
                 <Button
-                  className="bg-green-600 hover:bg-green-700 mt-4"
+                  className="mt-4"
                   onClick={() => {
                     navigate('/auth/login')
                   }}
@@ -186,7 +186,7 @@ const RootPage: React.FC = () => {
       </Sidebar>
 
       <main className="flex-1 min-w-100vh">
-        <div className="p-6 max-h-screen max-w-[calc(100vw-256px)] overflow-auto overflow-x-hidden">
+        <div className="max-h-screen max-w-[calc(100vw-256px)] overflow-auto overflow-x-hidden">
           <Outlet />
         </div>
       </main>

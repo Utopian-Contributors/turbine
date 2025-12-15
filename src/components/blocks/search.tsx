@@ -7,12 +7,14 @@ import { Input } from '../ui/input'
 interface SearchProps
   extends Omit<React.HTMLAttributes<HTMLInputElement>, 'onChange'> {
   onChange: (value: string) => void
+  placeholder: string
   className?: string
   defaultValue?: string
 }
 
 const Search: React.FC<SearchProps> = ({
   onChange,
+  placeholder,
   className,
   defaultValue,
   ...props
@@ -22,10 +24,10 @@ const Search: React.FC<SearchProps> = ({
     <div className="w-[420px] relative transform -translate-x-1/2 left-1/2 flex gap-1 items-center">
       <Input
         className={cn(
-          `w-[420px] bg-transparent backdrop-blur-xs m-0 p-6 text-lg rounded-full ${className}`
+          `w-md bg-transparent backdrop-blur-xs m-0 p-6 text-lg rounded-full ${className}`
         )}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search npm packages"
+        placeholder={placeholder}
         defaultValue={defaultValue}
         ref={ref}
         {...props}

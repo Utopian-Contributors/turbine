@@ -115,7 +115,6 @@ const Signup: React.FC<{
           <Field>
             <Button
               type="submit"
-              className="bg-green-600 hover:bg-green-700"
               onClick={() => handleSubmit()}
             >
               Create Account

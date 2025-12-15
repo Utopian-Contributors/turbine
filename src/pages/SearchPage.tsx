@@ -26,11 +26,12 @@ const SearchPage: React.FC<SearchPageProps> = () => {
     useSearch(initialSearchTerm)
 
   return (
-    <div className="w-full">
+    <div className="pt-6 w-full">
       <title>Turbine | Search</title>
       <div className="w-2xl mx-auto">
         <div className="sticky top-0 pb-2 z-10">
           <Search
+            placeholder="Search npm packages and fonts"
             onChange={(res) => search(res)}
             defaultValue={initialSearchTerm}
             autoFocus
@@ -40,7 +41,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
               <Checkbox
                 id="showFonts"
                 defaultChecked={showFonts}
-                className="data-[state=checked]:border-green-600 data-[state=checked]:bg-green-600"
+                className="data-[state=checked]:border-green-600 data-[state=checked]:bg-green-500"
                 onCheckedChange={() => setShowFonts(!showFonts)}
               />
               <Label
