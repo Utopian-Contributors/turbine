@@ -107,7 +107,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         initial={{ opacity: 0, filter: 'blur(10px)' }}
         animate={{ opacity: 1, filter: 'blur(0px)' }}
         transition={{ duration: 0.5 }}
-        className="grid grid-cols-4 py-4 gap-6"
+        className="grid grid-cols-4 gap-6"
       >
         <div className="col-span-3">
           <Bundle measurement={measurement} />
@@ -137,7 +137,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
   )
 
   useEffect(() => {
-    if (url) {
+    if (
+      url &&
+      !measurementsQueryData?.measurements?.some((m) => m.url === url)
+    ) {
       measurementsQuery({
         variables: { url },
         fetchPolicy: 'network-only',
@@ -149,22 +152,36 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         }
       })
     }
-  }, [measurementsQuery, navigate, params, url])
+  }, [
+    measurementsQuery,
+    measurementsQueryData?.measurements,
+    navigate,
+    params,
+    url,
+  ])
 
   const measure = useCallback(
     (device: DeviceType, connection: ConnectionType) => {
       if (url) {
-        // Create a new measurement if it doesn't exist
-        createMeasurement({
-          variables: {
-            url: url || '',
-            device,
-            connection,
-          },
-        })
+        if (
+          !measurementsQueryData?.measurements?.some(
+            (m) =>
+              m.url === url &&
+              m.device.type === device &&
+              m.connectionType === connection
+          )
+        ) {
+          createMeasurement({
+            variables: {
+              url: url || '',
+              device,
+              connection,
+            },
+          })
+        }
       }
     },
-    [createMeasurement, url]
+    [createMeasurement, measurementsQueryData?.measurements, url]
   )
 
   useEffect(() => {
@@ -188,6 +205,30 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     measurementsQueryData?.measurements,
     measurement,
   ])
+
+  useEffect(() => {
+    const device = searchParams.get('device')
+    const connection = searchParams.get('connection') as ConnectionType
+    if (device) {
+      const deviceObj = measurementDevicesData?.measurementDevices?.find(
+        (d) => d.type === (device as DeviceType)
+      )
+      if (deviceObj) {
+        setSelectedDevice(deviceObj.id)
+      }
+    } else {
+      setSelectedDevice(
+        measurementDevicesData?.measurementDevices?.find(
+          (d) => d.type === DeviceType.Desktop
+        )?.id || null
+      )
+    }
+    if (connection) {
+      setSelectedConnection(connection)
+    } else {
+      setSelectedConnection(ConnectionType.Wifi)
+    }
+  }, [measurementDevicesData?.measurementDevices, searchParams])
 
   return (
     <div className="p-6">
@@ -227,11 +268,11 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 >
                   <PreloadImage
                     src={measurement.thumbnail}
-                    className="w-[12rem] h-[7rem] rounded-sm bg-cover bg-center"
+                    className="w-[12rem] h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
                   >
                     {(error) =>
                       error ? (
-                        <div className="w-[12rem] h-[7rem] bg-gray-200 rounded-sm">
+                        <div className="w-full h-full bg-gray-200 rounded-sm">
                           <div className="h-full flex flex-col items-center justify-center gap-1 text-red-400">
                             <EyeOff size={20} /> No thumbnail
                           </div>
@@ -291,12 +332,33 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   className="flex gap-2"
                   variant="outline"
                   onClick={() => {
-                    createMeasurement({
-                      variables: {
-                        url,
-                        remeasure: true,
-                      },
-                    })
+                    if (selectedDevice && selectedConnection) {
+                      createMeasurement({
+                        variables: {
+                          url,
+                          device:
+                            measurementDevicesData?.measurementDevices?.find(
+                              (d) => d.id === selectedDevice
+                            )?.type,
+                          connection: selectedConnection,
+                          remeasure: true,
+                        },
+                      }).then((createMutation) => {
+                        const newMeasurement =
+                          createMutation.data?.createMeasurement
+                        const newUrlObj = new URL(newMeasurement?.url || url)
+                        navigate(
+                          `/measurements/${newUrlObj.hostname}?path=${
+                            newUrlObj.pathname
+                          }&device=${
+                            measurementDevicesData?.measurementDevices?.find(
+                              (d) => d.id === selectedDevice
+                            )?.type
+                          }&connection=${selectedConnection}`,
+                          { replace: true }
+                        )
+                      })
+                    }
                   }}
                 >
                   <Repeat size={16} /> Re-measure
@@ -369,6 +431,8 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
             </motion.div>
             {measurementsQueryData.measurements && measurement && (
               <Environments
+                selectedConnection={selectedConnection}
+                onChangeConnection={setSelectedConnection}
                 measurements={measurementsQueryData.measurements}
                 current={measurement}
                 onClick={measure}
@@ -388,7 +452,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     initial={{ opacity: 0, filter: 'blur(10px)' }}
                     animate={{ opacity: 1, filter: 'blur(0px)' }}
                     transition={{ duration: 0.5 }}
-                    className="flex gap-4 py-4 px-1 overflow-x-auto"
+                    className="flex gap-4 p-1 overflow-x-auto"
                   >
                     {measurement.screenshots.map((img, index) => (
                       <div
