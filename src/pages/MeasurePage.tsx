@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from 'react-router'
 import {
   ConnectionType,
   DeviceType,
-  useMeasurementsLazyQuery
+  useMeasurementsLazyQuery,
 } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -26,24 +26,24 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
 
   const search = useCallback(
     (url: string) => {
-      if (!isConnected) {
-        login()
-      } else {
-        const urlObj = new URL(url)
-        measurementsQuery({ variables: { url } })
-          .then(async (response) => {
-            if (!response.error && !response.data?.measurements?.length) {
+      const urlObj = new URL(url)
+      measurementsQuery({ variables: { url }, fetchPolicy: 'network-only' })
+        .then(async (response) => {
+          if (!response.error && !response.data?.measurements?.length) {
+            if (!isConnected) {
+              login()
+            } else {
               await createMeasure({
                 url: new URL(urlObj.pathname, `https://${urlObj.host}`).href,
                 device: DeviceType.Desktop,
                 connection: ConnectionType.Wifi,
               })
             }
-          })
-          .then(() => {
-            navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
-          })
-      }
+          }
+        })
+        .then(() => {
+          navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
+        })
     },
     [createMeasure, isConnected, login, measurementsQuery, navigate]
   )

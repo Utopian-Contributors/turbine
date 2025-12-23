@@ -117,18 +117,13 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         fetchPolicy: 'network-only',
       }).then((data) => {
         if (!data.error && !data.data?.measurements?.length) {
-          createMeasure({
-            device: DeviceType.Desktop,
-            connection: ConnectionType.Wifi,
-          }).then(() => {
-            navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
-          })
+          navigate(`/measure/?url=${encodeURIComponent(url)}`)
         } else {
           navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
         }
       })
     },
-    [createMeasure, measurementsQuery, navigate]
+    [measurementsQuery, navigate]
   )
 
   useEffect(() => {
