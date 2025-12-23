@@ -1,16 +1,16 @@
 import {
+  CreditCardIcon,
   Github,
+  GlobeIcon,
   HomeIcon,
   LogOutIcon,
   PackageIcon,
   Scale,
   SearchIcon,
-  TypeIcon
+  TypeIcon,
 } from 'lucide-react'
-import { useEffect, type JSX } from 'react'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
-import { hideSplashScreen } from 'vite-plugin-splash-screen/runtime'
-import { useLoggedInQuery } from '../generated/graphql'
+import { type JSX } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   Sidebar,
   SidebarContent,
@@ -23,63 +23,82 @@ import {
   SidebarProvider,
 } from './components/blocks/sidebar'
 import LogoSilhouette from './components/icons/logoSilhouette'
+import Wallet from './components/Phantom/Wallet'
 import { Button } from './components/ui/button'
 import { Separator } from './components/ui/separator'
+import { useWalletOrAccLogin } from './hooks/useWalletOrAccLogin'
+import { cn } from './lib/utils'
 
 interface SidebarItem {
   title: string
   url: string
-  icon: JSX.Element
+  icon: (selected: boolean) => JSX.Element
 }
 
 const items: SidebarItem[] = [
   {
     title: 'Home',
     url: '/home',
-    icon: <HomeIcon />,
+    icon: (selected: boolean) => (
+      <HomeIcon className={selected ? 'text-black' : 'text-muted-foreground'} />
+    ),
   },
   {
     title: 'Search',
     url: '/search',
-    icon: <SearchIcon />,
+    icon: (selected: boolean) => (
+      <SearchIcon
+        className={selected ? 'text-black' : 'text-muted-foreground'}
+      />
+    ),
   },
-  { title: 'Measure', url: '/measure', icon: <Scale /> },
-  // {
-  //   title: 'Spotlight',
-  //   url: '/spotlight',
-  //   icon: <StarIcon />,
-  // },
-  // {
-  //   title: 'Apps',
-  //   url: '/apps',
-  //   icon: <LayoutGridIcon />,
-  // },
+  {
+    title: 'Websites',
+    url: '/websites',
+    icon: (selected: boolean) => (
+      <GlobeIcon
+        className={selected ? 'text-black' : 'text-muted-foreground'}
+      />
+    ),
+  },
+  {
+    title: 'Measure',
+    url: '/measure',
+    icon: (selected: boolean) => (
+      <Scale className={selected ? 'text-black' : 'text-muted-foreground'} />
+    ),
+  },
   {
     title: 'Libraries',
     url: '/libraries',
-    icon: <PackageIcon />,
+    icon: (selected: boolean) => (
+      <PackageIcon
+        className={selected ? 'text-black' : 'text-muted-foreground'}
+      />
+    ),
   },
   {
     title: 'Fonts',
     url: '/fonts',
-    icon: <TypeIcon />,
+    icon: (selected: boolean) => (
+      <TypeIcon className={selected ? 'text-black' : 'text-muted-foreground'} />
+    ),
+  },
+  {
+    title: 'Payments',
+    url: '/payments',
+    icon: (selected: boolean) => (
+      <CreditCardIcon
+        className={cn(selected ? 'text-black' : 'text-muted-foreground')}
+      />
+    ),
   },
 ]
 
 const RootPage: React.FC = () => {
+  const location = useLocation()
   const navigate = useNavigate()
-  const { data: loggedInQueryData } = useLoggedInQuery()
-
-  useEffect(() => {
-    if (loggedInQueryData?.loggedIn?.verified === false) {
-      navigate('/auth/verify')
-    }
-    hideSplashScreen()
-  }, [
-    loggedInQueryData?.loggedIn,
-    loggedInQueryData?.loggedIn?.verified,
-    navigate,
-  ])
+  const { isLoggedIn, user, loginRedirect } = useWalletOrAccLogin()
 
   return (
     <SidebarProvider>
@@ -92,32 +111,36 @@ const RootPage: React.FC = () => {
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild tooltip={item.title}>
-                      {item.url.startsWith('/') ? (
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      className={cn(
+                        location.pathname.startsWith(item.url)
+                          ? 'font-bold'
+                          : 'text-muted-foreground'
+                      )}
+                    >
+                      {location.pathname.startsWith(item.url) ? (
                         <Link to={item.url}>
-                          {item.icon}
+                          {item.icon(true)}
                           <span>{item.title}</span>
                         </Link>
                       ) : (
-                        <a href={item.url}>
-                          {item.icon}
+                        <Link to={item.url}>
+                          {item.icon(false)}
                           <span>{item.title}</span>
-                        </a>
+                        </Link>
                       )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
-            {loggedInQueryData?.loggedIn ? (
+            {isLoggedIn ? (
               <div className="bg-white border rounded-lg p-4 flex justify-between items-center mt-4 mb-2">
                 <div className="flex flex-col">
-                  <p className="text-sm font-bold">
-                    {loggedInQueryData?.loggedIn.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {loggedInQueryData?.loggedIn.email}
-                  </p>
+                  <p className="text-sm font-bold">{user?.name}</p>
+                  <p className="text-xs text-muted-foreground">{user?.email}</p>
                 </div>
                 <Button
                   size="icon"
@@ -132,7 +155,7 @@ const RootPage: React.FC = () => {
                 <Button
                   className="mt-4"
                   onClick={() => {
-                    navigate('/auth/login')
+                    loginRedirect()
                   }}
                 >
                   Log in
@@ -152,6 +175,7 @@ const RootPage: React.FC = () => {
         </SidebarContent>
 
         <SidebarFooter>
+          {isLoggedIn && <Wallet />}
           <SidebarGroup>
             <div className="flex gap-2">
               <Button

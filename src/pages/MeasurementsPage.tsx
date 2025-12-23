@@ -3,9 +3,9 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Bundle from '@/components/Measurement/Bundle'
 import Environments from '@/components/Measurement/Environments'
+import Pricetag from '@/components/Pricetag'
 import AutoProgress from '@/components/ui/auto-progress'
 import { Button } from '@/components/ui/button'
-import { Icons } from '@/components/ui/icons'
 import PreloadImage from '@/components/ui/preload-image-cover'
 import {
   Select,
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { motion } from 'framer-motion'
 import { toHeaderCase } from 'js-convert-case'
 import { Clock, EyeOff, Repeat } from 'lucide-react'
@@ -22,9 +23,7 @@ import { useLocation, useNavigate, useParams } from 'react-router'
 import {
   ConnectionType,
   DeviceType,
-  MeasurementsDocument,
   MeasurementStatus,
-  useCreateMeasurementMutation,
   useMeasurementDevicesQuery,
   useMeasurementsLazyQuery,
 } from '../../generated/graphql'
@@ -63,15 +62,8 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
 
   const [measurementsQuery, { data: measurementsQueryData, refetch }] =
     useMeasurementsLazyQuery()
-  const [createMeasurement] = useCreateMeasurementMutation({
-    refetchQueries: [
-      {
-        query: MeasurementsDocument,
-        variables: {
-          url,
-        },
-      },
-    ],
+  const { createMeasure } = useCreateMeasure({
+    url,
   })
 
   const measurement = useMemo(() => {
@@ -125,7 +117,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         fetchPolicy: 'network-only',
       }).then((data) => {
         if (!data.error && !data.data?.measurements?.length) {
-          createMeasurement({ variables: { url } }).then(() => {
+          createMeasure({
+            device: DeviceType.Desktop,
+            connection: ConnectionType.Wifi,
+          }).then(() => {
             navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
           })
         } else {
@@ -133,7 +128,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         }
       })
     },
-    [createMeasurement, measurementsQuery, navigate]
+    [createMeasure, measurementsQuery, navigate]
   )
 
   useEffect(() => {
@@ -171,17 +166,14 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
               m.connectionType === connection
           )
         ) {
-          createMeasurement({
-            variables: {
-              url: url || '',
-              device,
-              connection,
-            },
+          createMeasure({
+            device,
+            connection,
           })
         }
       }
     },
-    [createMeasurement, measurementsQueryData?.measurements, url]
+    [createMeasure, measurementsQueryData?.measurements, url]
   )
 
   useEffect(() => {
@@ -328,21 +320,21 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 transition={{ duration: 1, delay: 0.5 }}
                 className="flex flex-col items-end gap-2 pt-2"
               >
+                <Pricetag />
                 <Button
                   className="flex gap-2"
                   variant="outline"
                   onClick={() => {
                     if (selectedDevice && selectedConnection) {
-                      createMeasurement({
-                        variables: {
-                          url,
-                          device:
-                            measurementDevicesData?.measurementDevices?.find(
-                              (d) => d.id === selectedDevice
-                            )?.type,
-                          connection: selectedConnection,
-                          remeasure: true,
-                        },
+                      const device =
+                        measurementDevicesData?.measurementDevices?.find(
+                          (d) => d.id === selectedDevice
+                        )?.type
+                      if (!device) return
+                      createMeasure({
+                        device,
+                        connection: selectedConnection,
+                        remeasure: true,
                       }).then((createMutation) => {
                         const newMeasurement =
                           createMutation.data?.createMeasurement
@@ -368,7 +360,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     onValueChange={(value) => setSelectedDevice(value)}
                     defaultValue={selectedDevice || undefined}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-fit">
                       {toHeaderCase(
                         measurementDevicesData?.measurementDevices?.find(
                           (device) => device.id === selectedDevice
@@ -391,7 +383,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     }
                     defaultValue={selectedConnection}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-fit">
                       {toHeaderCase(selectedConnection)
                         .replace('3g', '3G')
                         .replace('4g', '4G')
@@ -416,10 +408,6 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button className="flex gap-2 bg-gray-900 hover:bg-gray-700">
-                  <Icons.twitter className="w-[16px] h-[16px] fill-white" />
-                  Share
-                </Button>
               </motion.div>
             </div>
             <motion.div
@@ -431,8 +419,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
             </motion.div>
             {measurementsQueryData.measurements && measurement && (
               <Environments
-                selectedConnection={selectedConnection}
-                onChangeConnection={setSelectedConnection}
+                initial={selectedConnection}
                 measurements={measurementsQueryData.measurements}
                 current={measurement}
                 onClick={measure}

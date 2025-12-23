@@ -1,10 +1,7 @@
 import { cn } from '@/lib/utils'
 import React, { useState } from 'react'
 
-import {
-  useToggleIntegrateVersionMutation,
-  type VersionConfigFragment,
-} from '../../../generated/graphql'
+import { type VersionConfigFragment } from '../../../generated/graphql'
 
 const Version: React.FC<{
   version: string
@@ -30,9 +27,7 @@ const Version: React.FC<{
 
 interface VersionConfigProps {
   versionConfig?: VersionConfigFragment
-  toggleIntegrateVersion: ReturnType<
-    typeof useToggleIntegrateVersionMutation
-  >[0]
+  toggleIntegrateVersion: (version: string) => void
   isAdmin?: boolean
 }
 
@@ -53,9 +48,7 @@ const VersionConfig: React.FC<VersionConfigProps> = ({
             integrated
             isAdmin={isAdmin}
             onClick={() => {
-              toggleIntegrateVersion({
-                variables: { version: integrated.id },
-              })
+              toggleIntegrateVersion(integrated.id)
             }}
           />
         ))}
@@ -65,7 +58,7 @@ const VersionConfig: React.FC<VersionConfigProps> = ({
             version={popular.version}
             isAdmin={isAdmin}
             onClick={() => {
-              toggleIntegrateVersion({ variables: { version: popular.id } })
+              toggleIntegrateVersion(popular.id)
             }}
           />
         ))}
@@ -95,7 +88,7 @@ const VersionConfig: React.FC<VersionConfigProps> = ({
                 version={other.version}
                 isAdmin={isAdmin}
                 onClick={() => {
-                  toggleIntegrateVersion({ variables: { version: other.id } })
+                  toggleIntegrateVersion(other.id)
                 }}
               />
             ))}

@@ -1,0 +1,16 @@
+query websites {
+  websites {
+    id
+    host
+    rating
+    latestMeasurement {
+      icon
+      thumbnail
+      description
+      title
+      url
+      redirect
+      createdAt
+    }
+  }
+}

@@ -2,18 +2,15 @@ import { Card, CardContent } from '@/components/ui/card'
 import { ChartBarLabelCustom } from '@/components/ui/chart-bar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type {
-  useToggleIntegrateVersionMutation,
   VersionIntegrationsQuery,
-  VersionUsageQuery,
+  VersionUsageQuery
 } from 'generated/graphql'
 import { abbreviateNumber } from 'js-abbreviation-number'
 import React from 'react'
 import VersionConfig from '../VersionConfig'
 
 interface VersionsCardProps {
-  toggleIntegrateVersion: ReturnType<
-    typeof useToggleIntegrateVersionMutation
-  >[0]
+  toggleIntegrateVersion: (version: string) => void
   integrations: VersionIntegrationsQuery['versionIntegrations']
   usage: VersionUsageQuery['versionUsage']
   isAdmin: boolean

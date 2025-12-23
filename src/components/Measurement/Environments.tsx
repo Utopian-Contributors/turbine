@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { toHeaderCase, toSentenceCase } from 'js-convert-case'
 import {
   CircleCheck,
-  CirclePlay,
   CircleX,
   Monitor,
   Smartphone,
@@ -17,6 +16,7 @@ import {
 import React from 'react'
 import { useNavigate } from 'react-router'
 
+import { useWalletOrAccLogin } from '@/hooks/useWalletOrAccLogin'
 import { TabsContent } from '@radix-ui/react-tabs'
 import {
   ConnectionType,
@@ -26,6 +26,7 @@ import {
   type MeasuredFileFragment,
   type Measurement,
 } from '../../../generated/graphql'
+import Pricetag from '../Pricetag'
 import { Card, CardContent, CardHeader } from '../ui/card'
 import { Skeleton } from '../ui/skeleton'
 import { Spinner } from '../ui/spinner'
@@ -69,16 +70,17 @@ interface EnvironmentsProps {
   current: Pick<Measurement, 'id' | 'url' | 'elapsed'> & {
     bundledFiles: MeasuredFileFragment[]
   }
-  selectedConnection: ConnectionType
-  onChangeConnection: React.Dispatch<React.SetStateAction<ConnectionType>>
+  initial: ConnectionType
   onClick: (device: DeviceType, connection: ConnectionType) => void
 }
 
 const Environments: React.FC<EnvironmentsProps> = ({
   measurements,
   current,
+  initial,
   onClick,
 }) => {
+  const { login, isLoggedIn } = useWalletOrAccLogin()
   const navigate = useNavigate()
 
   const { data: measurementDevicesData } = useMeasurementDevicesQuery()
@@ -102,10 +104,14 @@ const Environments: React.FC<EnvironmentsProps> = ({
   const possibleDevices = measurementDevicesData.measurementDevices
 
   return (
-    <Tabs defaultValue={possibleConnections[0]} className="p-6">
+    <Tabs defaultValue={initial || possibleConnections[0]} className="p-6">
       <TabsList>
         {possibleConnections.map((connection) => (
-          <TabsTrigger key={connection} value={connection}>
+          <TabsTrigger
+            key={connection}
+            value={connection}
+            disabled={connection === ConnectionType.Offline}
+          >
             {toHeaderCase(connection)
               .replace('3g', '3G')
               .replace('4g', '4G')
@@ -167,20 +173,24 @@ const Environments: React.FC<EnvironmentsProps> = ({
                           ? 'animate-pulse'
                           : '',
                         current.id === measurementForDevice?.id
-                          ? 'ring-2 ring-green-500'
+                          ? 'ring ring-green-500'
                           : ''
                       )}
                       onClick={() => {
-                        const currentUrlObj = new URL(current.url)
-                        onClick(device.type, connection)
-                        navigate(
-                          `/measurements/${currentUrlObj.host}?path=${currentUrlObj.pathname}&device=${device.type}&connection=${connection}`,
-                          { replace: true }
-                        )
+                        if (isLoggedIn) {
+                          const currentUrlObj = new URL(current.url)
+                          onClick(device.type, connection)
+                          navigate(
+                            `/measurements/${currentUrlObj.host}?path=${currentUrlObj.pathname}&device=${device.type}&connection=${connection}`,
+                            { replace: true }
+                          )
+                        } else {
+                          login()
+                        }
                       }}
                     >
                       <CardHeader>
-                        <div className="flex justify-between">
+                        <div className="h-[40px] flex items-center justify-between">
                           <div className={'flex items-center gap-2'}>
                             {getDeviceIcon(device.type)}
                             <h3 className="text-xl">
@@ -204,10 +214,7 @@ const Environments: React.FC<EnvironmentsProps> = ({
                               className="text-white fill-red-500"
                             />
                           ) : (
-                            <CirclePlay
-                              size={32}
-                              className="m-[4px] text-gray-200"
-                            />
+                            <Pricetag />
                           )}
                         </div>
                       </CardHeader>

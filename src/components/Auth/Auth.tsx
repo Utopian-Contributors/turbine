@@ -13,9 +13,9 @@ export const Auth: React.FC = () => {
 
   useEffect(() => {
     if (data?.loggedIn && data.loggedIn.verified) {
-      const redirect = localStorage.getItem('redirect')
+      const redirect = localStorage.getItem('postLoginRedirect')
       if (redirect) {
-        localStorage.removeItem('redirect')
+        localStorage.removeItem('postLoginRedirect')
         navigate(redirect, { replace: true })
       } else if (!location.pathname.endsWith('/logout')) {
         navigate('/', { replace: true })

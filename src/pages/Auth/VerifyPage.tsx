@@ -19,9 +19,9 @@ export const VerifyPage: React.FC = () => {
       loggedInQueryResult.client.cache.evict({ fieldName: "loggedIn" });
       if (data.verify?.verified) {
         // Redirect to the previous page or the home page
-        const prev = localStorage.getItem("redirect");
+        const prev = localStorage.getItem("postLoginRedirect");
         if (prev) {
-          localStorage.removeItem("redirect");
+          localStorage.removeItem("postLoginRedirect");
           navigate(prev);
         } else {
           navigate("/");

@@ -1,10 +1,13 @@
+import Pricetag from '@/components/Pricetag'
 import { SearchWebsite } from '@/components/ui/search-website'
+import { useCreateMeasure } from '@/hooks/useCreateMeasure'
+import { useWalletOrAccLogin } from '@/hooks/useWalletOrAccLogin'
 import React, { useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import {
-  MeasurementsDocument,
-  useCreateMeasurementMutation,
-  useMeasurementsLazyQuery,
+  ConnectionType,
+  DeviceType,
+  useMeasurementsLazyQuery
 } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -16,39 +19,39 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   const params = new URLSearchParams(location.search)
 
   const [measurementsQuery] = useMeasurementsLazyQuery()
-  const [createMeasurement] = useCreateMeasurementMutation({
-    refetchQueries: [
-      {
-        query: MeasurementsDocument,
-        variables: { url: params.get('url') || '' },
-      },
-    ],
+  const { createMeasure } = useCreateMeasure({
+    url: '',
   })
+  const { isConnected, login } = useWalletOrAccLogin()
 
   const search = useCallback(
     (url: string) => {
-      const urlObj = new URL(url)
-      measurementsQuery({ variables: { url } })
-        .then(async (data) => {
-          if (!data.error && !data.data?.measurements?.length) {
-            await createMeasurement({
-              variables: {
+      if (!isConnected) {
+        login()
+      } else {
+        const urlObj = new URL(url)
+        measurementsQuery({ variables: { url } })
+          .then(async (response) => {
+            if (!response.error && !response.data?.measurements?.length) {
+              await createMeasure({
                 url: new URL(urlObj.pathname, `https://${urlObj.host}`).href,
-              },
-            })
-          }
-        })
-        .then(() => {
-          navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
-        })
+                device: DeviceType.Desktop,
+                connection: ConnectionType.Wifi,
+              })
+            }
+          })
+          .then(() => {
+            navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
+          })
+      }
     },
-    [createMeasurement, measurementsQuery, navigate]
+    [createMeasure, isConnected, login, measurementsQuery, navigate]
   )
 
   return (
     <div className="w-full h-screen overflow-hidden">
       <div className="w-full mt-16 flex flex-col items-center">
-        <h1 className="max-w-4xl text-white text-center text-6xl font-bold leading-16 animate-pulse mb-8">
+        <h1 className="max-w-4xl text-white text-center text-6xl font-bold leading-16 mb-8">
           Measure and optimize the performance of your website
         </h1>
         <SearchWebsite
@@ -57,8 +60,9 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
           size={24}
           initial={params.get('url') || ''}
           onSearch={search}
-          className="w-xl"
+          className="w-xl mb-4"
         />
+        <Pricetag />
         <div className="max-w-xl flex flex-wrap justify-center gap-2 mt-2 p-4">
           <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
             Understand SEO
@@ -97,9 +101,8 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
           alt="Turbine animation"
           className="absolute inset-0 h-full w-full"
           style={{
-            scale: 0.5,
             opacity: 0.7,
-            transform: 'translate(50%, 80%)',
+            transform: 'scale(0.5) translate(50%, 80%)',
           }}
         />
         <img
@@ -107,9 +110,8 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
           alt="Turbine animation"
           className="absolute inset-0 h-full w-full"
           style={{
-            scale: 0.5,
             opacity: 0.7,
-            transform: 'translate(-50%, 80%)',
+            transform: 'scale(0.5) translate(-50%, 80%)',
           }}
         />
       </div>

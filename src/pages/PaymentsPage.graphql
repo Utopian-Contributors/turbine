@@ -1,0 +1,9 @@
+query payments {
+  payments {
+    id
+    amount
+    txSignature
+    tokenMint
+    createdAt
+  }
+}

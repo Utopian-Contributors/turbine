@@ -34,6 +34,13 @@ export type BundledFile = {
   width?: Maybe<Scalars['Int']['output']>;
 };
 
+export type BundledImages = {
+  __typename?: 'BundledImages';
+  desktop?: Maybe<Array<BundledFile>>;
+  mobile?: Maybe<Array<BundledFile>>;
+  tablet?: Maybe<Array<BundledFile>>;
+};
+
 export enum ConnectionType {
   Fast_3G = 'FAST_3G',
   Fast_4G = 'FAST_4G',
@@ -178,6 +185,15 @@ export type MeasurementDevice = {
   width: Scalars['Int']['output'];
 };
 
+export type MeasurementPrice = {
+  __typename?: 'MeasurementPrice';
+  amount: Scalars['Float']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  tokenMint: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export enum MeasurementStatus {
   Completed = 'COMPLETED',
   Failed = 'FAILED',
@@ -205,7 +221,10 @@ export type MutationCreateMeasurementArgs = {
   connection?: InputMaybe<ConnectionType>;
   device?: InputMaybe<DeviceType>;
   remeasure?: InputMaybe<Scalars['Boolean']['input']>;
+  tokenMint?: InputMaybe<Scalars['String']['input']>;
+  txSignature?: InputMaybe<Scalars['String']['input']>;
   url?: InputMaybe<Scalars['String']['input']>;
+  walletAddress?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -250,15 +269,28 @@ export type MutationVerifyArgs = {
   code?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Payment = {
+  __typename?: 'Payment';
+  amount: Scalars['Float']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  tokenMint: Scalars['String']['output'];
+  txSignature: Scalars['String']['output'];
+  walletAddress: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   bigLibraries?: Maybe<Array<Library>>;
   font?: Maybe<Font>;
+  imagesToConvert: BundledImages;
   library?: Maybe<Library>;
   libraryUsage?: Maybe<LibraryUsage>;
   loggedIn: User;
   measurementDevices?: Maybe<Array<MeasurementDevice>>;
+  measurementPrices?: Maybe<Array<MeasurementPrice>>;
   measurements?: Maybe<Array<Measurement>>;
+  payments?: Maybe<Array<Payment>>;
   popularFonts?: Maybe<Array<Font>>;
   searchFonts?: Maybe<Array<Font>>;
   searchLibrary?: Maybe<Array<LibrarySearchResult>>;
@@ -266,11 +298,17 @@ export type Query = {
   versionFileIntegrations: VersionFileIntegrations;
   versionIntegrations: VersionIntegrations;
   versionUsage?: Maybe<Array<VersionUsage>>;
+  websites?: Maybe<Array<WebsiteHost>>;
 };
 
 
 export type QueryFontArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryImagesToConvertArgs = {
+  url?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -401,7 +439,8 @@ export type WebsiteHost = {
   __typename?: 'WebsiteHost';
   host: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  measurements: Array<Measurement>;
+  latestMeasurement?: Maybe<Measurement>;
+  rating?: Maybe<Scalars['Int']['output']>;
 };
 
 export type LoggedInQueryVariables = Exact<{ [key: string]: never; }>;
@@ -474,6 +513,15 @@ export type PopularFontsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type PopularFontsQuery = { __typename?: 'Query', popularFonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, integrated: boolean, publishedAt: any }> | null };
+
+export type ImagesToConvertQueryVariables = Exact<{
+  url: Scalars['String']['input'];
+}>;
+
+
+export type ImagesToConvertQuery = { __typename?: 'Query', imagesToConvert: { __typename?: 'BundledImages', desktop?: Array<{ __typename?: 'BundledFile', id: string, url: string, type: string, size?: string | null, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> | null, tablet?: Array<{ __typename?: 'BundledFile', id: string, url: string, type: string, size?: string | null, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> | null, mobile?: Array<{ __typename?: 'BundledFile', id: string, url: string, type: string, size?: string | null, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> | null } };
+
+export type BundledImageFragment = { __typename?: 'BundledFile', id: string, url: string, type: string, size?: string | null, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null };
 
 export type BigLibrariesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -552,12 +600,25 @@ export type CreateMeasurementMutationVariables = Exact<{
   remeasure?: InputMaybe<Scalars['Boolean']['input']>;
   device?: InputMaybe<DeviceType>;
   connection?: InputMaybe<ConnectionType>;
+  txSignature: Scalars['String']['input'];
+  walletAddress: Scalars['String']['input'];
+  tokenMint: Scalars['String']['input'];
 }>;
 
 
 export type CreateMeasurementMutation = { __typename?: 'Mutation', createMeasurement?: { __typename?: 'Measurement', id: string, url: string, redirect?: string | null, title?: string | null, description?: string | null, status: MeasurementStatus, elapsed?: number | null, icon?: string | null, thumbnail?: string | null, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, cacheControl?: string | null, elapsed: number, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> } | null };
 
 export type MeasuredFileFragment = { __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, cacheControl?: string | null, elapsed: number, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null };
+
+export type MeasurementPricesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeasurementPricesQuery = { __typename?: 'Query', measurementPrices?: Array<{ __typename?: 'MeasurementPrice', tokenMint: string, amount: number }> | null };
+
+export type PaymentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PaymentsQuery = { __typename?: 'Query', payments?: Array<{ __typename?: 'Payment', id: string, amount: number, txSignature: string, tokenMint: string, createdAt: any }> | null };
 
 export type SearchLibraryQueryVariables = Exact<{
   term: Scalars['String']['input'];
@@ -575,6 +636,23 @@ export type SearchFontsQuery = { __typename?: 'Query', searchFonts?: Array<{ __t
 
 export type FontSearchResultFragment = { __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, integrated: boolean, publishedAt: any };
 
+export type WebsitesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, rating?: number | null, latestMeasurement?: { __typename?: 'Measurement', icon?: string | null, thumbnail?: string | null, description?: string | null, title?: string | null, url: string, redirect?: string | null, createdAt: any } | null }> | null };
+
+export const BundledImageFragmentDoc = gql`
+    fragment BundledImage on BundledFile {
+  id
+  url
+  type
+  size
+  width
+  height
+  clientWidth
+  clientHeight
+}
+    `;
 export const VersionConfigFragmentDoc = gql`
     fragment VersionConfig on VersionIntegrations {
   integrated {
@@ -1049,6 +1127,54 @@ export type PopularFontsQueryHookResult = ReturnType<typeof usePopularFontsQuery
 export type PopularFontsLazyQueryHookResult = ReturnType<typeof usePopularFontsLazyQuery>;
 export type PopularFontsSuspenseQueryHookResult = ReturnType<typeof usePopularFontsSuspenseQuery>;
 export type PopularFontsQueryResult = Apollo.QueryResult<PopularFontsQuery, PopularFontsQueryVariables>;
+export const ImagesToConvertDocument = gql`
+    query imagesToConvert($url: String!) {
+  imagesToConvert(url: $url) {
+    desktop {
+      ...BundledImage
+    }
+    tablet {
+      ...BundledImage
+    }
+    mobile {
+      ...BundledImage
+    }
+  }
+}
+    ${BundledImageFragmentDoc}`;
+
+/**
+ * __useImagesToConvertQuery__
+ *
+ * To run a query within a React component, call `useImagesToConvertQuery` and pass it any options that fit your needs.
+ * When your component renders, `useImagesToConvertQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useImagesToConvertQuery({
+ *   variables: {
+ *      url: // value for 'url'
+ *   },
+ * });
+ */
+export function useImagesToConvertQuery(baseOptions: Apollo.QueryHookOptions<ImagesToConvertQuery, ImagesToConvertQueryVariables> & ({ variables: ImagesToConvertQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ImagesToConvertQuery, ImagesToConvertQueryVariables>(ImagesToConvertDocument, options);
+      }
+export function useImagesToConvertLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ImagesToConvertQuery, ImagesToConvertQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ImagesToConvertQuery, ImagesToConvertQueryVariables>(ImagesToConvertDocument, options);
+        }
+export function useImagesToConvertSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ImagesToConvertQuery, ImagesToConvertQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ImagesToConvertQuery, ImagesToConvertQueryVariables>(ImagesToConvertDocument, options);
+        }
+export type ImagesToConvertQueryHookResult = ReturnType<typeof useImagesToConvertQuery>;
+export type ImagesToConvertLazyQueryHookResult = ReturnType<typeof useImagesToConvertLazyQuery>;
+export type ImagesToConvertSuspenseQueryHookResult = ReturnType<typeof useImagesToConvertSuspenseQuery>;
+export type ImagesToConvertQueryResult = Apollo.QueryResult<ImagesToConvertQuery, ImagesToConvertQueryVariables>;
 export const BigLibrariesDocument = gql`
     query bigLibraries {
   bigLibraries {
@@ -1497,12 +1623,15 @@ export type MeasurementDevicesLazyQueryHookResult = ReturnType<typeof useMeasure
 export type MeasurementDevicesSuspenseQueryHookResult = ReturnType<typeof useMeasurementDevicesSuspenseQuery>;
 export type MeasurementDevicesQueryResult = Apollo.QueryResult<MeasurementDevicesQuery, MeasurementDevicesQueryVariables>;
 export const CreateMeasurementDocument = gql`
-    mutation createMeasurement($url: String!, $remeasure: Boolean, $device: DeviceType, $connection: ConnectionType) {
+    mutation createMeasurement($url: String!, $remeasure: Boolean, $device: DeviceType, $connection: ConnectionType, $txSignature: String!, $walletAddress: String!, $tokenMint: String!) {
   createMeasurement(
     url: $url
     remeasure: $remeasure
     device: $device
     connection: $connection
+    txSignature: $txSignature
+    walletAddress: $walletAddress
+    tokenMint: $tokenMint
   ) {
     id
     url
@@ -1538,6 +1667,9 @@ export type CreateMeasurementMutationFn = Apollo.MutationFunction<CreateMeasurem
  *      remeasure: // value for 'remeasure'
  *      device: // value for 'device'
  *      connection: // value for 'connection'
+ *      txSignature: // value for 'txSignature'
+ *      walletAddress: // value for 'walletAddress'
+ *      tokenMint: // value for 'tokenMint'
  *   },
  * });
  */
@@ -1548,6 +1680,89 @@ export function useCreateMeasurementMutation(baseOptions?: Apollo.MutationHookOp
 export type CreateMeasurementMutationHookResult = ReturnType<typeof useCreateMeasurementMutation>;
 export type CreateMeasurementMutationResult = Apollo.MutationResult<CreateMeasurementMutation>;
 export type CreateMeasurementMutationOptions = Apollo.BaseMutationOptions<CreateMeasurementMutation, CreateMeasurementMutationVariables>;
+export const MeasurementPricesDocument = gql`
+    query measurementPrices {
+  measurementPrices {
+    tokenMint
+    amount
+  }
+}
+    `;
+
+/**
+ * __useMeasurementPricesQuery__
+ *
+ * To run a query within a React component, call `useMeasurementPricesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeasurementPricesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeasurementPricesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMeasurementPricesQuery(baseOptions?: Apollo.QueryHookOptions<MeasurementPricesQuery, MeasurementPricesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeasurementPricesQuery, MeasurementPricesQueryVariables>(MeasurementPricesDocument, options);
+      }
+export function useMeasurementPricesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeasurementPricesQuery, MeasurementPricesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeasurementPricesQuery, MeasurementPricesQueryVariables>(MeasurementPricesDocument, options);
+        }
+export function useMeasurementPricesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MeasurementPricesQuery, MeasurementPricesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MeasurementPricesQuery, MeasurementPricesQueryVariables>(MeasurementPricesDocument, options);
+        }
+export type MeasurementPricesQueryHookResult = ReturnType<typeof useMeasurementPricesQuery>;
+export type MeasurementPricesLazyQueryHookResult = ReturnType<typeof useMeasurementPricesLazyQuery>;
+export type MeasurementPricesSuspenseQueryHookResult = ReturnType<typeof useMeasurementPricesSuspenseQuery>;
+export type MeasurementPricesQueryResult = Apollo.QueryResult<MeasurementPricesQuery, MeasurementPricesQueryVariables>;
+export const PaymentsDocument = gql`
+    query payments {
+  payments {
+    id
+    amount
+    txSignature
+    tokenMint
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __usePaymentsQuery__
+ *
+ * To run a query within a React component, call `usePaymentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePaymentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePaymentsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePaymentsQuery(baseOptions?: Apollo.QueryHookOptions<PaymentsQuery, PaymentsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PaymentsQuery, PaymentsQueryVariables>(PaymentsDocument, options);
+      }
+export function usePaymentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PaymentsQuery, PaymentsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PaymentsQuery, PaymentsQueryVariables>(PaymentsDocument, options);
+        }
+export function usePaymentsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PaymentsQuery, PaymentsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PaymentsQuery, PaymentsQueryVariables>(PaymentsDocument, options);
+        }
+export type PaymentsQueryHookResult = ReturnType<typeof usePaymentsQuery>;
+export type PaymentsLazyQueryHookResult = ReturnType<typeof usePaymentsLazyQuery>;
+export type PaymentsSuspenseQueryHookResult = ReturnType<typeof usePaymentsSuspenseQuery>;
+export type PaymentsQueryResult = Apollo.QueryResult<PaymentsQuery, PaymentsQueryVariables>;
 export const SearchLibraryDocument = gql`
     query searchLibrary($term: String!) {
   searchLibrary(term: $term) {
@@ -1635,3 +1850,53 @@ export type SearchFontsQueryHookResult = ReturnType<typeof useSearchFontsQuery>;
 export type SearchFontsLazyQueryHookResult = ReturnType<typeof useSearchFontsLazyQuery>;
 export type SearchFontsSuspenseQueryHookResult = ReturnType<typeof useSearchFontsSuspenseQuery>;
 export type SearchFontsQueryResult = Apollo.QueryResult<SearchFontsQuery, SearchFontsQueryVariables>;
+export const WebsitesDocument = gql`
+    query websites {
+  websites {
+    id
+    host
+    rating
+    latestMeasurement {
+      icon
+      thumbnail
+      description
+      title
+      url
+      redirect
+      createdAt
+    }
+  }
+}
+    `;
+
+/**
+ * __useWebsitesQuery__
+ *
+ * To run a query within a React component, call `useWebsitesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWebsitesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWebsitesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useWebsitesQuery(baseOptions?: Apollo.QueryHookOptions<WebsitesQuery, WebsitesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<WebsitesQuery, WebsitesQueryVariables>(WebsitesDocument, options);
+      }
+export function useWebsitesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WebsitesQuery, WebsitesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<WebsitesQuery, WebsitesQueryVariables>(WebsitesDocument, options);
+        }
+export function useWebsitesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<WebsitesQuery, WebsitesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<WebsitesQuery, WebsitesQueryVariables>(WebsitesDocument, options);
+        }
+export type WebsitesQueryHookResult = ReturnType<typeof useWebsitesQuery>;
+export type WebsitesLazyQueryHookResult = ReturnType<typeof useWebsitesLazyQuery>;
+export type WebsitesSuspenseQueryHookResult = ReturnType<typeof useWebsitesSuspenseQuery>;
+export type WebsitesQueryResult = Apollo.QueryResult<WebsitesQuery, WebsitesQueryVariables>;

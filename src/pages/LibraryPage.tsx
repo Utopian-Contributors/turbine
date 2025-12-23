@@ -10,7 +10,7 @@ import { useVersions } from '@/hooks/useVersions'
 import { filesize } from 'filesize'
 import { Globe, PackageIcon } from 'lucide-react'
 import moment from 'moment'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router'
 import { Link } from 'react-router-dom'
 
@@ -107,6 +107,20 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
     }
   }, [libraryQueryData?.library?.name])
 
+  const toggleIntegrate = useCallback(
+    async (version: string) => {
+      if (loggedInQueryData?.loggedIn?.role !== Role.Admin) {
+        return
+      }
+      await toggleIntegrateVersion({
+        variables: {
+          version,
+        },
+      })
+    },
+    [toggleIntegrateVersion, loggedInQueryData?.loggedIn?.role]
+  )
+
   if (loading) {
     return <div>Loading...</div>
   }
@@ -116,7 +130,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto p-6">
       <title>{title}</title>
       <Search
         placeholder="Search npm packages"
@@ -190,14 +204,12 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
           </div>
           <Separator className="my-6" />
           {versionIntegrationsQueryData &&
-            (versionIntegrationsQueryData?.versionIntegrations.integrated
-              .length ||
-              loggedInQueryData?.loggedIn.role === Role.Admin) && (
+            versionIntegrationsQueryData?.versionIntegrations && (
               <VersionsCard
                 integrations={versionIntegrationsQueryData.versionIntegrations}
                 usage={versionUsageQueryData?.versionUsage}
                 isAdmin={loggedInQueryData?.loggedIn.role === Role.Admin}
-                toggleIntegrateVersion={toggleIntegrateVersion}
+                toggleIntegrateVersion={toggleIntegrate}
               />
             )}
           {versionFilesQueryData?.versionFileIntegrations && (
