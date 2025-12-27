@@ -84,3 +84,14 @@ query measurementPrices {
     amount
   }
 }
+
+query website($host: String!) {
+  website(host: $host) {
+    id
+    host
+    rating {
+      overallScore
+      createdAt
+    }
+  }
+}

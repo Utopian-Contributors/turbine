@@ -14,11 +14,13 @@ import {
   SelectTrigger,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import StarRating from '@/components/ui/StarRating'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { motion } from 'framer-motion'
 import { toHeaderCase } from 'js-convert-case'
-import { Clock, EyeOff, Repeat } from 'lucide-react'
+import { Clock, EyeOff, Repeat, Rocket } from 'lucide-react'
+import moment from 'moment'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import {
   ConnectionType,
@@ -26,6 +28,7 @@ import {
   MeasurementStatus,
   useMeasurementDevicesQuery,
   useMeasurementsLazyQuery,
+  useWebsiteQuery,
 } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -89,6 +92,16 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         : null)
     )
   }, [measurementsQueryData?.measurements, searchParams, url])
+
+  const { data: websiteQueryData } = useWebsiteQuery({
+    variables: {
+      host: measurement?.redirect
+        ? new URL(measurement.redirect).host
+        : measurement?.url
+        ? new URL(measurement?.url).host!
+        : params.host || '',
+    },
+  })
 
   const bundle = useMemo(() => {
     if (measurement?.status !== MeasurementStatus.Completed) {
@@ -251,7 +264,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   initial={{ scale: 0, filter: 'blur(10px)' }}
                   animate={{ scale: 1, filter: 'blur(0px)' }}
                   transition={{ duration: 2, type: 'spring' }}
-                  className="w-fit border rounded-lg p-2"
+                  className="h-fit w-fit border rounded-lg p-2"
                 >
                   <PreloadImage
                     src={measurement.thumbnail}
@@ -405,6 +418,56 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 </div>
               </motion.div>
             </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="px-6 flex gap-4 mb-6"
+            >
+              <div
+                className="cursor-pointer w-fit border rounded-md shadow-sm flex flex-col gap-1 p-4"
+                onClick={() =>
+                  navigate(
+                    '/ratings/' +
+                      (measurement.redirect
+                        ? new URL(measurement.redirect).host
+                        : new URL(measurement.url).host || params.host || '')
+                  )
+                }
+              >
+                <StarRating
+                  rating={websiteQueryData?.website?.rating?.overallScore}
+                />
+                <span className="text-xs text-gray-400">
+                  {websiteQueryData?.website?.rating
+                    ? moment(
+                        websiteQueryData?.website?.rating.createdAt
+                      ).fromNow()
+                    : 'Not rated yet'}
+                </span>
+              </div>
+              <div className="opacity-50 w-fit border rounded-md flex items-center gap-3 p-4">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 1, type: 'spring' }}
+                  className="w-fit h-fit p-2 bg-muted rounded-full"
+                >
+                  <Rocket size={20} />
+                </motion.div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-primary">
+                    Want to boost visibility for this website?
+                  </span>
+                  {/* <div className="flex text-sm gap-2">
+                    <Pricetag />
+                    </div> */}
+                  <span className="text-xs text-muted-foreground">
+                    Coming Soon
+                  </span>
+                </div>
+              </div>
+            </motion.div>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

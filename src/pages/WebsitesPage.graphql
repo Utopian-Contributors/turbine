@@ -2,7 +2,10 @@ query websites {
   websites {
     id
     host
-    rating
+    rating {
+      overallScore
+      createdAt
+    }
     latestMeasurement {
       icon
       thumbnail
@@ -10,7 +13,6 @@ query websites {
       title
       url
       redirect
-      createdAt
     }
   }
 }

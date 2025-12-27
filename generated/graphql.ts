@@ -18,6 +18,18 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
+export type AccessibilityViolation = {
+  __typename?: 'AccessibilityViolation';
+  createdAt: Scalars['DateTime']['output'];
+  description: Scalars['String']['output'];
+  help: Scalars['String']['output'];
+  helpUrl: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  impact: Scalars['String']['output'];
+  screenshots?: Maybe<Array<Scalars['String']['output']>>;
+  violationId: Scalars['String']['output'];
+};
+
 export type BundledFile = {
   __typename?: 'BundledFile';
   cacheControl?: Maybe<Scalars['String']['output']>;
@@ -298,6 +310,7 @@ export type Query = {
   versionFileIntegrations: VersionFileIntegrations;
   versionIntegrations: VersionIntegrations;
   versionUsage?: Maybe<Array<VersionUsage>>;
+  website?: Maybe<WebsiteHost>;
   websites?: Maybe<Array<WebsiteHost>>;
 };
 
@@ -349,6 +362,33 @@ export type QueryVersionIntegrationsArgs = {
 
 export type QueryVersionUsageArgs = {
   library?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryWebsiteArgs = {
+  host?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Rating = {
+  __typename?: 'Rating';
+  accessibility: Array<AccessibilityViolation>;
+  avifUsage: Array<Scalars['String']['output']>;
+  cacheControlUsage: Array<Scalars['String']['output']>;
+  compressionUsage: Array<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  fast3GLoadTime?: Maybe<Scalars['Int']['output']>;
+  firstContentfulPaint?: Maybe<Scalars['Int']['output']>;
+  hasDescription: Scalars['Boolean']['output'];
+  hasFavicon: Scalars['Boolean']['output'];
+  hasOgImage: Scalars['Boolean']['output'];
+  httpsSupport: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  largestContentfulPaint?: Maybe<Scalars['Int']['output']>;
+  noMixedContent: Scalars['Boolean']['output'];
+  overallScore: Scalars['Int']['output'];
+  slow3GLoadTime?: Maybe<Scalars['Int']['output']>;
+  stableLoadTime?: Maybe<Scalars['Int']['output']>;
+  webpUsage: Array<Scalars['String']['output']>;
 };
 
 export enum Role {
@@ -440,7 +480,7 @@ export type WebsiteHost = {
   host: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   latestMeasurement?: Maybe<Measurement>;
-  rating?: Maybe<Scalars['Int']['output']>;
+  rating?: Maybe<Rating>;
 };
 
 export type LoggedInQueryVariables = Exact<{ [key: string]: never; }>;
@@ -615,10 +655,24 @@ export type MeasurementPricesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeasurementPricesQuery = { __typename?: 'Query', measurementPrices?: Array<{ __typename?: 'MeasurementPrice', tokenMint: string, amount: number }> | null };
 
+export type WebsiteQueryVariables = Exact<{
+  host: Scalars['String']['input'];
+}>;
+
+
+export type WebsiteQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, rating?: { __typename?: 'Rating', overallScore: number, createdAt: any } | null } | null };
+
 export type PaymentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type PaymentsQuery = { __typename?: 'Query', payments?: Array<{ __typename?: 'Payment', id: string, amount: number, txSignature: string, tokenMint: string, createdAt: any }> | null };
+
+export type WebsiteRatingQueryVariables = Exact<{
+  host: Scalars['String']['input'];
+}>;
+
+
+export type WebsiteRatingQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, rating?: { __typename?: 'Rating', httpsSupport: boolean, noMixedContent: boolean, hasDescription: boolean, hasFavicon: boolean, hasOgImage: boolean, firstContentfulPaint?: number | null, largestContentfulPaint?: number | null, stableLoadTime?: number | null, fast3GLoadTime?: number | null, slow3GLoadTime?: number | null, webpUsage: Array<string>, avifUsage: Array<string>, cacheControlUsage: Array<string>, compressionUsage: Array<string>, overallScore: number, createdAt: any, accessibility: Array<{ __typename?: 'AccessibilityViolation', violationId: string, impact: string, description: string, helpUrl: string, help: string, screenshots?: Array<string> | null }> } | null } | null };
 
 export type SearchLibraryQueryVariables = Exact<{
   term: Scalars['String']['input'];
@@ -639,7 +693,7 @@ export type FontSearchResultFragment = { __typename?: 'Font', id: string, name: 
 export type WebsitesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, rating?: number | null, latestMeasurement?: { __typename?: 'Measurement', icon?: string | null, thumbnail?: string | null, description?: string | null, title?: string | null, url: string, redirect?: string | null, createdAt: any } | null }> | null };
+export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, rating?: { __typename?: 'Rating', overallScore: number, createdAt: any } | null, latestMeasurement?: { __typename?: 'Measurement', icon?: string | null, thumbnail?: string | null, description?: string | null, title?: string | null, url: string, redirect?: string | null } | null }> | null };
 
 export const BundledImageFragmentDoc = gql`
     fragment BundledImage on BundledFile {
@@ -1720,6 +1774,51 @@ export type MeasurementPricesQueryHookResult = ReturnType<typeof useMeasurementP
 export type MeasurementPricesLazyQueryHookResult = ReturnType<typeof useMeasurementPricesLazyQuery>;
 export type MeasurementPricesSuspenseQueryHookResult = ReturnType<typeof useMeasurementPricesSuspenseQuery>;
 export type MeasurementPricesQueryResult = Apollo.QueryResult<MeasurementPricesQuery, MeasurementPricesQueryVariables>;
+export const WebsiteDocument = gql`
+    query website($host: String!) {
+  website(host: $host) {
+    id
+    host
+    rating {
+      overallScore
+      createdAt
+    }
+  }
+}
+    `;
+
+/**
+ * __useWebsiteQuery__
+ *
+ * To run a query within a React component, call `useWebsiteQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWebsiteQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWebsiteQuery({
+ *   variables: {
+ *      host: // value for 'host'
+ *   },
+ * });
+ */
+export function useWebsiteQuery(baseOptions: Apollo.QueryHookOptions<WebsiteQuery, WebsiteQueryVariables> & ({ variables: WebsiteQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<WebsiteQuery, WebsiteQueryVariables>(WebsiteDocument, options);
+      }
+export function useWebsiteLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WebsiteQuery, WebsiteQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<WebsiteQuery, WebsiteQueryVariables>(WebsiteDocument, options);
+        }
+export function useWebsiteSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<WebsiteQuery, WebsiteQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<WebsiteQuery, WebsiteQueryVariables>(WebsiteDocument, options);
+        }
+export type WebsiteQueryHookResult = ReturnType<typeof useWebsiteQuery>;
+export type WebsiteLazyQueryHookResult = ReturnType<typeof useWebsiteLazyQuery>;
+export type WebsiteSuspenseQueryHookResult = ReturnType<typeof useWebsiteSuspenseQuery>;
+export type WebsiteQueryResult = Apollo.QueryResult<WebsiteQuery, WebsiteQueryVariables>;
 export const PaymentsDocument = gql`
     query payments {
   payments {
@@ -1763,6 +1862,73 @@ export type PaymentsQueryHookResult = ReturnType<typeof usePaymentsQuery>;
 export type PaymentsLazyQueryHookResult = ReturnType<typeof usePaymentsLazyQuery>;
 export type PaymentsSuspenseQueryHookResult = ReturnType<typeof usePaymentsSuspenseQuery>;
 export type PaymentsQueryResult = Apollo.QueryResult<PaymentsQuery, PaymentsQueryVariables>;
+export const WebsiteRatingDocument = gql`
+    query websiteRating($host: String!) {
+  website(host: $host) {
+    id
+    host
+    rating {
+      httpsSupport
+      noMixedContent
+      hasDescription
+      hasFavicon
+      hasOgImage
+      firstContentfulPaint
+      largestContentfulPaint
+      stableLoadTime
+      fast3GLoadTime
+      slow3GLoadTime
+      webpUsage
+      avifUsage
+      cacheControlUsage
+      compressionUsage
+      accessibility {
+        violationId
+        impact
+        description
+        helpUrl
+        help
+        screenshots
+      }
+      overallScore
+      createdAt
+    }
+  }
+}
+    `;
+
+/**
+ * __useWebsiteRatingQuery__
+ *
+ * To run a query within a React component, call `useWebsiteRatingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWebsiteRatingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWebsiteRatingQuery({
+ *   variables: {
+ *      host: // value for 'host'
+ *   },
+ * });
+ */
+export function useWebsiteRatingQuery(baseOptions: Apollo.QueryHookOptions<WebsiteRatingQuery, WebsiteRatingQueryVariables> & ({ variables: WebsiteRatingQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<WebsiteRatingQuery, WebsiteRatingQueryVariables>(WebsiteRatingDocument, options);
+      }
+export function useWebsiteRatingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WebsiteRatingQuery, WebsiteRatingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<WebsiteRatingQuery, WebsiteRatingQueryVariables>(WebsiteRatingDocument, options);
+        }
+export function useWebsiteRatingSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<WebsiteRatingQuery, WebsiteRatingQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<WebsiteRatingQuery, WebsiteRatingQueryVariables>(WebsiteRatingDocument, options);
+        }
+export type WebsiteRatingQueryHookResult = ReturnType<typeof useWebsiteRatingQuery>;
+export type WebsiteRatingLazyQueryHookResult = ReturnType<typeof useWebsiteRatingLazyQuery>;
+export type WebsiteRatingSuspenseQueryHookResult = ReturnType<typeof useWebsiteRatingSuspenseQuery>;
+export type WebsiteRatingQueryResult = Apollo.QueryResult<WebsiteRatingQuery, WebsiteRatingQueryVariables>;
 export const SearchLibraryDocument = gql`
     query searchLibrary($term: String!) {
   searchLibrary(term: $term) {
@@ -1855,7 +2021,10 @@ export const WebsitesDocument = gql`
   websites {
     id
     host
-    rating
+    rating {
+      overallScore
+      createdAt
+    }
     latestMeasurement {
       icon
       thumbnail
@@ -1863,7 +2032,6 @@ export const WebsitesDocument = gql`
       title
       url
       redirect
-      createdAt
     }
   }
 }

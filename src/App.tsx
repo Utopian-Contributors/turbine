@@ -22,6 +22,7 @@ import LibraryPage from './pages/LibraryPage'
 import MeasurePage from './pages/MeasurePage'
 import MeasurementsPage from './pages/MeasurementsPage'
 import PaymentsPage from './pages/PaymentsPage'
+import RatingsPage from './pages/RatingsPage'
 import SearchPage from './pages/SearchPage'
 import WebsitesPage from './pages/WebsitesPage'
 
@@ -49,6 +50,7 @@ const router = createBrowserRouter([
         path: 'measure',
         element: <MeasurePage />,
       },
+      { path: '/ratings/:host', element: <RatingsPage /> },
       {
         path: 'libraries',
         element: <LibrariesPage />,

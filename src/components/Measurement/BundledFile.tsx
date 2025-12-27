@@ -61,7 +61,7 @@ const BundledFile: React.FC<BundledFileProps> = ({
               target="_blank"
             >
               {new URL(url).pathname !== '/'
-                ? abbreviateFilename(getFilename(url, baseUrl))
+                ? abbreviateFilename(getFilename(url, baseUrl), 26)
                 : new URL(url).hostname}
             </a>
           </div>

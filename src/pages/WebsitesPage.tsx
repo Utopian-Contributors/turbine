@@ -75,16 +75,12 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1">
-                          {website.rating && (
-                            <StarRating rating={website.rating} />
-                          )}
-                          {website.latestMeasurement ? (
-                            <span className="text-xs text-gray-400">
-                              {moment(
-                                website.latestMeasurement.createdAt
-                              ).fromNow()}
-                            </span>
-                          ) : null}
+                          <StarRating rating={website.rating?.overallScore} />
+                          <span className="text-xs text-gray-400">
+                            {website.rating
+                              ? moment(website.rating.createdAt).fromNow()
+                              : 'Not rated yet'}
+                          </span>
                         </div>
                       </div>
                       {website.latestMeasurement?.description && (

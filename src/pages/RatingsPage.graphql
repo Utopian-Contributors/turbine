@@ -1,0 +1,36 @@
+query websiteRating($host: String!) {
+  website(host: $host) {
+    id
+    host
+    rating {
+      httpsSupport
+      noMixedContent
+
+      hasDescription
+      hasFavicon
+      hasOgImage
+
+      firstContentfulPaint
+      largestContentfulPaint
+      stableLoadTime
+      fast3GLoadTime
+      slow3GLoadTime
+      webpUsage
+      avifUsage
+      cacheControlUsage
+      compressionUsage
+
+      accessibility {
+        violationId
+        impact
+        description
+        helpUrl
+        help
+        screenshots
+      }
+
+      overallScore
+      createdAt
+    }
+  }
+}
