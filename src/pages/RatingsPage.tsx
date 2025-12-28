@@ -103,7 +103,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
       >
         <ArrowLeft size={16} className="text-muted-foreground" />
         <span className="group-hover:underline text-md text-muted-foreground">
-          Back to {websiteQueryData?.website?.host}
+          Back to measurements of {websiteQueryData?.website?.host}
         </span>
       </div>
       <div className="flex justify-between gap-4">
