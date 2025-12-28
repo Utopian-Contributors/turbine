@@ -1,13 +1,13 @@
 import type { FetchResult } from '@apollo/client'
-import { useSolana } from '@phantom/react-sdk'
+import { useModal, usePhantom, useSolana } from '@phantom/react-sdk'
 import { PublicKey } from '@solana/web3.js'
 import {
-    DeviceType,
-    MeasurementsDocument,
-    useCreateMeasurementMutation,
-    useMeasurementPricesQuery,
-    type ConnectionType,
-    type CreateMeasurementMutation,
+  DeviceType,
+  MeasurementsDocument,
+  useCreateMeasurementMutation,
+  useMeasurementPricesQuery,
+  type ConnectionType,
+  type CreateMeasurementMutation,
 } from '../../generated/graphql'
 import { USDC_MINT_ADDRESS, useBalance, UTCC_MINT_ADDRESS } from './useBalance'
 import { useSendTransaction } from './useSendTransaction'
@@ -19,11 +19,7 @@ interface CreateMeasureArgs {
   connection: ConnectionType
 }
 
-export const useCreateMeasure = ({
-  url,
-}: {
-  url: string
-}) => {
+export const useCreateMeasure = ({ url }: { url: string }) => {
   const { data: measurementPricesData } = useMeasurementPricesQuery()
   const [createMeasurement, response] = useCreateMeasurementMutation({
     refetchQueries: [
@@ -36,6 +32,8 @@ export const useCreateMeasure = ({
     ],
   })
   const { solana } = useSolana()
+  const { isConnected } = usePhantom()
+  const { open } = useModal()
   const { balance, preferedPayment: tokenMint } = useBalance(solana.publicKey)
 
   const { sendTransaction } = useSendTransaction(tokenMint)
@@ -48,6 +46,11 @@ export const useCreateMeasure = ({
     if (options.url) {
       url = options.url
     }
+
+    if (!isConnected) {
+      await open()
+    }
+
     const walletAddress = await solana.getPublicKey()
     if (!walletAddress) {
       throw new Error('Wallet not connected')
