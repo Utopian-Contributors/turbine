@@ -8,7 +8,7 @@ import {
   SearchIcon,
   TypeIcon,
 } from 'lucide-react'
-import { type JSX } from 'react'
+import { useEffect, type JSX } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   Sidebar,
@@ -99,6 +99,12 @@ const RootPage: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { isLoggedIn, user, loginRedirect } = useWalletOrAccLogin()
+
+  useEffect(() => {
+    if (location.pathname === '/') {
+      navigate('/home', { replace: true })
+    }
+  }, [location, navigate])
 
   return (
     <SidebarProvider>
