@@ -280,16 +280,6 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                   }
                 />
                 <RatingsSection
-                  title="Slow3G Load Time"
-                  description="Has a decent load time on a slow 3G connection."
-                  value={websiteQueryData.website.rating.slow3GLoadTime + 'ms'}
-                  error={
-                    websiteQueryData.website.rating.slow3GLoadTime! > 15000
-                      ? 'Takes longer than 15s to load'
-                      : undefined
-                  }
-                />
-                <RatingsSection
                   title="Compressed Images"
                   description="Uses compressed images instead of PNG."
                   error={
