@@ -2,7 +2,6 @@ import {
   CreditCardIcon,
   Github,
   GlobeIcon,
-  HomeIcon,
   LogOutIcon,
   PackageIcon,
   Scale,
@@ -36,11 +35,18 @@ interface SidebarItem {
 }
 
 const items: SidebarItem[] = [
+  // {
+  //   title: 'Home',
+  //   url: '/home',
+  //   icon: (selected: boolean) => (
+  //     <HomeIcon className={selected ? 'text-black' : 'text-muted-foreground'} />
+  //   ),
+  // },
   {
-    title: 'Home',
+    title: 'Measure',
     url: '/home',
     icon: (selected: boolean) => (
-      <HomeIcon className={selected ? 'text-black' : 'text-muted-foreground'} />
+      <Scale className={selected ? 'text-black' : 'text-muted-foreground'} />
     ),
   },
   {
@@ -61,13 +67,7 @@ const items: SidebarItem[] = [
       />
     ),
   },
-  {
-    title: 'Measure',
-    url: '/measure',
-    icon: (selected: boolean) => (
-      <Scale className={selected ? 'text-black' : 'text-muted-foreground'} />
-    ),
-  },
+
   {
     title: 'Libraries',
     url: '/libraries',

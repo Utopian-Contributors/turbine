@@ -61,34 +61,6 @@ export const Auth: React.FC = () => {
         >
           The future of the web is sustainable
         </motion.h1>
-        <img
-          src="/turbine-animation.svg"
-          alt="Turbine animation"
-          className="absolute inset-0 h-full w-full"
-          style={{
-            transform: 'translate(0%, 10%)',
-          }}
-        />
-        <img
-          src="/turbine-animation.svg"
-          alt="Turbine animation"
-          className="absolute inset-0 h-full w-full"
-          style={{
-            scale: 0.5,
-            opacity: 0.7,
-            transform: 'translate(50%, 50%)',
-          }}
-        />
-        <img
-          src="/turbine-animation.svg"
-          alt="Turbine animation"
-          className="absolute inset-0 h-full w-full"
-          style={{
-            scale: 0.5,
-            opacity: 0.7,
-            transform: 'translate(-50%, 50%)',
-          }}
-        />
       </div>
     </div>
   )

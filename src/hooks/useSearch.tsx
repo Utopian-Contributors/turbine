@@ -33,10 +33,22 @@ export const useSearch = (initialSearchTerm?: string) => {
         clearTimeout(searchTimeout)
       }
 
+      const search = new URLSearchParams(location.search)
+      search.set('q', term)
+      if (
+        location.pathname === '/libraries' ||
+        location.pathname.startsWith('/l')
+      ) {
+        search.set('s', 'lib')
+      }
+      if(location.pathname.startsWith('/fonts')) {
+        search.set('s', 'font')
+      }
+
       if (location.pathname !== '/search') {
-        navigate('/search?q=' + term)
+        navigate('/search?' + search.toString())
       } else {
-        navigate('/search?q=' + term, { replace: true })
+        navigate('/search?' + search.toString(), { replace: true })
       }
 
       setSearchTimeout(

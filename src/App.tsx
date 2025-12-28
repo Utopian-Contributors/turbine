@@ -15,7 +15,6 @@ import Logout from './pages/Auth/Logout'
 import { NotFoundPage } from './pages/Error/404Page'
 import FontPage from './pages/FontPage'
 import FontsPage from './pages/FontsPage'
-import HomePage from './pages/HomePage'
 import ImageConversionPage from './pages/ImageConversionPage'
 import LibrariesPage from './pages/LibrariesPage'
 import LibraryPage from './pages/LibraryPage'
@@ -37,7 +36,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'home',
-        element: <HomePage />,
+        element: <MeasurePage />,
       },
       { path: '/websites', element: <WebsitesPage /> },
       { path: '/payments', element: <PaymentsPage /> },
