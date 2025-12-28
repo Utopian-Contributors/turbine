@@ -2,7 +2,7 @@ import React from 'react'
 
 import PreloadImage from '@/components/ui/preload-image-cover'
 import StarRating from '@/components/ui/StarRating'
-import { GlobeIcon } from 'lucide-react'
+import { Globe, GlobeIcon } from 'lucide-react'
 import moment from 'moment'
 import { useNavigate } from 'react-router'
 import { useWebsitesQuery } from '../../generated/graphql'
@@ -35,12 +35,14 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                   {website.latestMeasurement?.thumbnail && (
                     <div className="mx-1 my-2 min-w-64 border rounded-lg overflow-hidden">
                       <PreloadImage
-                        src={website.latestMeasurement?.thumbnail}
+                        src={website.latestMeasurement.thumbnail}
                         className="h-40 w-full bg-cover bg-center"
                       >
                         {(error) =>
                           error && (
-                            <div className="h-40 w-full bg-gradient-to-b from-green-500 to-green-500/5" />
+                            <div className="h-40 w-full bg-gradient-to-b from-green-500 to-green-500/5">
+                              <Globe className="relative top-1/2 -translate-y-1/2 mx-auto text-white" size={64} />
+                            </div>
                           )
                         }
                       </PreloadImage>
