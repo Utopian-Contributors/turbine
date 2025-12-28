@@ -46,8 +46,8 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
         <div>
           <h3>{title}</h3>
           <p className="text-sm text-gray-500 mb-2">{description}</p>
+          {errorScreenshot && <img src={errorScreenshot} alt={error} className='max-h-[16rem] max-w-sm' />}
         </div>
-        {errorScreenshot && <img src={errorScreenshot} alt={error} />}
       </div>
       <div>
         {error && !errorScreenshot ? (
@@ -218,16 +218,19 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
             <AccordionContent>
               <div className="flex flex-col mt-2">
                 {websiteQueryData.website.rating.accessibility.length
-                  ? websiteQueryData.website.rating.accessibility.map((v) => (
-                      <RatingsSection
-                        title={toHeaderCase(v.violationId)}
-                        description={v.description}
-                        error={v.description}
-                        errorScreenshot={
-                          v.screenshots?.length ? v.screenshots[0] : undefined
-                        }
-                      />
-                    ))
+                  ? websiteQueryData.website.rating.accessibility.map(
+                      (v, index) => (
+                        <RatingsSection
+                          key={v.violationId + ' ' + index}
+                          title={toHeaderCase(v.violationId)}
+                          description={v.description}
+                          error={v.description}
+                          errorScreenshot={
+                            v.screenshots?.length ? v.screenshots[0] : undefined
+                          }
+                        />
+                      )
+                    )
                   : 'No accessibility issues found.'}
               </div>
             </AccordionContent>
