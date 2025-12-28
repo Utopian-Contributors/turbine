@@ -4,10 +4,10 @@ import React, { useCallback } from 'react'
 import { useParams } from 'react-router'
 
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
 } from '@/components/ui/accordion'
 import { toHeaderCase } from 'js-convert-case'
 import { CheckIcon, XIcon } from 'lucide-react'
@@ -21,6 +21,7 @@ interface RatingsSectionProps {
   description: string
   value?: boolean | number | string
   error?: string
+  errorScreenshot?: string
 }
 
 const RatingsSection: React.FC<RatingsSectionProps> = ({
@@ -28,6 +29,7 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
   description,
   value,
   error,
+  errorScreenshot,
 }) => {
   return (
     <div className="flex justify-between items-center p-1">
@@ -45,13 +47,15 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
           <h3>{title}</h3>
           <p className="text-sm text-gray-500 mb-2">{description}</p>
         </div>
+        {errorScreenshot && <img src={errorScreenshot} alt={error} />}
       </div>
       <div>
-        {error ? (
+        {error && !errorScreenshot ? (
           <span className="bg-red-100 rounded-sm font-medium px-2 py-1">
             {error}
           </span>
-        ) : typeof value !== 'boolean' ? (
+        ) : null}
+        {!error && typeof value !== 'boolean' ? (
           <span className="bg-gray-100 rounded-sm font-medium px-2 py-1">
             {value}
           </span>
@@ -218,7 +222,10 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       <RatingsSection
                         title={toHeaderCase(v.violationId)}
                         description={v.description}
-                        value
+                        error={v.description}
+                        errorScreenshot={
+                          v.screenshots?.length ? v.screenshots[0] : undefined
+                        }
                       />
                     ))
                   : 'No accessibility issues found.'}
@@ -319,7 +326,8 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       : undefined
                   }
                   value={
-                    websiteQueryData.website.rating.cacheControlUsage.length === 0
+                    websiteQueryData.website.rating.cacheControlUsage.length ===
+                    0
                       ? 'All files use cache control'
                       : undefined
                   }
@@ -333,7 +341,8 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       : undefined
                   }
                   value={
-                    websiteQueryData.website.rating.compressionUsage.length === 0
+                    websiteQueryData.website.rating.compressionUsage.length ===
+                    0
                       ? 'All files use transfer compression'
                       : undefined
                   }
