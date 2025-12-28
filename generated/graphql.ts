@@ -20,13 +20,12 @@ export type Scalars = {
 
 export type AccessibilityViolation = {
   __typename?: 'AccessibilityViolation';
-  createdAt: Scalars['DateTime']['output'];
   description: Scalars['String']['output'];
   help: Scalars['String']['output'];
   helpUrl: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   impact: Scalars['String']['output'];
-  screenshots?: Maybe<Array<Scalars['String']['output']>>;
+  screenshots: Array<Scalars['String']['output']>;
   violationId: Scalars['String']['output'];
 };
 
@@ -181,7 +180,7 @@ export type Measurement = {
   icon?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   redirect?: Maybe<Scalars['String']['output']>;
-  screenshots?: Maybe<Array<Scalars['String']['output']>>;
+  screenshots: Array<Scalars['String']['output']>;
   status: MeasurementStatus;
   thumbnail?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
@@ -628,7 +627,7 @@ export type MeasurementsQueryVariables = Exact<{
 }>;
 
 
-export type MeasurementsQuery = { __typename?: 'Query', measurements?: Array<{ __typename?: 'Measurement', id: string, url: string, redirect?: string | null, title?: string | null, description?: string | null, status: MeasurementStatus, elapsed?: number | null, screenshots?: Array<string> | null, connectionType: ConnectionType, icon?: string | null, thumbnail?: string | null, device: { __typename?: 'MeasurementDevice', id: string, type: DeviceType, width: number, height: number }, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, cacheControl?: string | null, elapsed: number, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> }> | null };
+export type MeasurementsQuery = { __typename?: 'Query', measurements?: Array<{ __typename?: 'Measurement', id: string, url: string, redirect?: string | null, title?: string | null, description?: string | null, status: MeasurementStatus, elapsed?: number | null, screenshots: Array<string>, connectionType: ConnectionType, icon?: string | null, thumbnail?: string | null, host?: { __typename?: 'WebsiteHost', id: string, host: string } | null, device: { __typename?: 'MeasurementDevice', id: string, type: DeviceType, width: number, height: number }, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, cacheControl?: string | null, elapsed: number, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> }> | null };
 
 export type MeasurementDevicesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -672,7 +671,7 @@ export type WebsiteRatingQueryVariables = Exact<{
 }>;
 
 
-export type WebsiteRatingQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, rating?: { __typename?: 'Rating', httpsSupport: boolean, noMixedContent: boolean, hasDescription: boolean, hasFavicon: boolean, hasOgImage: boolean, firstContentfulPaint?: number | null, largestContentfulPaint?: number | null, stableLoadTime?: number | null, fast3GLoadTime?: number | null, slow3GLoadTime?: number | null, webpUsage: Array<string>, avifUsage: Array<string>, cacheControlUsage: Array<string>, compressionUsage: Array<string>, overallScore: number, createdAt: any, accessibility: Array<{ __typename?: 'AccessibilityViolation', violationId: string, impact: string, description: string, helpUrl: string, help: string, screenshots?: Array<string> | null }> } | null } | null };
+export type WebsiteRatingQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, rating?: { __typename?: 'Rating', httpsSupport: boolean, noMixedContent: boolean, hasDescription: boolean, hasFavicon: boolean, hasOgImage: boolean, firstContentfulPaint?: number | null, largestContentfulPaint?: number | null, stableLoadTime?: number | null, fast3GLoadTime?: number | null, slow3GLoadTime?: number | null, webpUsage: Array<string>, avifUsage: Array<string>, cacheControlUsage: Array<string>, compressionUsage: Array<string>, overallScore: number, createdAt: any, accessibility: Array<{ __typename?: 'AccessibilityViolation', violationId: string, impact: string, description: string, helpUrl: string, help: string, screenshots: Array<string> }> } | null } | null };
 
 export type SearchLibraryQueryVariables = Exact<{
   term: Scalars['String']['input'];
@@ -1580,6 +1579,10 @@ export const MeasurementsDocument = gql`
   measurements(url: $url) {
     id
     url
+    host {
+      id
+      host
+    }
     redirect
     title
     description

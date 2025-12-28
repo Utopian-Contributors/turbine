@@ -75,7 +75,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     return (
       measurementsQueryData?.measurements?.find((m) => {
         const match =
-          m.url === url &&
+          (m.url === url || m.host?.host === params.host) &&
           m.connectionType === (connection || ConnectionType.Wifi) &&
           m.device.type === (device || DeviceType.Desktop)
         if (match && m.status === MeasurementStatus.Completed) {
@@ -91,7 +91,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         ? measurementsQueryData?.measurements[0]
         : null)
     )
-  }, [measurementsQueryData?.measurements, searchParams, url])
+  }, [measurementsQueryData?.measurements, params.host, searchParams, url])
 
   const { data: websiteQueryData } = useWebsiteQuery({
     variables: {

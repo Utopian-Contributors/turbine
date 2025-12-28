@@ -2,6 +2,10 @@ query measurements($url: String) {
   measurements(url: $url) {
     id
     url
+    host {
+      id
+      host
+    }
     redirect
     title
     description

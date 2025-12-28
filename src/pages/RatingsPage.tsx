@@ -1,7 +1,7 @@
 import StarRating from '@/components/ui/StarRating'
 import moment from 'moment'
 import React, { useCallback } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import {
   Accordion,
@@ -10,7 +10,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { toHeaderCase } from 'js-convert-case'
-import { CheckIcon, XIcon } from 'lucide-react'
+import { ArrowLeft, CheckIcon, XIcon } from 'lucide-react'
 import { useWebsiteRatingQuery } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -46,7 +46,13 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
         <div>
           <h3>{title}</h3>
           <p className="text-sm text-gray-500 mb-2">{description}</p>
-          {errorScreenshot && <img src={errorScreenshot} alt={error} className='max-h-[16rem] max-w-sm' />}
+          {errorScreenshot && (
+            <img
+              src={errorScreenshot}
+              alt={error}
+              className="max-h-[16rem] max-w-sm"
+            />
+          )}
         </div>
       </div>
       <div>
@@ -66,6 +72,7 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
 }
 
 const RatingsPage: React.FC<RatingsPageProps> = () => {
+  const navigate = useNavigate()
   const params = useParams()
   const { data: websiteQueryData } = useWebsiteRatingQuery({
     variables: { host: params.host! },
@@ -88,6 +95,17 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
 
   return (
     <div className="max-w-3xl mx-auto py-6">
+      <div
+        className="group cursor-pointer flex items-center gap-2 mb-4"
+        onClick={() => {
+          navigate('/measurements/' + websiteQueryData?.website?.host)
+        }}
+      >
+        <ArrowLeft size={16} className="text-muted-foreground" />
+        <span className="group-hover:underline text-md text-muted-foreground">
+          Back to {websiteQueryData?.website?.host}
+        </span>
+      </div>
       <div className="flex justify-between gap-4">
         <h1 className="px-2 text-4xl font-light">{params.host}</h1>
         <div className="flex flex-col items-end gap-2">
