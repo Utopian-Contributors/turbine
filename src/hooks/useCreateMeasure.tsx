@@ -1,6 +1,7 @@
 import type { FetchResult } from '@apollo/client'
 import { useModal, usePhantom, useSolana } from '@phantom/react-sdk'
 import { PublicKey } from '@solana/web3.js'
+import { useState } from 'react'
 import {
   DeviceType,
   MeasurementsDocument,
@@ -31,9 +32,10 @@ export const useCreateMeasure = ({ url }: { url: string }) => {
       },
     ],
   })
+  const [isPaying, setIsPaying] = useState(false)
   const { solana } = useSolana()
   const { isConnected } = usePhantom()
-  const { open } = useModal()
+  const { open, isOpened } = useModal()
   const { balance, preferedPayment: tokenMint } = useBalance(solana.publicKey)
 
   const { sendTransaction } = useSendTransaction(tokenMint)
@@ -47,75 +49,98 @@ export const useCreateMeasure = ({ url }: { url: string }) => {
       url = options.url
     }
 
-    if (!isConnected) {
+    if (!isConnected && !isOpened) {
       await open()
-    }
-
-    const walletAddress = await solana.getPublicKey()
-    if (!walletAddress) {
-      throw new Error('Wallet not connected')
-    }
-
-    // 1. Send tokens to treasury address
-    if (tokenMint === UTCC_MINT_ADDRESS.toBase58()) {
-      const measurementPrice = measurementPricesData?.measurementPrices?.find(
-        (price) => price.tokenMint === tokenMint
-      )?.amount
-      if (!measurementPrice) {
-        throw new Error('Measurement price not found for ' + tokenMint)
-      }
-      if ((balance?.utcc?.amount ?? 0) < measurementPrice) {
-        throw new Error('Insufficient UTCC balance')
+    } else if (isConnected) {
+      const walletAddress = await solana.getPublicKey()
+      if (!walletAddress) {
+        throw new Error('Wallet not connected')
       }
 
-      signature = await sendTransaction(measurementPrice)
-    }
+      setIsPaying(true)
 
-    if (tokenMint === PublicKey.default.toBase58()) {
-      const measurementPrice = measurementPricesData?.measurementPrices?.find(
-        (price) => price.tokenMint === tokenMint
-      )?.amount
-      if (!measurementPrice) {
-        throw new Error('Measurement price not found for ' + tokenMint)
-      }
-      if ((balance?.sol?.amount ?? 0) < measurementPrice) {
-        throw new Error('Insufficient SOL balance')
-      }
+      // 1. Send tokens to treasury address
+      if (tokenMint === UTCC_MINT_ADDRESS.toBase58()) {
+        const measurementPrice = measurementPricesData?.measurementPrices?.find(
+          (price) => price.tokenMint === tokenMint
+        )?.amount
+        if (!measurementPrice) {
+          setIsPaying(false)
+          throw new Error('Measurement price not found for ' + tokenMint)
+        }
+        if ((balance?.utcc?.amount ?? 0) < measurementPrice) {
+          setIsPaying(false)
+          throw new Error('Insufficient UTCC balance')
+        }
 
-      signature = await sendTransaction(measurementPrice)
-    }
-
-    if (tokenMint === USDC_MINT_ADDRESS.toBase58()) {
-      const measurementPrice = measurementPricesData?.measurementPrices?.find(
-        (price) => price.tokenMint === tokenMint
-      )?.amount
-      if (!measurementPrice) {
-        throw new Error('Measurement price not found for ' + tokenMint)
-      }
-      if ((balance?.usdc?.amount ?? 0) < measurementPrice) {
-        throw new Error('Insufficient USDC balance')
+        signature = await sendTransaction(measurementPrice).catch((error) => {
+          setIsPaying(false)
+          throw error
+        })
       }
 
-      signature = await sendTransaction(measurementPrice)
+      if (tokenMint === PublicKey.default.toBase58()) {
+        const measurementPrice = measurementPricesData?.measurementPrices?.find(
+          (price) => price.tokenMint === tokenMint
+        )?.amount
+        if (!measurementPrice) {
+          setIsPaying(false)
+          throw new Error('Measurement price not found for ' + tokenMint)
+        }
+        if ((balance?.sol?.amount ?? 0) < measurementPrice) {
+          setIsPaying(false)
+          throw new Error('Insufficient SOL balance')
+        }
+
+        signature = await sendTransaction(measurementPrice).catch((error) => {
+          setIsPaying(false)
+          throw error
+        })
+      }
+
+      if (tokenMint === USDC_MINT_ADDRESS.toBase58()) {
+        const measurementPrice = measurementPricesData?.measurementPrices?.find(
+          (price) => price.tokenMint === tokenMint
+        )?.amount
+        if (!measurementPrice) {
+          setIsPaying(false)
+          throw new Error('Measurement price not found for ' + tokenMint)
+        }
+        if ((balance?.usdc?.amount ?? 0) < measurementPrice) {
+          setIsPaying(false)
+          throw new Error('Insufficient USDC balance')
+        }
+
+        signature = await sendTransaction(measurementPrice).catch((error) => {
+          setIsPaying(false)
+          throw error
+        })
+      }
+
+      if (!signature) {
+        setIsPaying(false)
+        throw new Error('Transaction failed, no signature obtained')
+      }
+
+      // 2. Create measurement record in backend using transaction signature
+      return await createMeasurement({
+        variables: {
+          url,
+          remeasure: remeasure ?? false,
+          device,
+          connection,
+          tokenMint,
+          walletAddress: walletAddress,
+          txSignature: signature,
+        },
+        onCompleted: () => {
+          setIsPaying(false)
+        },
+      })
     }
 
-    if (!signature) {
-      throw new Error('Transaction failed, no signature obtained')
-    }
-
-    // 2. Create measurement record in backend using transaction signature
-    return await createMeasurement({
-      variables: {
-        url,
-        remeasure: remeasure ?? false,
-        device,
-        connection,
-        tokenMint,
-        walletAddress: walletAddress,
-        txSignature: signature,
-      },
-    })
+    return Promise.reject(new Error('Wallet not connected'))
   }
 
-  return { createMeasure, ...response }
+  return { createMeasure, isPaying, ...response }
 }

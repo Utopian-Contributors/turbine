@@ -65,7 +65,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
 
   const [measurementsQuery, { data: measurementsQueryData, refetch }] =
     useMeasurementsLazyQuery()
-  const { createMeasure } = useCreateMeasure({
+  const { createMeasure, isPaying } = useCreateMeasure({
     url,
   })
 
@@ -229,6 +229,17 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       setSelectedConnection(ConnectionType.Wifi)
     }
   }, [measurementDevicesData?.measurementDevices, searchParams])
+
+  if (isPaying) {
+    return (
+      <div className="flex flex-col items-center gap-2 my-6 mt-[58px]">
+        <div className="text-2xl animate-pulse m-6 text-muted-foreground whitespace-nowrap overflow-hidden">
+          Processing payment...
+        </div>
+        <AutoProgress />
+      </div>
+    )
+  }
 
   return (
     <div className="p-6">

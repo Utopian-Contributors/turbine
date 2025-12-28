@@ -1,4 +1,5 @@
 import Pricetag from '@/components/Pricetag'
+import AutoProgress from '@/components/ui/auto-progress'
 import { SearchWebsite } from '@/components/ui/search-website'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { useWalletOrAccLogin } from '@/hooks/useWalletOrAccLogin'
@@ -19,7 +20,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   const params = new URLSearchParams(location.search)
 
   const [measurementsQuery] = useMeasurementsLazyQuery()
-  const { createMeasure } = useCreateMeasure({
+  const { createMeasure, isPaying } = useCreateMeasure({
     url: '',
   })
   const { isConnected, login } = useWalletOrAccLogin()
@@ -47,6 +48,17 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     },
     [createMeasure, isConnected, login, measurementsQuery, navigate]
   )
+
+  if (isPaying) {
+    return (
+      <div className="flex flex-col items-center gap-2 my-6 mt-[58px]">
+        <div className="text-2xl animate-pulse m-6 text-muted-foreground whitespace-nowrap overflow-hidden">
+          Processing payment...
+        </div>
+        <AutoProgress />
+      </div>
+    )
+  }
 
   return (
     <div className="w-full h-screen overflow-hidden">
