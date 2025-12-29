@@ -83,15 +83,13 @@ const Signup: React.FC<{
                 {errors['password']}
               </FieldDescription>
             ) : (
-              <FieldDescription>
-                Must be at least 8 characters long.
-              </FieldDescription>
+              null
             )}
           </Field>
           <Field>
-            <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+            <FieldLabel htmlFor="repeat">Confirm Password</FieldLabel>
             <Input
-              id="confirm-password"
+              id="repeat"
               type="password"
               placeholder="••••••••••••••••"
               required
@@ -102,7 +100,7 @@ const Signup: React.FC<{
                 {errors['repeat']}
               </FieldDescription>
             ) : (
-              <FieldDescription>Please confirm your password.</FieldDescription>
+              null
             )}
           </Field>
           {error && (
