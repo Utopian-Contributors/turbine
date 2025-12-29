@@ -98,7 +98,7 @@ function App() {
           AddressType.sui,
         ],
         authOptions: {
-          redirectUrl: 'http://turbine.utopian.build/wallet/', // Must be whitelisted in Phantom Portal
+          redirectUrl: 'https://turbine.utopian.build/wallet/', // Must be whitelisted in Phantom Portal
         },
       }}
       theme={lightTheme}
