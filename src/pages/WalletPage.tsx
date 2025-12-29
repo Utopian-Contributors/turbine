@@ -59,7 +59,7 @@ const WalletPage: React.FC<WalletPageProps> = () => {
       {isLoggedIn && isConnected && (
         <div className="flex flex-col gap-2 my-4">
           <h3>
-            You can add funds to this wallet by sending them your embedded
+            You can add funds to this wallet by sending them to the embedded
             wallet address:
           </h3>
           <h3
