@@ -1,71 +1,75 @@
-import React, { useMemo } from "react";
+import React, { useMemo } from 'react'
 
-import { useNavigate } from "react-router";
+import { useNavigate } from 'react-router'
 
 import {
   useLoggedInQuery,
   useResendCodeMutation,
   useVerifyMutation,
-} from "../../../generated/graphql";
-import { Verify } from "../../components/Auth";
+} from '../../../generated/graphql'
+import { Verify } from '../../components/Auth'
 
 export const VerifyPage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const loggedInQueryResult = useLoggedInQuery();
+  const loggedInQueryResult = useLoggedInQuery()
 
   const [verify, verificationResult] = useVerifyMutation({
     onCompleted: (data) => {
-      loggedInQueryResult.client.cache.evict({ fieldName: "loggedIn" });
+      loggedInQueryResult.client.cache.evict({ fieldName: 'loggedIn' })
       if (data.verify?.verified) {
         // Redirect to the previous page or the home page
-        const prev = localStorage.getItem("postLoginRedirect");
+        const prev = localStorage.getItem('postLoginRedirect')
         if (prev) {
-          localStorage.removeItem("postLoginRedirect");
-          navigate(prev);
+          localStorage.removeItem('postLoginRedirect')
+          navigate(prev)
         } else {
-          navigate("/");
+          navigate('/')
         }
       }
     },
     onError: (error) => console.error(error),
-  });
+  })
 
   const [resendCode, resendMutationResult] = useResendCodeMutation({
     onCompleted: () => {
-      console.debug("Code was sent again.");
+      console.debug('Code was sent again.')
     },
-  });
+  })
 
   const resendResultMessage = useMemo(() => {
     if (resendMutationResult.data?.resendVerificationCode) {
-      return "Code was sent again.";
+      return 'Code was sent again.'
     }
-  }, [resendMutationResult.data?.resendVerificationCode]);
+  }, [resendMutationResult.data?.resendVerificationCode])
 
   const resendResultError = useMemo(() => {
     if (resendMutationResult.error) {
-      return "Code was already requested.";
+      return 'Code was already requested.'
     }
-  }, [resendMutationResult.error]);
+  }, [resendMutationResult.error])
 
   return (
     <Verify
       onResendCode={() => {
-        const { data } = loggedInQueryResult;
+        const { data } = loggedInQueryResult
         if (data?.loggedIn?.email) {
-          resendCode();
+          resendCode()
         }
       }}
-      onSubmit={({ verificationCode }) => {
+      onSubmit={({ otp }) => {
         verify({
           variables: {
-            code: verificationCode,
+            code: otp,
           },
-        });
+        })
       }}
       message={resendResultMessage}
-      error={verificationResult.error ? "Invalid Code" : resendResultError}
+      error={
+        verificationResult.error
+          ? verificationResult.error.message
+          : resendResultError
+      }
     />
-  );
-};
+  )
+}

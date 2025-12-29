@@ -18,13 +18,18 @@ import { Flex } from '@radix-ui/themes'
 import { Formik } from 'formik'
 
 interface VerifyProps {
-  onSubmit: (data: { verificationCode: string }) => void
+  onSubmit: (data: { otp: string }) => void
   onResendCode: () => void
   message?: string
   error?: string
 }
 
-const Verify: React.FC<VerifyProps> = ({ onSubmit, onResendCode, message, error }) => {
+const Verify: React.FC<VerifyProps> = ({
+  onSubmit,
+  onResendCode,
+  message,
+  error,
+}) => {
   return (
     <Flex
       direction="column"
@@ -32,8 +37,8 @@ const Verify: React.FC<VerifyProps> = ({ onSubmit, onResendCode, message, error 
       gap="lg"
       style={{ textAlign: 'center' }}
     >
-      <Formik initialValues={{ verificationCode: '' }} onSubmit={onSubmit}>
-        {({ handleSubmit }) => (
+      <Formik initialValues={{ otp: '' }} onSubmit={onSubmit}>
+        {({ handleSubmit, setValues }) => (
           <FieldGroup>
             <div className="flex flex-col items-center gap-1 text-center">
               <h1 className="text-2xl font-bold">Enter verification code</h1>
@@ -59,7 +64,13 @@ const Verify: React.FC<VerifyProps> = ({ onSubmit, onResendCode, message, error 
               <FieldLabel htmlFor="otp" className="sr-only">
                 Verification code
               </FieldLabel>
-              <InputOTP maxLength={6} id="otp" required>
+              <InputOTP
+                maxLength={6}
+                id="otp"
+                name="otp"
+                onChange={(value) => setValues({ otp: value })}
+                required
+              >
                 <InputOTPGroup className="gap-2 *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border">
                   <InputOTPSlot index={0} />
                   <InputOTPSlot index={1} />
