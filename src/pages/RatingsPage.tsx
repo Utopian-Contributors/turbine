@@ -31,7 +31,7 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
   errorScreenshot,
 }) => {
   return (
-    <div className="flex justify-between items-center p-1">
+    <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center p-1">
       <div className="flex gap-3">
         {error ? (
           <div className="w-fit h-fit bg-red-500 text-white rounded-full p-1 mt-1">
@@ -152,7 +152,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col mt-2">
+              <div className="flex flex-col gap-2 md:gap-0 mt-2">
                 <RatingsSection
                   title="HTTPS"
                   description="Has a valid HTTPS certificate."
@@ -192,7 +192,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col mt-2">
+              <div className="flex flex-col gap-2 md:gap-0 mt-2">
                 <RatingsSection
                   title="Favicon"
                   description="Has a favicon."
@@ -242,7 +242,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col mt-2">
+              <div className="flex flex-col gap-2 md:gap-0 mt-2">
                 {websiteQueryData.website.rating.accessibility.length
                   ? websiteQueryData.website.rating.accessibility.map(
                       (v, index) => (
@@ -277,7 +277,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col mt-2">
+              <div className="flex flex-col gap-2 md:gap-0 mt-2">
                 <RatingsSection
                   title="Wifi Load Time"
                   description="Has a decent load time on a wifi connection."
