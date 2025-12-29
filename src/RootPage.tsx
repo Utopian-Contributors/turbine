@@ -108,7 +108,7 @@ const RootPage: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="none" className="min-w-[256px]">
+      <Sidebar collapsible="none" className="hidden md:inline min-w-[256px]">
         <SidebarContent>
           <SidebarGroup>
             <img src="/turbine-wordmark.png" width="120px" className="mb-2" />
@@ -216,7 +216,7 @@ const RootPage: React.FC = () => {
       </Sidebar>
 
       <main className="flex-1 min-w-100vh">
-        <div className="max-h-screen max-w-[calc(100vw-256px)] overflow-auto overflow-x-hidden">
+        <div className="max-h-screen max-w-screen md:max-w-[calc(100vw-256px)] overflow-auto overflow-x-hidden">
           <Outlet />
         </div>
       </main>

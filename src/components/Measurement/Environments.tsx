@@ -98,13 +98,12 @@ const Environments: React.FC<EnvironmentsProps> = ({
     ConnectionType.Slow_4G,
     ConnectionType.Fast_3G,
     ConnectionType.Slow_3G,
-    ConnectionType.Offline,
   ]
 
   const possibleDevices = measurementDevicesData.measurementDevices
 
   return (
-    <Tabs defaultValue={initial || possibleConnections[0]} className="p-6">
+    <Tabs defaultValue={initial || possibleConnections[0]} className="py-4 md:p-6">
       <TabsList>
         {possibleConnections.map((connection) => (
           <TabsTrigger
@@ -164,7 +163,7 @@ const Environments: React.FC<EnvironmentsProps> = ({
                   >
                     <Card
                       className={cn(
-                        'cursor-pointer min-w-xs',
+                        'cursor-pointer min-w-[16rem] md:min-w-xs',
                         measurementForDevice
                           ? ''
                           : 'opacity-30 hover:opacity-100 transition duration-300',

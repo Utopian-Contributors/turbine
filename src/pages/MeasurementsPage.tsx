@@ -114,7 +114,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         transition={{ duration: 0.5 }}
         className="grid grid-cols-4 gap-6"
       >
-        <div className="col-span-3">
+        <div className="col-span-4 md:col-span-3">
           <Bundle measurement={measurement} />
         </div>
       </motion.div>
@@ -248,6 +248,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         prefix="https://"
         size={24}
         initial={url || ''}
+        className='hidden md:inline'
         onSearch={search}
       />
       {measurementsQueryData?.measurements?.filter(
@@ -269,17 +270,17 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       ) &&
         measurement && (
           <div>
-            <div className="flex justify-between gap-6 p-6">
-              <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between gap-6 px-2 py-4 md:p-6">
+              <div className="flex flex-col items-center md-items-start md:flex-row gap-4">
                 <motion.div
                   initial={{ scale: 0, filter: 'blur(10px)' }}
                   animate={{ scale: 1, filter: 'blur(0px)' }}
                   transition={{ duration: 2, type: 'spring' }}
-                  className="h-fit w-fit border rounded-lg p-2"
+                  className="h-fit w-full md:w-fit border rounded-lg p-2"
                 >
                   <PreloadImage
                     src={measurement.thumbnail}
-                    className="w-[12rem] h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
+                    className="w-full h-[12rem] md:w-[12rem] md:h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
                   >
                     {(error) =>
                       error ? (
@@ -337,7 +338,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 initial={{ position: 'relative', left: '100%' }}
                 animate={{ left: 0 }}
                 transition={{ duration: 1, delay: 0.5 }}
-                className="flex flex-col items-end gap-2 pt-2"
+                className="flex flex-col items-center md:items-end gap-2 pt-2"
               >
                 <Pricetag />
                 <Button
@@ -433,10 +434,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1 }}
-              className="px-6 flex gap-4 mb-6"
+              className="md:px-6 flex flex-col md:flex-row gap-4 mb-6"
             >
               <div
-                className="cursor-pointer w-fit border rounded-md shadow-sm flex flex-col gap-1 p-4"
+                className="cursor-pointer w-full md:w-fit border rounded-md shadow-sm flex flex-col gap-1 p-4"
                 onClick={() =>
                   navigate(
                     '/ratings/' +
@@ -494,7 +495,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 onClick={measure}
               />
             )}
-            <Tabs defaultValue="bundle" className="p-6 pt-0">
+            <Tabs defaultValue="bundle" className="md:p-6 pt-0">
               <TabsList>
                 <TabsTrigger value="bundle">Bundle</TabsTrigger>
                 {measurement.screenshots?.length && (

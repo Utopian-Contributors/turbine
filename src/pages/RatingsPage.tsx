@@ -94,7 +94,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
   }, [])
 
   return (
-    <div className="max-w-3xl mx-auto py-6">
+    <div className="max-w-screen md:max-w-3xl mx-auto p-4 md:py-6">
       <div
         className="group cursor-pointer flex items-center gap-2 mb-4"
         onClick={() => {
@@ -106,9 +106,9 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
           Back to measurements of {websiteQueryData?.website?.host}
         </span>
       </div>
-      <div className="flex justify-between gap-4">
-        <h1 className="px-2 text-4xl font-light">{params.host}</h1>
-        <div className="flex flex-col items-end gap-2">
+      <div className="flex flex-col md:flex-row md:justify-between gap-4">
+        <h1 className="md:px-2 text-3xl md:text-4xl font-light">{params.host}</h1>
+        <div className="flex flex-col md:items-end gap-2">
           <StarRating
             size={40}
             rating={websiteQueryData?.website?.rating?.overallScore}
