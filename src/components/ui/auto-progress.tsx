@@ -3,7 +3,7 @@ import React from 'react'
 
 const AutoProgress: React.FC = () => {
   return (
-    <div className="relative w-sm h-3 rounded-full shadow-sm ring-1 ring-green-600 overflow-hidden">
+    <div className="relative w-xs md:w-sm h-3 rounded-full shadow-sm ring-1 ring-green-600 overflow-hidden">
       <motion.div
         id="progress"
         initial={{ left: '-50%' }}

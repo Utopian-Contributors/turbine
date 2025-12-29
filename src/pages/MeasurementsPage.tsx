@@ -65,7 +65,12 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
 
   const [measurementsQuery, { data: measurementsQueryData, refetch }] =
     useMeasurementsLazyQuery()
-  const { createMeasure, isPaying } = useCreateMeasure({
+  const {
+    createMeasure,
+    error: createMeasureError,
+    setError,
+    isPaying,
+  } = useCreateMeasure({
     url,
   })
 
@@ -232,11 +237,32 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
 
   if (isPaying) {
     return (
-      <div className="flex flex-col items-center gap-2 my-6 mt-[58px]">
-        <div className="text-2xl animate-pulse m-6 text-muted-foreground whitespace-nowrap overflow-hidden">
+      <div className="max-w-full flex flex-col items-center gap-2 my-6 mt-[58px]">
+        <div className="text-xl md:text-2xl animate-pulse m-6 text-muted-foreground text-center overflow-hidden">
           Processing payment...
         </div>
         <AutoProgress />
+      </div>
+    )
+  }
+
+  if (createMeasureError) {
+    return (
+      <div className="max-w-full flex flex-col items-center gap-2 my-6 mt-[58px]">
+        <div className="text-xl md:text-2xl m-6 text-muted-foreground text-center overflow-hidden">
+          There was an error creating the measurement
+        </div>
+        <p className="text-red-500">
+          {(createMeasureError as string) ||
+            'Please try again later or contact support.'}
+        </p>
+        <Button
+          variant="destructive"
+          className="text-white mt-6"
+          onClick={() => setError(null)}
+        >
+          Close
+        </Button>
       </div>
     )
   }
@@ -248,7 +274,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         prefix="https://"
         size={24}
         initial={url || ''}
-        className='hidden md:flex'
+        className="hidden md:flex"
         onSearch={search}
       />
       {measurementsQueryData?.measurements?.filter(
