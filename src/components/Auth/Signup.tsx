@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import type { CreateUserInput } from 'generated/graphql'
 
 const signupValidationSchema = Yup.object().shape({
+  name: Yup.string().required('Name is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
   password: Yup.string()
     .required('Password is required')
@@ -48,6 +49,24 @@ const Signup: React.FC<{
               Fill in the form below to create your account
             </p>
           </div>
+          <Field>
+            <FieldLabel htmlFor="name">Name</FieldLabel>
+            <Input
+              id="name"
+              placeholder="John Doe"
+              required
+              onChange={handleChange}
+            />
+            {errors['name'] ? (
+              <FieldDescription className="text-red-500">
+                {errors['name']}
+              </FieldDescription>
+            ) : (
+              <FieldDescription>
+                This is the name that will be displayed on your profile.
+              </FieldDescription>
+            )}
+          </Field>
           <Field>
             <FieldLabel htmlFor="email">Email</FieldLabel>
             <Input
