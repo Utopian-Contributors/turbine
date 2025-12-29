@@ -248,7 +248,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         prefix="https://"
         size={24}
         initial={url || ''}
-        className='hidden md:inline'
+        className='hidden md:flex'
         onSearch={search}
       />
       {measurementsQueryData?.measurements?.filter(

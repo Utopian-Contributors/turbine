@@ -108,7 +108,7 @@ const RootPage: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="none" className="hidden md:inline min-w-[256px]">
+      <Sidebar collapsible="none" className="hidden md:flex min-w-[256px]">
         <SidebarContent>
           <SidebarGroup>
             <img src="/turbine-wordmark.png" width="120px" className="mb-2" />
