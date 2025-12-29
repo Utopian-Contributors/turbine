@@ -8,7 +8,7 @@ import { Signup } from "../../components/Auth";
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const [register] = useRegisterMutation({
+  const [register, registerMutationData] = useRegisterMutation({
     onCompleted: (data) => {
       if (data.register?.accessToken) {
         localStorage.setItem("access_token", data.register.accessToken);
@@ -23,6 +23,7 @@ export const SignupPage: React.FC = () => {
       onSubmit={(data) => {
         register({ variables: { data } });
       }}
+      error={registerMutationData.error?.message}
     />
   );
 };

@@ -13,7 +13,6 @@ import { Input } from '@/components/ui/input'
 import type { CreateUserInput } from 'generated/graphql'
 
 const signupValidationSchema = Yup.object().shape({
-  name: Yup.string().required('Name is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
   password: Yup.string()
     .required('Password is required')
@@ -82,9 +81,7 @@ const Signup: React.FC<{
               <FieldDescription className="text-red-500">
                 {errors['password']}
               </FieldDescription>
-            ) : (
-              null
-            )}
+            ) : null}
           </Field>
           <Field>
             <FieldLabel htmlFor="repeat">Confirm Password</FieldLabel>
@@ -99,9 +96,7 @@ const Signup: React.FC<{
               <FieldDescription className="text-red-500">
                 {errors['repeat']}
               </FieldDescription>
-            ) : (
-              null
-            )}
+            ) : null}
           </Field>
           {error && (
             <Field>
@@ -111,10 +106,7 @@ const Signup: React.FC<{
             </Field>
           )}
           <Field>
-            <Button
-              type="submit"
-              onClick={() => handleSubmit()}
-            >
+            <Button type="submit" onClick={() => handleSubmit()}>
               Create Account
             </Button>
           </Field>
