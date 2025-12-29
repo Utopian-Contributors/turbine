@@ -23,6 +23,7 @@ import MeasurementsPage from './pages/MeasurementsPage'
 import PaymentsPage from './pages/PaymentsPage'
 import RatingsPage from './pages/RatingsPage'
 import SearchPage from './pages/SearchPage'
+import WalletPage from './pages/WalletPage'
 import WebsitesPage from './pages/WebsitesPage'
 
 const router = createBrowserRouter([
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
       {
         path: 'l/:name',
         element: <LibraryPage />,
+      },
+      {
+        path: 'wallet',
+        element: <WalletPage />,
       },
       {
         path: 'fonts',

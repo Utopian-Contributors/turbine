@@ -24,11 +24,11 @@ const VersionsCard: React.FC<VersionsCardProps> = ({
 }) => {
   return (
     <Card className="bg-gradient-to-t from-primary/2 to-card border rounded-xl">
-      <Tabs defaultValue="popular">
+      <Tabs defaultValue="stats">
         <CardContent>
           <TabsList className="mb-2">
-            <TabsTrigger value="popular">Popular</TabsTrigger>
             <TabsTrigger value="stats">Stats</TabsTrigger>
+            <TabsTrigger value="popular">Popular</TabsTrigger>
           </TabsList>
           <TabsContent value="popular">
             <VersionConfig

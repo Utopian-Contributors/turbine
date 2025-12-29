@@ -3,10 +3,10 @@ import FontEmbedConfig from '@/components/Font/FontEmbedConfig'
 import React from 'react'
 import { useParams } from 'react-router'
 import {
-    FontDocument,
-    useFontQuery,
-    useLoggedInQuery,
-    useToggleFontIntegrationMutation,
+  FontDocument,
+  useFontQuery,
+  useLoggedInQuery,
+  useToggleFontIntegrationMutation,
 } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

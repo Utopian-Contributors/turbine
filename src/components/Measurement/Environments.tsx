@@ -165,7 +165,7 @@ const Environments: React.FC<EnvironmentsProps> = ({
                       className={cn(
                         'cursor-pointer min-w-[16rem] md:min-w-xs',
                         measurementForDevice
-                          ? ''
+                          ? 'bg-gradient-to-t from-primary/2 to-card'
                           : 'opacity-30 hover:opacity-100 transition duration-300',
                         measurementForDevice?.status ===
                           MeasurementStatus.Pending

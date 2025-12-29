@@ -13,7 +13,7 @@ interface UsageProps {
 
 const Usage: React.FC<UsageProps> = ({ library, usage, prevUsage }) => {
   return (
-    <div className="hidden md:flex flex-col items-start gap-1">
+    <div className="flex flex-col items-start gap-1">
       <div className="flex gap-1 items-center">
         <Link
           className="underline"

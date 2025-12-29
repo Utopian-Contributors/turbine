@@ -276,11 +276,11 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   initial={{ scale: 0, filter: 'blur(10px)' }}
                   animate={{ scale: 1, filter: 'blur(0px)' }}
                   transition={{ duration: 2, type: 'spring' }}
-                  className="h-fit w-full md:w-fit border rounded-lg p-2"
+                  className="h-fit w-full md:w-fit border rounded-lg"
                 >
                   <PreloadImage
                     src={measurement.thumbnail}
-                    className="w-full h-[12rem] md:w-[12rem] md:h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
+                    className="w-full h-48 md:w-[12rem] md:h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
                   >
                     {(error) =>
                       error ? (

@@ -1,5 +1,4 @@
 import StarRating from '@/components/ui/StarRating'
-import moment from 'moment'
 import React, { useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
@@ -101,25 +100,34 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
           navigate('/measurements/' + websiteQueryData?.website?.host)
         }}
       >
-        <ArrowLeft size={16} className="text-muted-foreground" />
+        <ArrowLeft size={20} className="text-muted-foreground" />
         <span className="group-hover:underline text-md text-muted-foreground">
           Back to measurements of {websiteQueryData?.website?.host}
         </span>
       </div>
       <div className="flex flex-col md:flex-row md:justify-between gap-4">
-        <h1 className="md:px-2 text-3xl md:text-4xl font-light">{params.host}</h1>
-        <div className="flex flex-col md:items-end gap-2">
-          <StarRating
-            size={40}
-            rating={websiteQueryData?.website?.rating?.overallScore}
-          />
-          <span className="text-xs text-gray-400 px-2">
-            {websiteQueryData?.website?.rating
-              ? moment(websiteQueryData?.website?.rating.createdAt).fromNow()
-              : 'Not rated yet'}
-          </span>
-        </div>
+        <h1 className="md:px-2 text-3xl md:text-4xl font-light">
+          {params.host}
+        </h1>
+        {websiteQueryData?.website?.rating && (
+          <div className="flex flex-col md:items-end gap-2">
+            <StarRating
+              size={40}
+              rating={websiteQueryData?.website?.rating?.overallScore}
+            />
+          </div>
+        )}
       </div>
+      {typeof websiteQueryData?.website?.rating?.overallScore ===
+        'undefined' && (
+        <div className="border rounded-lg p-4 mt-6">
+          <h2 className="text-lg md:text-xl">No ratings available.</h2>
+          <p className="text-muted-foreground mt-2">
+            A website must be measured using WiFi,
+            Fast 3G & Slow 3G in order to get a rating.
+          </p>
+        </div>
+      )}
       {websiteQueryData?.website?.rating?.overallScore && (
         <Accordion
           type="multiple"

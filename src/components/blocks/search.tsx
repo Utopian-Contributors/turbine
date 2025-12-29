@@ -21,7 +21,7 @@ const Search: React.FC<SearchProps> = ({
 }) => {
   const ref = useRef<HTMLInputElement>(null)
   return (
-    <div className="w-[420px] relative transform -translate-x-1/2 left-1/2 flex gap-1 items-center">
+    <div className="max-w-xs mx-auto w-[420px] flex gap-1 items-center">
       <Input
         className={cn(
           `w-md bg-transparent backdrop-blur-xs m-0 p-6 text-lg rounded-full ${className}`

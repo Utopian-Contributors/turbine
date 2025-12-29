@@ -98,8 +98,8 @@ const FontEmbedConfig: React.FC<FontEmbedConfigProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-6">
-      <div className="px-2 space-y-4 max-h-[calc(100vh-107px-5rem)] overflow-y-auto">
+    <div className="flex flex-col md:grid md:grid-cols-2 gap-6">
+      <div className="order-1 md:order-0 px-2 space-y-4 md:max-h-[calc(100vh-107px-5rem)] md:overflow-y-auto">
         {weightMode === 'full' ? (
           files.map((file) => (
             <style>

@@ -10,10 +10,11 @@ import { abbreviateNumber } from 'js-abbreviation-number'
 import React from 'react'
 import { Button } from '../ui/button'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface WalletProps {}
+interface WalletProps {
+  className?: string
+}
 
-const Wallet: React.FC<WalletProps> = () => {
+const Wallet: React.FC<WalletProps> = ({className}) => {
   const { open } = useModal()
   const { disconnect, isDisconnecting } = useDisconnect()
   const { solana } = useSolana()
@@ -84,7 +85,7 @@ const Wallet: React.FC<WalletProps> = () => {
   }
 
   return (
-    <Button onClick={open} disabled={isConnecting}>
+    <Button onClick={open} disabled={isConnecting} className={className}>
       Connect Wallet
     </Button>
   )

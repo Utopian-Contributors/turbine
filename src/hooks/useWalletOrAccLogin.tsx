@@ -10,7 +10,7 @@ export const useWalletOrAccLogin = () => {
   const location = window.location
   const { data: loggedInQueryData } = useLoggedInQuery()
   const { open } = useModal()
-  const { isConnected } = usePhantom()
+  const { isConnected, addresses } = usePhantom()
 
   useEffect(() => {
     if (loggedInQueryData?.loggedIn && !loggedInQueryData?.loggedIn.verified) {
@@ -40,6 +40,7 @@ export const useWalletOrAccLogin = () => {
   }, [isConnected, loggedInQueryData?.loggedIn, loginRedirect, open])
 
   return {
+    addresses,
     isConnected: !!loggedInQueryData?.loggedIn && isConnected,
     isLoggedIn: !!loggedInQueryData?.loggedIn,
     login,

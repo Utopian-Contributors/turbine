@@ -1,12 +1,13 @@
 import {
   CreditCardIcon,
   Github,
-  GlobeIcon,
+  Globe,
   LogOutIcon,
   PackageIcon,
   Scale,
   SearchIcon,
   TypeIcon,
+  WalletIcon,
 } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -62,9 +63,7 @@ const items: SidebarItem[] = [
     title: 'Websites',
     url: '/websites',
     icon: (selected: boolean) => (
-      <GlobeIcon
-        className={selected ? 'text-black' : 'text-muted-foreground'}
-      />
+      <Globe className={selected ? 'text-black' : 'text-muted-foreground'} />
     ),
   },
 
@@ -90,6 +89,32 @@ const items: SidebarItem[] = [
     icon: (selected: boolean) => (
       <CreditCardIcon
         className={cn(selected ? 'text-black' : 'text-muted-foreground')}
+      />
+    ),
+  },
+]
+
+const tabBarItems: SidebarItem[] = [
+  {
+    title: 'Measure',
+    url: '/home',
+    icon: (selected: boolean) => (
+      <Scale className={selected ? 'text-black' : 'text-gray-600'} />
+    ),
+  },
+  {
+    title: 'Websites',
+    url: '/websites',
+    icon: (selected: boolean) => (
+      <Globe className={selected ? 'text-black' : 'text-gray-600'} />
+    ),
+  },
+  {
+    title: 'Wallet',
+    url: '/wallet',
+    icon: (selected: boolean) => (
+      <WalletIcon
+        className={selected ? 'text-black' : 'text-gray-600'}
       />
     ),
   },
@@ -214,6 +239,27 @@ const RootPage: React.FC = () => {
           </SidebarGroup>
         </SidebarFooter>
       </Sidebar>
+
+      <div className="md:hidden fixed w-[calc(100vw-64px)] bottom-8 z-10 left-1/2 transform -translate-x-1/2 bg-white/50 ring ring-gray-300 backdrop-blur rounded-full shadow-lg flex">
+        {tabBarItems.map((item) => (
+          <div
+            key={item.title}
+            className={cn(
+              'flex-1 flex justify-center p-2',
+            )}
+            onClick={() => navigate(item.url)}
+          >
+            <div
+              className={cn(
+                'rounded-full px-8 py-4',
+                location.pathname.startsWith(item.url) ? 'bg-gray-100' : ''
+              )}
+            >
+              {item.icon(location.pathname.startsWith(item.url))}
+            </div>
+          </div>
+        ))}
+      </div>
 
       <main className="flex-1 min-w-100vh">
         <div className="max-h-screen max-w-screen md:max-w-[calc(100vw-256px)] overflow-auto overflow-x-hidden">

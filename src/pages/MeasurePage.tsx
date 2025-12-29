@@ -63,7 +63,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   return (
     <div className="w-full h-screen overflow-hidden">
       <div className="w-full mt-16 flex flex-col items-center">
-        <h1 className="max-w-4xl text-white text-center text-6xl font-bold leading-16 mb-8">
+        <h1 className="max-w-xs md:max-w-4xl text-white text-center text-3xl md:text-6xl font-bold md:leading-16 mb-8">
           Measure and optimize the performance of your website
         </h1>
         <SearchWebsite
@@ -72,10 +72,10 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
           size={24}
           initial={params.get('url') || ''}
           onSearch={search}
-          className="w-xl mb-4"
+          className="w-xs md:w-xl mb-4"
         />
         <Pricetag />
-        <div className="max-w-xl flex flex-wrap justify-center gap-2 mt-2 p-4">
+        <div className="max-w-xl flex flex-wrap justify-center gap-2 md:mt-2 p-4">
           <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
             Understand SEO
           </span>
@@ -94,7 +94,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
         </div>
       </div>
       <div
-        className="inset absolute top-0 w-[calc(100vw-256px)] z-[-1] bg-muted h-screen overflow-hidden"
+        className="inset absolute top-0 w-full md:w-[calc(100vw-256px)] z-[-1] bg-muted h-screen overflow-hidden"
         style={{
           background:
             'radial-gradient(ellipse at top, rgba(50, 205, 50, 0.6), green)',
