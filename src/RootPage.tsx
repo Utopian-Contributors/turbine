@@ -33,6 +33,7 @@ interface SidebarItem {
   title: string
   url: string
   icon: (selected: boolean) => JSX.Element
+  subpages?: string[]
 }
 
 const items: SidebarItem[] = [
@@ -105,6 +106,7 @@ const tabBarItems: SidebarItem[] = [
   {
     title: 'Websites',
     url: '/websites',
+    subpages: ['/measurements', '/ratings'],
     icon: (selected: boolean) => (
       <Globe className={selected ? 'text-black' : 'text-gray-600'} />
     ),
@@ -113,9 +115,7 @@ const tabBarItems: SidebarItem[] = [
     title: 'Wallet',
     url: '/wallet',
     icon: (selected: boolean) => (
-      <WalletIcon
-        className={selected ? 'text-black' : 'text-gray-600'}
-      />
+      <WalletIcon className={selected ? 'text-black' : 'text-gray-600'} />
     ),
   },
 ]
@@ -240,28 +240,36 @@ const RootPage: React.FC = () => {
         </SidebarFooter>
       </Sidebar>
 
-      <div className="md:hidden fixed w-[calc(100vw-64px)] bottom-8 z-10 left-1/2 transform -translate-x-1/2 bg-white/50 ring ring-gray-300 backdrop-blur rounded-full shadow-lg flex">
-        {tabBarItems.map((item) => (
-          <div
-            key={item.title}
-            className={cn(
-              'flex-1 flex justify-center p-2',
-            )}
-            onClick={() => navigate(item.url)}
-          >
+      <div className="md:hidden fixed w-[calc(100vw-64px)] bottom-6 z-10 left-1/2 transform -translate-x-1/2 bg-white/50 ring ring-gray-300 backdrop-blur rounded-full shadow-lg flex">
+        {tabBarItems.map((item) => {
+          const selected =
+            location.pathname.startsWith(item.url) ||
+            Boolean(
+              item.subpages &&
+                item.subpages.some((subpage) =>
+                  location.pathname.startsWith(subpage)
+                )
+            )
+          return (
             <div
-              className={cn(
-                'rounded-full px-8 py-4',
-                location.pathname.startsWith(item.url) ? 'bg-gray-100' : ''
-              )}
+              key={item.title}
+              className={cn('flex-1 flex justify-center p-2')}
+              onClick={() => navigate(item.url)}
             >
-              {item.icon(location.pathname.startsWith(item.url))}
+              <div
+                className={cn(
+                  'rounded-full px-8 py-4',
+                  selected ? 'bg-gray-100' : ''
+                )}
+              >
+                {item.icon(selected)}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
-      <main className="flex-1 min-w-100vh">
+      <main className="flex-1 min-w-100dvh">
         <div className="max-h-screen max-w-screen md:max-w-[calc(100vw-256px)] overflow-auto overflow-x-hidden">
           <Outlet />
         </div>
