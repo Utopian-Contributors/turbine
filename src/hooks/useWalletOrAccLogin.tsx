@@ -1,4 +1,4 @@
-import { useModal, usePhantom } from '@phantom/react-sdk'
+import { AddressType, useModal, usePhantom } from '@phantom/react-sdk'
 import { useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 import { hideSplashScreen } from 'vite-plugin-splash-screen/runtime'
@@ -40,7 +40,9 @@ export const useWalletOrAccLogin = () => {
   }, [isConnected, loggedInQueryData?.loggedIn, loginRedirect, open])
 
   return {
-    addresses,
+    address:
+      addresses.find((addr) => addr.addressType === AddressType.solana)
+        ?.address || null,
     isConnected: !!loggedInQueryData?.loggedIn && isConnected,
     isLoggedIn: !!loggedInQueryData?.loggedIn,
     login,

@@ -13,7 +13,7 @@ const WalletPage: React.FC<WalletPageProps> = () => {
   const navigate = useNavigate()
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null)
 
-  const { isLoggedIn, isConnected, addresses, user, loginRedirect } =
+  const { isLoggedIn, isConnected, address, user, loginRedirect } =
     useWalletOrAccLogin()
 
   return (
@@ -65,18 +65,16 @@ const WalletPage: React.FC<WalletPageProps> = () => {
           <h3
             className="break-all font-mono bg-gray-100 p-2 rounded"
             onClick={() => {
-              if (addresses[0].address) {
-                navigator.clipboard.writeText(addresses[0].address)
-                setCopiedAddress(addresses[0].address)
+              if (address) {
+                navigator.clipboard.writeText(address)
+                setCopiedAddress(address)
                 setTimeout(() => {
                   setCopiedAddress(null)
                 }, 2000)
               }
             }}
           >
-            {addresses && addresses.length > 0
-              ? addresses[0].address
-              : 'No address found'}
+            {address || 'No address found'}
           </h3>
           {copiedAddress && (
             <span className="text-gray-500 text-sm">Copied to clipboard!</span>
