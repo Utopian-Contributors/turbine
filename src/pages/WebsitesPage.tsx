@@ -99,11 +99,6 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                           </span>
                         </div>
                       </div>
-                      {website.latestMeasurement?.description && (
-                        <p className="max-w-full line-clamp-4 overflow-ellipsis">
-                          {website.latestMeasurement.description}
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>
