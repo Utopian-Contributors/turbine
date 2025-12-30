@@ -57,6 +57,7 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
               </span>
             ) : null}
           </div>
+          <h3 className="hidden md:block text-lg font-medium">{title}</h3>
           <p className="text-sm text-gray-500 mb-1 lg:mb-2">{description}</p>
           {errorScreenshot && (
             <img
@@ -67,11 +68,13 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
           )}
           {files && files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4 lg:mb-6">
-              {files.map((f) => (
-                <div className="underline" key={f}>
-                  {f.slice(f.lastIndexOf('/') + 1)}
+              {files.map((f) => {
+                const filename = f.slice(f.lastIndexOf('/') + 1);
+                const filenameWithoutParams = filename.split('?')[0];
+                return <div className="underline" key={f}>
+                  {filenameWithoutParams}
                 </div>
-              ))}
+              })}
             </div>
           )}
         </div>
@@ -131,7 +134,12 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
       <div
         className="group cursor-pointer flex items-center gap-2 mb-4"
         onClick={() => {
-          navigate('/measurements/' + websiteQueryData?.website?.host)
+          navigate(
+            '/measurements/' +
+              websiteQueryData?.website?.host +
+              '?path=' +
+              search.get('path')
+          )
         }}
       >
         <ArrowLeft size={20} className="text-muted-foreground" />
@@ -140,9 +148,12 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
         </span>
       </div>
       <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
-        <h1 className="lg:px-2 text-3xl lg:text-4xl font-light">
-          {params.host}
-        </h1>
+        <div className="flex flex-col gap-2">
+          <h1 className="lg:px-2 text-3xl lg:text-4xl">{params.host}</h1>
+          <span className="text-2xl text-muted-foreground font-light ml-2">
+            {search.get('path') === '/' ? 'Root Page' : search.get('path')}
+          </span>
+        </div>
         {rating && (
           <div className="flex flex-col lg:items-end gap-2">
             <StarRating size={40} rating={rating?.overallScore} />
