@@ -78,13 +78,9 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                       }
                     </PreloadImage>
                     <div className="lg:max-w-[calc(100%-2px)] w-full p-2 bg-white flex flex-col gap-2">
-                      {getRating(website as WebsiteHost)?.overallScore && (
-                        <StarRating
-                          rating={
-                            getRating(website as WebsiteHost)?.overallScore
-                          }
-                        />
-                      )}
+                      <StarRating
+                        rating={getRating(website as WebsiteHost)?.overallScore}
+                      />
                       <div className="max-w-full flex items-center gap-2">
                         {website.latestMeasurement?.icon ? (
                           <img
