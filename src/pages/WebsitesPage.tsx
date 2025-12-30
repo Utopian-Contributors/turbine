@@ -48,7 +48,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                           >
                             <Globe
                               className="relative top-1/2 -translate-y-1/2 mx-auto text-white"
-                              size={64}
+                              size={80}
                             />
                           </div>
                         )
