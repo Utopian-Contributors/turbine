@@ -6,14 +6,14 @@ import type { BundledFileProps } from './Bundle'
 
 const getFilename = (url: string, baseUrl: string) => {
   try {
-    const urlObj = new URL(url)
-    const pathname = urlObj.pathname
-    // Remove baseUrl pathname from the full pathname
-    const basePathname = new URL(baseUrl).pathname
-    const relativePath = pathname.replace(basePathname, '')
-    // Get the last segment (filename)
+    const absolutePath = new URL(url).pathname
+    const relativePath = absolutePath
+      .slice(new URL(baseUrl).pathname.length)
+      .startsWith('/')
+      ? absolutePath.replace(new URL(baseUrl).pathname, '')
+      : absolutePath
     const segments = relativePath.split('/').filter(Boolean)
-    return segments[segments.length - 1] || relativePath
+    return segments[segments.length - 1] || relativePath.slice(1)
   } catch {
     // Fallback if URL parsing fails
     return url.replace(baseUrl, '').split('?')[0].split('/').pop() || url
@@ -69,8 +69,8 @@ const BundledFile: React.FC<BundledFileProps> = ({
             {new URL(url).hostname !== new URL(baseUrl).hostname ? (
               <Globe className="h-3 w-3 text-muted-foreground" />
             ) : null}{' '}
-            <span className="text-xs text-muted-foreground leading-[10px]">
-              {new URL(url).hostname}
+            <span className="max-w-48 truncate text-xs text-muted-foreground leading-[10px]">
+              {abbreviateFilename(new URL(url).hostname, 40)}
             </span>
           </div>
         </div>
@@ -83,8 +83,8 @@ const BundledFile: React.FC<BundledFileProps> = ({
             height &&
             clientWidth &&
             clientHeight
-            ? 'w-xs grid-cols-4'
-            : 'w-[10rem] grid-cols-2'
+            ? 'w-xs grid-cols-1 md:grid-cols-4'
+            : 'w-[10rem] grid-cols-1 md:grid-cols-2'
         )}
       >
         {clientWidth && clientHeight && width && height
@@ -92,7 +92,7 @@ const BundledFile: React.FC<BundledFileProps> = ({
               <div
                 key="natural"
                 className={cn(
-                  'col-span-1 flex flex-col items-end',
+                  'hidden col-span-1 md:flex flex-col items-end',
                   width > clientWidth && height > clientHeight
                     ? 'text-red-500'
                     : ''
@@ -107,7 +107,7 @@ const BundledFile: React.FC<BundledFileProps> = ({
               </div>,
               <div
                 key="rendered"
-                className={'col-span-1 flex flex-col items-end'}
+                className={'hidden col-span-1 md:flex flex-col items-end'}
               >
                 <span>
                   {clientWidth}x{clientHeight}
@@ -120,7 +120,7 @@ const BundledFile: React.FC<BundledFileProps> = ({
           <span>{filesize(size)}</span>
           <span className="text-xs text-muted-foreground">File size</span>
         </div>
-        <div className="col-span-1 flex flex-col items-end">
+        <div className="hidden col-span-1 md:flex flex-col items-end">
           <span>{elapsed}ms</span>
           <span className="text-xs text-muted-foreground">Load time</span>
         </div>

@@ -67,7 +67,8 @@ interface EnvironmentsProps {
   > & {
     bundledFiles: MeasuredFileFragment[]
   })[]
-  current: Pick<Measurement, 'id' | 'url' | 'elapsed'> & {
+  selectedPath?: string
+  current: Pick<Measurement, 'id' | 'host' | 'elapsed'> & {
     bundledFiles: MeasuredFileFragment[]
   }
   initial: ConnectionType
@@ -77,6 +78,7 @@ interface EnvironmentsProps {
 const Environments: React.FC<EnvironmentsProps> = ({
   measurements,
   current,
+  selectedPath,
   initial,
   onClick,
 }) => {
@@ -103,7 +105,10 @@ const Environments: React.FC<EnvironmentsProps> = ({
   const possibleDevices = measurementDevicesData.measurementDevices
 
   return (
-    <Tabs defaultValue={initial || possibleConnections[0]} className="py-4 lg:p-6">
+    <Tabs
+      defaultValue={initial || possibleConnections[0]}
+      className="py-4 lg:px-6 lg:py-4"
+    >
       <TabsList>
         {possibleConnections.map((connection) => (
           <TabsTrigger
@@ -177,10 +182,9 @@ const Environments: React.FC<EnvironmentsProps> = ({
                       )}
                       onClick={() => {
                         if (isLoggedIn) {
-                          const currentUrlObj = new URL(current.url)
                           onClick(device.type, connection)
                           navigate(
-                            `/measurements/${currentUrlObj.host}?path=${currentUrlObj.pathname}&device=${device.type}&connection=${connection}`,
+                            `/measurements/${current.host?.host}?path=${selectedPath}&device=${device.type}&connection=${connection}`,
                             { replace: true }
                           )
                         } else {

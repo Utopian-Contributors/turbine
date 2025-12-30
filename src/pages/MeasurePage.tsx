@@ -30,7 +30,11 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
       const urlObj = new URL(url)
       measurementsQuery({ variables: { url }, fetchPolicy: 'network-only' })
         .then(async (response) => {
-          if (!response.error && !response.data?.measurements?.length) {
+          if (
+            !response.error &&
+            (!response.data?.measurements?.length ||
+              !response.data?.measurements?.some((m) => m.url === url))
+          ) {
             if (!isConnected) {
               login()
             } else {

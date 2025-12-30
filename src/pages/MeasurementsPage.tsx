@@ -13,10 +13,10 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
 import StarRating from '@/components/ui/StarRating'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
+import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { toHeaderCase } from 'js-convert-case'
 import { Clock, EyeOff, Repeat, Rocket } from 'lucide-react'
@@ -43,10 +43,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     () => new URLSearchParams(location.search),
     [location.search]
   )
+  const selectedPath = searchParams.get('path') || '/'
   const url = useMemo(
-    () =>
-      new URL(searchParams.get('path') ?? '/', `https://${params.host}`).href,
-    [searchParams, params]
+    () => new URL(selectedPath ?? '/', `https://${params.host}`).href,
+    [selectedPath, params.host]
   )
 
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null)
@@ -78,25 +78,24 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     const device = searchParams.get('device') as DeviceType | null
     const connection = searchParams.get('connection') as ConnectionType | null
     return (
-      measurementsQueryData?.measurements?.find((m) => {
-        const match =
-          (m.url === url || m.host?.host === params.host) &&
-          m.connectionType === (connection || ConnectionType.Wifi) &&
-          m.device.type === (device || DeviceType.Desktop)
-        if (match && m.status === MeasurementStatus.Completed) {
-          return match
-        }
-      }) ||
+      measurementsQueryData?.measurements
+        ?.filter((m) => new URL(m.url).pathname === selectedPath)
+        .find((m) => {
+          const match =
+            m.connectionType === (connection || ConnectionType.Wifi) &&
+            m.device.type === (device || DeviceType.Desktop)
+          if (
+            (match && m.status === MeasurementStatus.Completed) ||
+            (match && m.status === MeasurementStatus.Pending)
+          ) {
+            return match
+          }
+        }) ||
       measurementsQueryData?.measurements?.find((m) => {
         return m.url === url && m.status === MeasurementStatus.Completed
-      }) ||
-      (measurementsQueryData?.measurements?.filter(
-        (m) => m.status === MeasurementStatus.Completed
-      ).length === 0
-        ? measurementsQueryData?.measurements[0]
-        : null)
+      })
     )
-  }, [measurementsQueryData?.measurements, params.host, searchParams, url])
+  }, [measurementsQueryData?.measurements, searchParams, selectedPath, url])
 
   const { data: websiteQueryData } = useWebsiteQuery({
     variables: {
@@ -153,7 +152,13 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         variables: { url },
         fetchPolicy: 'network-only',
       }).then((data) => {
-        if (!data.error && !data.data?.measurements?.length) {
+        if (
+          !data.error &&
+          (!data.data?.measurements?.length ||
+            !data.data?.measurements?.some(
+              (m) => new URL(m.url).pathname === selectedPath
+            ))
+        ) {
           navigate(`/measure/?url=${encodeURIComponent(url)}`, {
             replace: true,
           })
@@ -165,6 +170,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     measurementsQueryData?.measurements,
     navigate,
     params,
+    selectedPath,
     url,
   ])
 
@@ -174,7 +180,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         if (
           !measurementsQueryData?.measurements?.some(
             (m) =>
-              m.url === url &&
+              new URL(m.url).pathname === selectedPath &&
               m.device.type === device &&
               m.connectionType === connection
           )
@@ -186,7 +192,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         }
       }
     },
-    [createMeasure, measurementsQueryData?.measurements, url]
+    [createMeasure, measurementsQueryData?.measurements, selectedPath, url]
   )
 
   useEffect(() => {
@@ -268,7 +274,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 pb-40 lg:pb-6">
       <SearchWebsite
         type="search"
         prefix="https://"
@@ -278,7 +284,9 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         onSearch={search}
       />
       {measurementsQueryData?.measurements?.filter(
-        (m) => m.status === MeasurementStatus.Completed
+        (m) =>
+          new URL(m.url).pathname === selectedPath &&
+          m.status === MeasurementStatus.Completed
       ).length === 0 &&
         measurement?.status === MeasurementStatus.Pending && (
           <div className="flex flex-col items-center gap-2 my-6">
@@ -291,9 +299,9 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       {measurement?.status === MeasurementStatus.Failed && (
         <p>Measurement failed. Please try again later.</p>
       )}
-      {measurementsQueryData?.measurements?.some(
-        (m) => m?.status === MeasurementStatus.Completed
-      ) &&
+      {measurementsQueryData?.measurements
+        ?.filter((m) => new URL(m.url).pathname === selectedPath)
+        .some((m) => m?.status === MeasurementStatus.Completed) &&
         measurement && (
           <div>
             <div className="flex flex-col lg:flex-row items-center lg:items-start lg:justify-between gap-6 px-2 py-4 lg:p-6">
@@ -506,27 +514,72 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 </div>
               </div>
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 1 }}
-            >
-              <Separator />
+            <motion.div className="flex gap-2 items-center px-6 py-2">
+              <div
+                onClick={() => {
+                  const search = new URLSearchParams(location.search)
+                  search.set('path', '/')
+                  navigate(
+                    `/measurements/${params.host}?` + search.toString(),
+                    { replace: true }
+                  )
+                }}
+                className={cn(
+                  'border rounded-md px-2 py-1',
+                  '/' === selectedPath ? 'border-green-500 shadow-sm' : ''
+                )}
+              >
+                Root Page
+              </div>
+              {measurementsQueryData.measurements
+                .reduce((acc, m) => {
+                  const path = new URL(m.url).pathname
+                  if (!acc.includes(path) && path !== '/') {
+                    acc.push(path)
+                  }
+                  return acc
+                }, [] as string[])
+                .reverse()
+                .map((path) => {
+                  return (
+                    <div
+                      onClick={() => {
+                        const search = new URLSearchParams(location.search)
+                        search.set('path', path)
+                        navigate(
+                          `/measurements/${params.host}?` + search.toString(),
+                          { replace: true }
+                        )
+                      }}
+                      className={cn(
+                        'border rounded-md px-2 py-1',
+                        path === selectedPath
+                          ? 'border-green-500 shadow-sm'
+                          : ''
+                      )}
+                    >
+                      {path}
+                    </div>
+                  )
+                })}
             </motion.div>
             {measurementsQueryData.measurements && measurement && (
               <Environments
                 initial={selectedConnection}
-                measurements={measurementsQueryData.measurements}
+                measurements={measurementsQueryData.measurements.filter(
+                  (m) => new URL(m.url).pathname === selectedPath
+                )}
+                selectedPath={selectedPath}
                 current={measurement}
                 onClick={measure}
               />
             )}
-            <Tabs defaultValue="bundle" className="lg:p-6 pt-0">
+            <Tabs defaultValue="bundle" className="px-6 lg:pt-2">
               <TabsList>
                 <TabsTrigger value="bundle">Bundle</TabsTrigger>
-                {measurement.screenshots?.length && (
+                {measurement.screenshots?.length ? (
                   <TabsTrigger value="screenshots">Screenshots</TabsTrigger>
-                )}
+                ) : null}
               </TabsList>
               <TabsContent value="bundle">{bundle}</TabsContent>
               <TabsContent value="screenshots">

@@ -55,7 +55,6 @@ export const useSendTransaction = (tokenMint: string) => {
         { mint: mintPubkey }
       )
 
-      console.log('Treasury token accounts:', toTokenAccounts.value)
       console.log('Looking for mint:', mintPubkey.toBase58())
       console.log('Treasury wallet:', toPubkey.toBase58())
 

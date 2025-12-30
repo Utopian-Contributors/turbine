@@ -39,10 +39,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                 <div
                   key={website.id}
                   onClick={() => {
-                    const urlObj = new URL(website.latestMeasurement!.url)
-                    navigate(
-                      `/measurements/${urlObj.host}?path=${urlObj.pathname}`
-                    )
+                    navigate(`/measurements/${website.host}`)
                   }}
                   className="cursor-pointer lg:w-[calc(100%/3-0.75rem)] shadow-sm lg:shadow-none rounded-lg flex flex-col lg:flex-row lg:gap-2 overflow-hidden"
                 >
