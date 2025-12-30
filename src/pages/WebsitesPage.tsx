@@ -2,7 +2,7 @@ import React from 'react'
 
 import PreloadImage from '@/components/ui/preload-image-cover'
 import StarRating from '@/components/ui/StarRating'
-import { Globe, GlobeIcon } from 'lucide-react'
+import { Globe } from 'lucide-react'
 import moment from 'moment'
 import { useNavigate } from 'react-router'
 import { useWebsitesQuery } from '../../generated/graphql'
@@ -65,14 +65,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                             alt={`${website.host} icon`}
                             className="w-[32px] h-[32px]"
                           />
-                        ) : (
-                          <div className="w-[32px] h-[32px] text-muted-foreground/10 flex justify-center items-center rounded-full">
-                            <GlobeIcon
-                              size={20}
-                              className="text-muted-foreground"
-                            />
-                          </div>
-                        )}
+                        ) : null}
                         <div className="max-w-full flex flex-col">
                           <h3 className="max-w-full md:max-w-xs text-lg truncate m-0">
                             {website.latestMeasurement?.title}
@@ -100,14 +93,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                               alt={`${website.host} icon`}
                               className="w-[32px] h-[32px]"
                             />
-                          ) : (
-                            <div className="w-[32px] h-[32px] text-muted-foreground/10 flex justify-center items-center rounded-full">
-                              <GlobeIcon
-                                size={20}
-                                className="text-muted-foreground"
-                              />
-                            </div>
-                          )}
+                          ) : null}
                           <div className="max-w-full flex flex-col">
                             <h3 className="max-w-full md:max-w-xs text-lg truncate m-0">
                               {website.latestMeasurement?.title}
