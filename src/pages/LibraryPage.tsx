@@ -130,15 +130,15 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
   }
 
   return (
-    <div className="w-full md:max-w-6xl mx-auto p-6">
+    <div className="w-full lg:max-w-6xl mx-auto p-6">
       <title>{title}</title>
       <Search
         placeholder="Search npm packages"
         onChange={(q) => search(q)}
         defaultValue={libraryQueryData?.library.name}
       />
-      <div className="flex flex-col md:grid md:grid-cols-3 mt-6">
-        <div className="md:col-span-2">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 mt-6">
+        <div className="lg:col-span-2">
           <div className="flex flex-col gap-2 p-2">
             <div className="w-full flex justify-between items-center">
               <div className="flex gap-2 items-end">
@@ -223,8 +223,8 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             />
           )}
         </div>
-        <div className="w-full md:w-fit md:col-span-1 gap-4 flex flex-col">
-          <div className="w-full md:w-fit bg-gradient-to-t from-primary/2 to-card border rounded-xl flex flex-col gap-2 mt-4 md:mt-0 md:mx-8 p-4">
+        <div className="w-full lg:w-fit lg:col-span-1 gap-4 flex flex-col">
+          <div className="w-full lg:w-fit bg-gradient-to-t from-primary/2 to-card border rounded-xl flex flex-col gap-2 mt-4 lg:mt-0 lg:mx-8 p-4">
             <Versions
               versions={versions}
               selected={selectedVersion}
@@ -245,7 +245,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
           </div>
           {libraryUsageQueryData?.libraryUsage?.downloads &&
             libraryUsageQueryData.libraryUsage.bandwidth && (
-              <div className="w-full md:w-fit bg-gradient-to-t from-primary/2 to-card border rounded-xl md:max-w-[16rem] flex flex-col gap-2 md:ml-8 p-4 border rounded-xl">
+              <div className="w-full lg:w-fit bg-gradient-to-t from-primary/2 to-card border rounded-xl lg:max-w-[16rem] flex flex-col gap-2 lg:ml-8 p-4 border rounded-xl">
                 <Downloads
                   library={libraryQueryData?.library.name || ''}
                   downloads={

@@ -33,7 +33,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
   return (
     <div className="pt-6 w-full">
       <title>Turbine | Search</title>
-      <div className="w-full md:w-2xl mx-auto">
+      <div className="w-full lg:w-2xl mx-auto">
         <div className="sticky top-0 pb-2 z-10">
           <Search
             placeholder="Search npm packages and fonts"

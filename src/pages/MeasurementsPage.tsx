@@ -119,7 +119,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         transition={{ duration: 0.5 }}
         className="grid grid-cols-4 gap-6"
       >
-        <div className="col-span-4 md:col-span-3">
+        <div className="col-span-4 lg:col-span-3">
           <Bundle measurement={measurement} />
         </div>
       </motion.div>
@@ -238,7 +238,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
   if (isPaying) {
     return (
       <div className="max-w-full flex flex-col items-center gap-2 my-6 mt-[58px]">
-        <div className="text-xl md:text-2xl animate-pulse m-6 text-muted-foreground text-center overflow-hidden">
+        <div className="text-xl lg:text-2xl animate-pulse m-6 text-muted-foreground text-center overflow-hidden">
           Processing payment...
         </div>
         <AutoProgress />
@@ -249,7 +249,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
   if (createMeasureError) {
     return (
       <div className="max-w-full flex flex-col items-center gap-2 my-6 mt-[58px]">
-        <div className="text-xl md:text-2xl m-6 text-muted-foreground text-center overflow-hidden">
+        <div className="text-xl lg:text-2xl m-6 text-muted-foreground text-center overflow-hidden">
           There was an error creating the measurement
         </div>
         <p className="text-red-500">
@@ -274,7 +274,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         prefix="https://"
         size={24}
         initial={url || ''}
-        className="hidden md:flex"
+        className="hidden lg:flex"
         onSearch={search}
       />
       {measurementsQueryData?.measurements?.filter(
@@ -296,17 +296,17 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       ) &&
         measurement && (
           <div>
-            <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between gap-6 px-2 py-4 md:p-6">
-              <div className="flex flex-col items-center md-items-start md:flex-row gap-4">
+            <div className="flex flex-col lg:flex-row items-center lg:items-start lg:justify-between gap-6 px-2 py-4 lg:p-6">
+              <div className="flex flex-col items-center md-items-start lg:flex-row gap-4">
                 <motion.div
                   initial={{ scale: 0, filter: 'blur(10px)' }}
                   animate={{ scale: 1, filter: 'blur(0px)' }}
                   transition={{ duration: 2, type: 'spring' }}
-                  className="h-fit w-full md:w-fit border rounded-lg"
+                  className="h-fit w-full lg:w-fit border rounded-lg"
                 >
                   <PreloadImage
                     src={measurement.thumbnail}
-                    className="w-full h-48 md:w-[12rem] md:h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
+                    className="w-full h-48 lg:w-[12rem] lg:h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
                   >
                     {(error) =>
                       error ? (
@@ -364,7 +364,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 initial={{ position: 'relative', left: '100%' }}
                 animate={{ left: 0 }}
                 transition={{ duration: 1, delay: 0.5 }}
-                className="flex flex-col items-center md:items-end gap-2 pt-2"
+                className="flex flex-col items-center lg:items-end gap-2 pt-2"
               >
                 <Pricetag />
                 <Button
@@ -460,10 +460,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1 }}
-              className="md:px-6 flex flex-col md:flex-row gap-4 mb-6"
+              className="lg:px-6 flex flex-col lg:flex-row gap-4 mb-6"
             >
               <div
-                className="cursor-pointer w-full md:w-fit border rounded-md shadow-sm flex flex-col gap-1 p-4"
+                className="cursor-pointer w-full lg:w-fit border rounded-md shadow-sm flex flex-col gap-1 p-4"
                 onClick={() =>
                   navigate(
                     '/ratings/' +
@@ -521,7 +521,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 onClick={measure}
               />
             )}
-            <Tabs defaultValue="bundle" className="md:p-6 pt-0">
+            <Tabs defaultValue="bundle" className="lg:p-6 pt-0">
               <TabsList>
                 <TabsTrigger value="bundle">Bundle</TabsTrigger>
                 {measurement.screenshots?.length && (

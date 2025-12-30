@@ -14,7 +14,7 @@ const HomePage: React.FC<HomePageProps> = () => {
           <h1 className="text-base font-medium">Bandwidth savings</h1>
         </div>
       </header>
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+      <div className="flex flex-col gap-4 py-4 lg:gap-6 lg:py-6">
         <Statistics
           statistics={[
             {

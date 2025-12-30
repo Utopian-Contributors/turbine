@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
+import Search from '@/components/blocks/search'
 import PreloadImage from '@/components/ui/preload-image-cover'
 import StarRating from '@/components/ui/StarRating'
 import { Globe } from 'lucide-react'
-import moment from 'moment'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { useWebsitesQuery } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -12,13 +12,27 @@ interface WebsitesPageProps {}
 
 const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   const navigate = useNavigate()
-  const { data: websitesQueryData } = useWebsitesQuery()
+  const location = useLocation()
+  const { data: websitesQueryData, refetch } = useWebsitesQuery()
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const query = params.get('q') || ''
+    refetch({ query })
+  }, [location.search, refetch])
 
   return (
-    <div className="p-6 pb-40 md:pb-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold">Websites</h1>
-        <div className="flex flex-col gap-8 md:gap-4 mt-6">
+    <div className="p-6 pb-40 lg:pb-6">
+      <div className="lg:max-w-5xl mx-auto">
+        <Search
+          placeholder="Search websites..."
+          onChange={(value) => {
+            navigate(
+              '/websites?' + new URLSearchParams({ q: value }).toString()
+            )
+          }}
+        />
+        <div className="flex lg:flex-row lg:flex-wrap flex-col gap-8 lg:gap-4 mt-6">
           {websitesQueryData?.websites?.map(
             (website) =>
               website.latestMeasurement && (
@@ -30,20 +44,20 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                       `/measurements/${urlObj.host}?path=${urlObj.pathname}`
                     )
                   }}
-                  className="cursor-pointer shadow-sm md:shadow-none rounded-lg flex flex-col md:flex-row md:gap-2 overflow-hidden"
+                  className="cursor-pointer lg:w-[calc(100%/3-0.75rem)] shadow-sm lg:shadow-none rounded-lg flex flex-col lg:flex-row lg:gap-2 overflow-hidden"
                 >
-                  <div className="relative md:mx-1 md:my-2 min-w-64 border rounded-lg overflow-hidden">
+                  <div className="relative lg:mx-1 lg:my-2 min-w-64 border rounded-lg overflow-hidden">
                     <PreloadImage
                       src={website.latestMeasurement.thumbnail}
-                      className="h-48 w-full bg-cover bg-center"
+                      className="h-48 md:h-128 lg:h-48 w-full bg-cover bg-center"
                     >
                       {(error) =>
                         error && (
                           <div
-                            className="h-48 w-full"
+                            className="h-48 md:h-128 lg:h-48 w-full"
                             style={{
                               background:
-                                'linear-gradient(to top, var(--color-green-500), transparent), repeating-conic-gradient(#fff 0 25%, #fef 0 50%) 50% / 20px 20px',
+                                'radial-gradient(var(--color-green-400), transparent), repeating-conic-gradient(#fff 0 25%, #fef 0 50%) 50% / 20px 20px',
                             }}
                           >
                             <Globe
@@ -54,7 +68,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                         )
                       }
                     </PreloadImage>
-                    <div className="md:hidden w-full p-2 bg-white flex flex-col gap-2">
+                    <div className="lg:max-w-[calc(100%-2px)] w-full p-2 bg-white flex flex-col gap-2">
                       {website.rating?.overallScore && (
                         <StarRating rating={website.rating?.overallScore} />
                       )}
@@ -66,8 +80,8 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                             className="w-[32px] h-[32px]"
                           />
                         ) : null}
-                        <div className="max-w-full flex flex-col">
-                          <h3 className="max-w-full md:max-w-xs text-lg truncate m-0">
+                        <div className="w-full flex flex-col">
+                          <h3 className="max-w-[calc(100%-40px)] text-lg truncate overflow-hidden m-0">
                             {website.latestMeasurement?.title}
                           </h3>
                           <span className="text-gray-400 text-xs">
@@ -77,44 +91,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                         </div>
                       </div>
                       {website.latestMeasurement?.description && (
-                        <p className="max-w-full h-fit overflow-y-auto overflow-x-hidden text-ellipsis">
-                          {website.latestMeasurement.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="w-full ">
-                    <div className="hidden h-full md:flex flex-col gap-2 md:gap-4 mt-2 md:mt-0 md:p-4">
-                      <div className="flex flex-col md:flex-row md:justify-between gap-2">
-                        <div className=" max-w-full flex items-center gap-4">
-                          {website.latestMeasurement?.icon ? (
-                            <img
-                              src={website.latestMeasurement.icon}
-                              alt={`${website.host} icon`}
-                              className="w-[32px] h-[32px]"
-                            />
-                          ) : null}
-                          <div className="max-w-full flex flex-col">
-                            <h3 className="max-w-full md:max-w-xs text-lg truncate m-0">
-                              {website.latestMeasurement?.title}
-                            </h3>
-                            <span className="text-gray-400 text-xs">
-                              {website.latestMeasurement?.redirect ||
-                                website.latestMeasurement?.url}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="hidden md:flex flex-col md:items-end gap-1">
-                          <StarRating rating={website.rating?.overallScore} />
-                          <span className="text-xs text-gray-400">
-                            {website.rating
-                              ? moment(website.rating.createdAt).fromNow()
-                              : 'Not rated yet'}
-                          </span>
-                        </div>
-                      </div>
-                      {website.latestMeasurement?.description && (
-                        <p className="max-w-full h-fit overflow-y-auto overflow-x-hidden text-ellipsis">
+                        <p className="max-w-full line-clamp-4 overflow-ellipsis">
                           {website.latestMeasurement.description}
                         </p>
                       )}

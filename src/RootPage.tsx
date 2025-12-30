@@ -133,7 +133,7 @@ const RootPage: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="none" className="hidden md:flex min-w-[256px]">
+      <Sidebar collapsible="none" className="hidden lg:flex min-w-[256px]">
         <SidebarContent>
           <SidebarGroup>
             <img src="/turbine-wordmark.png" width="120px" className="mb-2" />
@@ -240,7 +240,7 @@ const RootPage: React.FC = () => {
         </SidebarFooter>
       </Sidebar>
 
-      <div className="md:hidden fixed w-[calc(100vw-64px)] bottom-6 z-10 left-1/2 transform -translate-x-1/2 bg-white/50 ring ring-gray-300 backdrop-blur rounded-full shadow-lg flex">
+      <div className="lg:hidden fixed w-[calc(100vw-64px)] bottom-6 z-10 left-1/2 transform -translate-x-1/2 bg-white/50 ring ring-gray-300 backdrop-blur rounded-full shadow-lg flex">
         {tabBarItems.map((item) => {
           const selected =
             location.pathname.startsWith(item.url) ||
@@ -270,7 +270,7 @@ const RootPage: React.FC = () => {
       </div>
 
       <main className="flex-1 min-w-100dvh">
-        <div className="max-h-screen max-w-screen md:max-w-[calc(100vw-256px)] overflow-auto overflow-x-hidden">
+        <div className="max-h-screen max-w-screen lg:max-w-[calc(100vw-256px)] overflow-auto overflow-x-hidden">
           <Outlet />
         </div>
       </main>

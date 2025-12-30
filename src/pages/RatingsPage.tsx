@@ -31,7 +31,7 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
   errorScreenshot,
 }) => {
   return (
-    <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center p-1">
+    <div className="flex flex-col lg:flex-row lg:justify-between items-start lg:items-center p-1">
       <div className="flex gap-3">
         {error ? (
           <div className="w-fit h-fit bg-red-500 text-white rounded-full p-1 mt-1">
@@ -93,7 +93,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
   }, [])
 
   return (
-    <div className="max-w-screen md:max-w-3xl mx-auto p-4 md:py-6">
+    <div className="max-w-screen lg:max-w-3xl mx-auto p-4 lg:py-6">
       <div
         className="group cursor-pointer flex items-center gap-2 mb-4"
         onClick={() => {
@@ -105,12 +105,12 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
           Back to measurements of {websiteQueryData?.website?.host}
         </span>
       </div>
-      <div className="flex flex-col md:flex-row md:justify-between gap-4">
-        <h1 className="md:px-2 text-3xl md:text-4xl font-light">
+      <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
+        <h1 className="lg:px-2 text-3xl lg:text-4xl font-light">
           {params.host}
         </h1>
         {websiteQueryData?.website?.rating && (
-          <div className="flex flex-col md:items-end gap-2">
+          <div className="flex flex-col lg:items-end gap-2">
             <StarRating
               size={40}
               rating={websiteQueryData?.website?.rating?.overallScore}
@@ -121,7 +121,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
       {typeof websiteQueryData?.website?.rating?.overallScore ===
         'undefined' && (
         <div className="border rounded-lg p-4 mt-6">
-          <h2 className="text-lg md:text-xl">No ratings available.</h2>
+          <h2 className="text-lg lg:text-xl">No ratings available.</h2>
           <p className="text-muted-foreground mt-2">
             A website must be measured using WiFi,
             Fast 3G & Slow 3G in order to get a rating.
@@ -152,7 +152,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col gap-2 md:gap-0 mt-2">
+              <div className="flex flex-col gap-2 lg:gap-0 mt-2">
                 <RatingsSection
                   title="HTTPS"
                   description="Has a valid HTTPS certificate."
@@ -192,7 +192,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col gap-2 md:gap-0 mt-2">
+              <div className="flex flex-col gap-2 lg:gap-0 mt-2">
                 <RatingsSection
                   title="Favicon"
                   description="Has a favicon."
@@ -242,7 +242,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col gap-2 md:gap-0 mt-2">
+              <div className="flex flex-col gap-2 lg:gap-0 mt-2">
                 {websiteQueryData.website.rating.accessibility.length
                   ? websiteQueryData.website.rating.accessibility.map(
                       (v, index) => (
@@ -277,7 +277,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col gap-2 md:gap-0 mt-2">
+              <div className="flex flex-col gap-2 lg:gap-0 mt-2">
                 <RatingsSection
                   title="Wifi Load Time"
                   description="Has a decent load time on a wifi connection."

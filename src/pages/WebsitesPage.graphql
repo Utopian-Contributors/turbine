@@ -1,5 +1,5 @@
-query websites {
-  websites {
+query websites($query: String) {
+  websites(query: $query) {
     id
     host
     rating {

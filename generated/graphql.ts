@@ -111,6 +111,8 @@ export type Library = {
   integrated?: Maybe<Scalars['Boolean']['output']>;
   lastVersion?: Maybe<Version>;
   name: Scalars['String']['output'];
+  recentBandwidth?: Maybe<LibraryBandwidth>;
+  recentDownloads?: Maybe<LibraryDownloads>;
   repository?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
   versions: Array<Version>;
@@ -135,6 +137,15 @@ export enum LibraryCategory {
   Ui = 'UI',
   Utilities = 'UTILITIES'
 }
+
+/** Download statistics for a library */
+export type LibraryDownloads = {
+  __typename?: 'LibraryDownloads';
+  /** Rank of the library by downloads */
+  rank: Scalars['String']['output'];
+  /** Total downloads of the library */
+  total: Scalars['String']['output'];
+};
 
 /** Result of a searching for a library */
 export type LibrarySearchResult = {
@@ -368,6 +379,11 @@ export type QueryWebsiteArgs = {
   host?: InputMaybe<Scalars['String']['input']>;
 };
 
+
+export type QueryWebsitesArgs = {
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Rating = {
   __typename?: 'Rating';
   accessibility: Array<AccessibilityViolation>;
@@ -565,7 +581,7 @@ export type BundledImageFragment = { __typename?: 'BundledFile', id: string, url
 export type BigLibrariesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type BigLibrariesQuery = { __typename?: 'Query', bigLibraries?: Array<{ __typename?: 'Library', id: string, name: string, description?: string | null, integrated?: boolean | null, homepage?: string | null, repository?: string | null, lastVersion?: { __typename?: 'Version', id: string, version: string } | null, versions: Array<{ __typename?: 'Version', id: string, version: string }> }> | null };
+export type BigLibrariesQuery = { __typename?: 'Query', bigLibraries?: Array<{ __typename?: 'Library', id: string, name: string, description?: string | null, integrated?: boolean | null, homepage?: string | null, repository?: string | null, lastVersion?: { __typename?: 'Version', id: string, version: string } | null, versions: Array<{ __typename?: 'Version', id: string, version: string }>, recentDownloads?: { __typename?: 'LibraryDownloads', total: string, rank: string } | null }> | null };
 
 export type LibraryQueryVariables = Exact<{
   name: Scalars['String']['input'];
@@ -689,7 +705,9 @@ export type SearchFontsQuery = { __typename?: 'Query', searchFonts?: Array<{ __t
 
 export type FontSearchResultFragment = { __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, integrated: boolean, publishedAt: any };
 
-export type WebsitesQueryVariables = Exact<{ [key: string]: never; }>;
+export type WebsitesQueryVariables = Exact<{
+  query?: InputMaybe<Scalars['String']['input']>;
+}>;
 
 
 export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, rating?: { __typename?: 'Rating', overallScore: number, createdAt: any } | null, latestMeasurement?: { __typename?: 'Measurement', icon?: string | null, thumbnail?: string | null, description?: string | null, title?: string | null, url: string, redirect?: string | null } | null }> | null };
@@ -1245,6 +1263,10 @@ export const BigLibrariesDocument = gql`
     versions {
       id
       version
+    }
+    recentDownloads {
+      total
+      rank
     }
   }
 }
@@ -2020,8 +2042,8 @@ export type SearchFontsLazyQueryHookResult = ReturnType<typeof useSearchFontsLaz
 export type SearchFontsSuspenseQueryHookResult = ReturnType<typeof useSearchFontsSuspenseQuery>;
 export type SearchFontsQueryResult = Apollo.QueryResult<SearchFontsQuery, SearchFontsQueryVariables>;
 export const WebsitesDocument = gql`
-    query websites {
-  websites {
+    query websites($query: String) {
+  websites(query: $query) {
     id
     host
     rating {
@@ -2052,6 +2074,7 @@ export const WebsitesDocument = gql`
  * @example
  * const { data, loading, error } = useWebsitesQuery({
  *   variables: {
+ *      query: // value for 'query'
  *   },
  * });
  */

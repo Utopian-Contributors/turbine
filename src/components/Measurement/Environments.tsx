@@ -103,7 +103,7 @@ const Environments: React.FC<EnvironmentsProps> = ({
   const possibleDevices = measurementDevicesData.measurementDevices
 
   return (
-    <Tabs defaultValue={initial || possibleConnections[0]} className="py-4 md:p-6">
+    <Tabs defaultValue={initial || possibleConnections[0]} className="py-4 lg:p-6">
       <TabsList>
         {possibleConnections.map((connection) => (
           <TabsTrigger
@@ -163,7 +163,7 @@ const Environments: React.FC<EnvironmentsProps> = ({
                   >
                     <Card
                       className={cn(
-                        'cursor-pointer min-w-[16rem] md:min-w-xs',
+                        'cursor-pointer min-w-[16rem] lg:min-w-xs',
                         measurementForDevice
                           ? 'bg-gradient-to-t from-primary/2 to-card'
                           : 'opacity-30 hover:opacity-100 transition duration-300',

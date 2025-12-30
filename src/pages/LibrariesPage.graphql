@@ -15,5 +15,9 @@ query bigLibraries {
       id
       version
     }
+    recentDownloads {
+      total
+      rank
+    }
   }
 }
