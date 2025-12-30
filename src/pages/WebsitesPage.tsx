@@ -21,11 +21,15 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
     refetch({ query })
   }, [location.search, refetch])
 
-  const getHighestRating = useCallback((website: WebsiteHost) => {
+  const getRating = useCallback((website: WebsiteHost) => {
     return website.ratings?.find(
       (r) =>
-        r.overallScore ===
-        Math.max(...(website.ratings?.map((r) => r.overallScore) || []))
+        new Date(r.createdAt).getTime() ===
+        Math.max(
+          ...(website.ratings?.map((rating) =>
+            new Date(rating.createdAt).getTime()
+          ) || [])
+        )
     )
   }, [])
 
@@ -74,12 +78,10 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                       }
                     </PreloadImage>
                     <div className="lg:max-w-[calc(100%-2px)] w-full p-2 bg-white flex flex-col gap-2">
-                      {getHighestRating(website as WebsiteHost)
-                        ?.overallScore && (
+                      {getRating(website as WebsiteHost)?.overallScore && (
                         <StarRating
                           rating={
-                            getHighestRating(website as WebsiteHost)
-                              ?.overallScore
+                            getRating(website as WebsiteHost)?.overallScore
                           }
                         />
                       )}
