@@ -55,7 +55,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                   }}
                   className="cursor-pointer lg:w-[calc(100%/3-0.75rem)] shadow-sm lg:shadow-none rounded-lg flex flex-col lg:flex-row lg:gap-2 overflow-hidden"
                 >
-                  <div className="relative lg:mx-1 lg:my-2 min-w-64 border rounded-lg overflow-hidden">
+                  <div className="relative lg:mx-1 lg:my-2 w-full border rounded-lg overflow-hidden">
                     <PreloadImage
                       src={website.latestMeasurement.thumbnail}
                       className="h-48 md:h-128 lg:h-48 w-full bg-cover bg-center"
