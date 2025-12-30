@@ -34,6 +34,9 @@ const SearchWebsite = React.forwardRef<HTMLInputElement, SearchWebsiteProps>(
             if (e.target.value === '') {
               setValue('https://')
               return
+            } else if (e.target.value.startsWith('https://https://')) {
+              setValue(e.target.value.replace('https://https://', 'https://'))
+              return
             }
             setValue(e.target.value)
           }}
