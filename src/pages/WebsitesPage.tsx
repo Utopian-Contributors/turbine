@@ -32,60 +32,64 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                   }}
                   className="cursor-pointer shadow-sm md:shadow-none rounded-lg flex flex-col md:flex-row md:gap-2 overflow-hidden"
                 >
-                  {website.latestMeasurement?.thumbnail && (
-                    <div className="relative md:mx-1 md:my-2 min-w-64 border rounded-lg overflow-hidden">
-                      <PreloadImage
-                        src={website.latestMeasurement.thumbnail}
-                        className="h-48 w-full bg-cover bg-center"
-                      >
-                        {(error) =>
-                          error && (
-                            <div className="h-40 w-full bg-gradient-to-b from-green-500 to-green-500/5">
-                              <Globe
-                                className="relative top-1/2 -translate-y-1/2 mx-auto text-white"
-                                size={64}
-                              />
-                            </div>
-                          )
-                        }
-                      </PreloadImage>
-                      <div className="md:hidden w-full p-2 bg-white flex flex-col gap-2">
-                        {website.rating?.overallScore && (
-                          <StarRating rating={website.rating?.overallScore} />
-                        )}
-                        <div className="max-w-full flex items-center gap-2">
-                          {website.latestMeasurement?.icon ? (
-                            <img
-                              src={website.latestMeasurement.icon}
-                              alt={`${website.host} icon`}
-                              className="w-[32px] h-[32px]"
+                  <div className="relative md:mx-1 md:my-2 min-w-64 border rounded-lg overflow-hidden">
+                    <PreloadImage
+                      src={website.latestMeasurement.thumbnail}
+                      className="h-48 w-full bg-cover bg-center"
+                    >
+                      {(error) =>
+                        error && (
+                          <div
+                            className="h-48 w-full"
+                            style={{
+                              background:
+                                'linear-gradient(to top, var(--color-green-500), transparent), repeating-conic-gradient(#fff 0 25%, #fef 0 50%) 50% / 20px 20px',
+                            }}
+                          >
+                            <Globe
+                              className="relative top-1/2 -translate-y-1/2 mx-auto text-white"
+                              size={64}
                             />
-                          ) : (
-                            <div className="w-[32px] h-[32px] text-muted-foreground/10 flex justify-center items-center rounded-full">
-                              <GlobeIcon
-                                size={20}
-                                className="text-muted-foreground"
-                              />
-                            </div>
-                          )}
-                          <div className="max-w-full flex flex-col">
-                            <h3 className="max-w-full md:max-w-xs text-lg truncate m-0">
-                              {website.latestMeasurement?.title}
-                            </h3>
-                            <span className="text-gray-400 text-xs">
-                              {website.latestMeasurement?.redirect ||
-                                website.latestMeasurement?.url}
-                            </span>
                           </div>
-                        </div>
-                        {website.latestMeasurement?.description && (
-                          <p className="max-w-full h-fit overflow-y-auto overflow-x-hidden text-ellipsis">
-                            {website.latestMeasurement.description}
-                          </p>
+                        )
+                      }
+                    </PreloadImage>
+                    <div className="md:hidden w-full p-2 bg-white flex flex-col gap-2">
+                      {website.rating?.overallScore && (
+                        <StarRating rating={website.rating?.overallScore} />
+                      )}
+                      <div className="max-w-full flex items-center gap-2">
+                        {website.latestMeasurement?.icon ? (
+                          <img
+                            src={website.latestMeasurement.icon}
+                            alt={`${website.host} icon`}
+                            className="w-[32px] h-[32px]"
+                          />
+                        ) : (
+                          <div className="w-[32px] h-[32px] text-muted-foreground/10 flex justify-center items-center rounded-full">
+                            <GlobeIcon
+                              size={20}
+                              className="text-muted-foreground"
+                            />
+                          </div>
                         )}
+                        <div className="max-w-full flex flex-col">
+                          <h3 className="max-w-full md:max-w-xs text-lg truncate m-0">
+                            {website.latestMeasurement?.title}
+                          </h3>
+                          <span className="text-gray-400 text-xs">
+                            {website.latestMeasurement?.redirect ||
+                              website.latestMeasurement?.url}
+                          </span>
+                        </div>
                       </div>
+                      {website.latestMeasurement?.description && (
+                        <p className="max-w-full h-fit overflow-y-auto overflow-x-hidden text-ellipsis">
+                          {website.latestMeasurement.description}
+                        </p>
+                      )}
                     </div>
-                  )}
+                  </div>
                   <div className="w-full ">
                     <div className="hidden h-full md:flex flex-col gap-2 md:gap-4 mt-2 md:mt-0 md:p-4">
                       <div className="flex flex-col md:flex-row md:justify-between gap-2">
