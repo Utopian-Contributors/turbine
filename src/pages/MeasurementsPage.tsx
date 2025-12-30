@@ -81,21 +81,32 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       measurementsQueryData?.measurements
         ?.filter((m) => new URL(m.url).pathname === selectedPath)
         .find((m) => {
-          const match =
+          return (
+            new URL(m.url).host === params.host &&
             m.connectionType === (connection || ConnectionType.Wifi) &&
-            m.device.type === (device || DeviceType.Desktop)
-          if (
-            (match && m.status === MeasurementStatus.Completed) ||
-            (match && m.status === MeasurementStatus.Pending)
-          ) {
-            return match
-          }
+            m.device.type === (device || DeviceType.Desktop) &&
+            m.status === MeasurementStatus.Completed
+          )
         }) ||
-      measurementsQueryData?.measurements?.find((m) => {
-        return m.url === url && m.status === MeasurementStatus.Completed
-      })
+      measurementsQueryData?.measurements
+        ?.filter((m) => new URL(m.url).pathname === selectedPath)
+        .find((m) => {
+          return m.status === MeasurementStatus.Completed
+        }) ||
+      (measurementsQueryData?.measurements?.filter(
+        (m) =>
+          new URL(m.url).pathname === selectedPath &&
+          m.status === MeasurementStatus.Completed
+      ).length === 0
+        ? measurementsQueryData?.measurements[0]
+        : null)
     )
-  }, [measurementsQueryData?.measurements, searchParams, selectedPath, url])
+  }, [
+    measurementsQueryData?.measurements,
+    params.host,
+    searchParams,
+    selectedPath,
+  ])
 
   const { data: websiteQueryData } = useWebsiteQuery({
     variables: {
@@ -204,6 +215,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     ) {
       const interval = setInterval(() => {
         if (measurement?.url) {
+          console.debug('Refetching measurement status for', measurement.url)
           refetch({ url: measurement.url })
         }
       }, 2000)
@@ -240,6 +252,12 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       setSelectedConnection(ConnectionType.Wifi)
     }
   }, [measurementDevicesData?.measurementDevices, searchParams])
+
+  const rating = useMemo(() => {
+    return websiteQueryData?.website?.ratings?.find(
+      (r) => new URL(r.url).pathname === selectedPath
+    )
+  }, [selectedPath, websiteQueryData?.website?.ratings])
 
   if (isPaying) {
     return (
@@ -477,18 +495,15 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     '/ratings/' +
                       (measurement.redirect
                         ? new URL(measurement.redirect).host
-                        : new URL(measurement.url).host || params.host || '')
+                        : new URL(measurement.url).host || params.host || '') +
+                      `?path=${selectedPath}`
                   )
                 }
               >
-                <StarRating
-                  rating={websiteQueryData?.website?.rating?.overallScore}
-                />
+                <StarRating rating={rating?.overallScore} />
                 <span className="text-xs text-gray-400">
-                  {websiteQueryData?.website?.rating
-                    ? moment(
-                        websiteQueryData?.website?.rating.createdAt
-                      ).fromNow()
+                  {rating
+                    ? moment(rating.createdAt).fromNow()
                     : 'Not rated yet'}
                 </span>
               </div>

@@ -2,7 +2,8 @@ query websiteRating($host: String!) {
   website(host: $host) {
     id
     host
-    rating {
+    ratings {
+      url
       httpsSupport
       noMixedContent
 

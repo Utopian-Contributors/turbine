@@ -403,6 +403,7 @@ export type Rating = {
   overallScore: Scalars['Int']['output'];
   slow3GLoadTime?: Maybe<Scalars['Int']['output']>;
   stableLoadTime?: Maybe<Scalars['Int']['output']>;
+  url: Scalars['String']['output'];
   webpUsage: Array<Scalars['String']['output']>;
 };
 
@@ -495,7 +496,7 @@ export type WebsiteHost = {
   host: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   latestMeasurement?: Maybe<Measurement>;
-  rating?: Maybe<Rating>;
+  ratings?: Maybe<Array<Rating>>;
 };
 
 export type LoggedInQueryVariables = Exact<{ [key: string]: never; }>;
@@ -675,7 +676,7 @@ export type WebsiteQueryVariables = Exact<{
 }>;
 
 
-export type WebsiteQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, rating?: { __typename?: 'Rating', overallScore: number, createdAt: any } | null } | null };
+export type WebsiteQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', url: string, overallScore: number, createdAt: any }> | null } | null };
 
 export type PaymentsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -687,7 +688,7 @@ export type WebsiteRatingQueryVariables = Exact<{
 }>;
 
 
-export type WebsiteRatingQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, rating?: { __typename?: 'Rating', httpsSupport: boolean, noMixedContent: boolean, hasDescription: boolean, hasFavicon: boolean, hasOgImage: boolean, firstContentfulPaint?: number | null, largestContentfulPaint?: number | null, stableLoadTime?: number | null, fast3GLoadTime?: number | null, slow3GLoadTime?: number | null, webpUsage: Array<string>, avifUsage: Array<string>, cacheControlUsage: Array<string>, compressionUsage: Array<string>, overallScore: number, createdAt: any, accessibility: Array<{ __typename?: 'AccessibilityViolation', violationId: string, impact: string, description: string, helpUrl: string, help: string, screenshots: Array<string> }> } | null } | null };
+export type WebsiteRatingQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', url: string, httpsSupport: boolean, noMixedContent: boolean, hasDescription: boolean, hasFavicon: boolean, hasOgImage: boolean, firstContentfulPaint?: number | null, largestContentfulPaint?: number | null, stableLoadTime?: number | null, fast3GLoadTime?: number | null, slow3GLoadTime?: number | null, webpUsage: Array<string>, avifUsage: Array<string>, cacheControlUsage: Array<string>, compressionUsage: Array<string>, overallScore: number, createdAt: any, accessibility: Array<{ __typename?: 'AccessibilityViolation', violationId: string, impact: string, description: string, helpUrl: string, help: string, screenshots: Array<string> }> }> | null } | null };
 
 export type SearchLibraryQueryVariables = Exact<{
   term: Scalars['String']['input'];
@@ -710,7 +711,7 @@ export type WebsitesQueryVariables = Exact<{
 }>;
 
 
-export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, rating?: { __typename?: 'Rating', overallScore: number, createdAt: any } | null, latestMeasurement?: { __typename?: 'Measurement', icon?: string | null, thumbnail?: string | null, description?: string | null, title?: string | null, url: string, redirect?: string | null } | null }> | null };
+export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', overallScore: number, createdAt: any }> | null, latestMeasurement?: { __typename?: 'Measurement', icon?: string | null, thumbnail?: string | null, description?: string | null, title?: string | null, url: string, redirect?: string | null } | null }> | null };
 
 export const BundledImageFragmentDoc = gql`
     fragment BundledImage on BundledFile {
@@ -1804,7 +1805,8 @@ export const WebsiteDocument = gql`
   website(host: $host) {
     id
     host
-    rating {
+    ratings {
+      url
       overallScore
       createdAt
     }
@@ -1892,7 +1894,8 @@ export const WebsiteRatingDocument = gql`
   website(host: $host) {
     id
     host
-    rating {
+    ratings {
+      url
       httpsSupport
       noMixedContent
       hasDescription
@@ -2046,7 +2049,7 @@ export const WebsitesDocument = gql`
   websites(query: $query) {
     id
     host
-    rating {
+    ratings {
       overallScore
       createdAt
     }

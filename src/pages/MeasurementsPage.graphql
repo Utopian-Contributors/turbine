@@ -93,7 +93,8 @@ query website($host: String!) {
   website(host: $host) {
     id
     host
-    rating {
+    ratings {
+      url
       overallScore
       createdAt
     }

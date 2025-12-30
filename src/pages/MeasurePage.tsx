@@ -23,34 +23,34 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   const { createMeasure, isPaying } = useCreateMeasure({
     url: '',
   })
-  const { isConnected, login } = useWalletOrAccLogin()
+  const { isConnected, isLoggedIn, login } = useWalletOrAccLogin()
 
   const search = useCallback(
     (url: string) => {
-      const urlObj = new URL(url)
-      measurementsQuery({ variables: { url }, fetchPolicy: 'network-only' })
-        .then(async (response) => {
-          if (
-            !response.error &&
-            (!response.data?.measurements?.length ||
-              !response.data?.measurements?.some((m) => m.url === url))
-          ) {
-            if (!isConnected) {
-              login()
-            } else {
+      if (!isConnected || !isLoggedIn) {
+        login()
+      } else {
+        const urlObj = new URL(url)
+        measurementsQuery({ variables: { url }, fetchPolicy: 'network-only' })
+          .then(async (response) => {
+            if (
+              !response.error &&
+              (!response.data?.measurements?.length ||
+                !response.data?.measurements?.some((m) => m.url === url))
+            ) {
               await createMeasure({
                 url: new URL(urlObj.pathname, `https://${urlObj.host}`).href,
                 device: DeviceType.Desktop,
                 connection: ConnectionType.Wifi,
               })
             }
-          }
-        })
-        .then(() => {
-          navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
-        })
+          })
+          .then(() => {
+            navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
+          })
+      }
     },
-    [createMeasure, isConnected, login, measurementsQuery, navigate]
+    [createMeasure, isConnected, isLoggedIn, login, measurementsQuery, navigate]
   )
 
   if (isPaying) {

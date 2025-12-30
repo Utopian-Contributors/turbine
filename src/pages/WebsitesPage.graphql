@@ -2,7 +2,7 @@ query websites($query: String) {
   websites(query: $query) {
     id
     host
-    rating {
+    ratings {
       overallScore
       createdAt
     }

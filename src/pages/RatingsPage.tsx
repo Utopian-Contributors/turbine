@@ -1,6 +1,6 @@
 import StarRating from '@/components/ui/StarRating'
-import React, { useCallback } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import React, { useCallback, useMemo } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router'
 
 import {
   Accordion,
@@ -19,6 +19,7 @@ interface RatingsSectionProps {
   title: string
   description: string
   value?: boolean | number | string
+  files?: string[]
   error?: string
   errorScreenshot?: string
 }
@@ -27,6 +28,7 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
   title,
   description,
   value,
+  files,
   error,
   errorScreenshot,
 }) => {
@@ -34,17 +36,28 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
     <div className="flex flex-col lg:flex-row lg:justify-between items-start lg:items-center p-1">
       <div className="flex gap-3">
         {error ? (
-          <div className="w-fit h-fit bg-red-500 text-white rounded-full p-1 mt-1">
+          <div className="hidden md:block w-fit h-fit bg-red-500 text-white rounded-full p-1 mt-1">
             <XIcon size={16} />
           </div>
         ) : (
-          <div className="w-fit h-fit bg-green-500 text-white rounded-full p-1 mt-1">
+          <div className="hidden md:block w-fit h-fit bg-green-500 text-white rounded-full p-1 mt-1">
             <CheckIcon size={16} />
           </div>
         )}
-        <div>
-          <h3>{title}</h3>
-          <p className="text-sm text-gray-500 mb-2">{description}</p>
+        <div className="flex flex-col gap-2 md:block">
+          <div className="md:hidden mx-[-0.25rem]">
+            {error && !errorScreenshot ? (
+              <span className="bg-red-100 rounded-sm font-medium px-2 py-1">
+                {error}
+              </span>
+            ) : null}
+            {!error && typeof value !== 'boolean' ? (
+              <span className="bg-green-100 rounded-sm font-medium px-2 py-1">
+                {value}
+              </span>
+            ) : null}
+          </div>
+          <p className="text-sm text-gray-500 mb-1 lg:mb-2">{description}</p>
           {errorScreenshot && (
             <img
               src={errorScreenshot}
@@ -52,9 +65,18 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
               className="max-h-[16rem] max-w-sm"
             />
           )}
+          {files && files.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4 lg:mb-6">
+              {files.map((f) => (
+                <div className="underline" key={f}>
+                  {f.slice(f.lastIndexOf('/') + 1)}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      <div>
+      <div className="hidden md:block">
         {error && !errorScreenshot ? (
           <span className="bg-red-100 rounded-sm font-medium px-2 py-1">
             {error}
@@ -72,10 +94,22 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
 
 const RatingsPage: React.FC<RatingsPageProps> = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const params = useParams()
+  const search = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  )
+
   const { data: websiteQueryData } = useWebsiteRatingQuery({
     variables: { host: params.host! },
   })
+
+  const rating = useMemo(() => {
+    return websiteQueryData?.website?.ratings?.find(
+      (r) => new URL(r.url).pathname === search.get('path')
+    )
+  }, [search, websiteQueryData?.website?.ratings])
 
   const getDefaultOpenAccordionItem = useCallback((rating?: number) => {
     switch (rating) {
@@ -93,7 +127,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
   }, [])
 
   return (
-    <div className="max-w-screen lg:max-w-3xl mx-auto p-4 lg:py-6">
+    <div className="max-w-screen lg:max-w-3xl mx-auto p-4 pb-40 lg:py-6">
       <div
         className="group cursor-pointer flex items-center gap-2 mb-4"
         onClick={() => {
@@ -109,31 +143,25 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
         <h1 className="lg:px-2 text-3xl lg:text-4xl font-light">
           {params.host}
         </h1>
-        {websiteQueryData?.website?.rating && (
+        {rating && (
           <div className="flex flex-col lg:items-end gap-2">
-            <StarRating
-              size={40}
-              rating={websiteQueryData?.website?.rating?.overallScore}
-            />
+            <StarRating size={40} rating={rating?.overallScore} />
           </div>
         )}
       </div>
-      {typeof websiteQueryData?.website?.rating?.overallScore ===
-        'undefined' && (
+      {typeof rating?.overallScore === 'undefined' && (
         <div className="border rounded-lg p-4 mt-6">
           <h2 className="text-lg lg:text-xl">No ratings available.</h2>
           <p className="text-muted-foreground mt-2">
-            A website must be measured using WiFi,
-            Fast 3G & Slow 3G in order to get a rating.
+            A website must be measured using WiFi, Fast 3G & Slow 3G in order to
+            get a rating.
           </p>
         </div>
       )}
-      {websiteQueryData?.website?.rating?.overallScore && (
+      {rating?.overallScore && (
         <Accordion
           type="multiple"
-          defaultValue={getDefaultOpenAccordionItem(
-            websiteQueryData?.website?.rating?.overallScore
-          )}
+          defaultValue={getDefaultOpenAccordionItem(rating?.overallScore)}
           className="mt-6"
         >
           <AccordionItem
@@ -145,7 +173,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <span className="text-xl min-w-32">Security</span>
                 <StarRating
                   animated={false}
-                  grayscale={websiteQueryData.website.rating.overallScore < 1}
+                  grayscale={rating.overallScore < 1}
                   size={24}
                   rating={1}
                 />
@@ -156,9 +184,9 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <RatingsSection
                   title="HTTPS"
                   description="Has a valid HTTPS certificate."
-                  value={websiteQueryData.website.rating.httpsSupport}
+                  value={rating.httpsSupport}
                   error={
-                    !websiteQueryData.website.rating.httpsSupport
+                    !rating.httpsSupport
                       ? "Doesn't have HTTPS support"
                       : undefined
                   }
@@ -166,9 +194,9 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <RatingsSection
                   title="No mixed content"
                   description="All resources are loaded over HTTPS."
-                  value={websiteQueryData.website.rating.noMixedContent}
+                  value={rating.noMixedContent}
                   error={
-                    !websiteQueryData.website.rating.noMixedContent
+                    !rating.noMixedContent
                       ? 'Contains mixed content'
                       : undefined
                   }
@@ -185,7 +213,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <span className="text-xl min-w-32">Metadata</span>
                 <StarRating
                   animated={false}
-                  grayscale={websiteQueryData.website.rating.overallScore < 2}
+                  grayscale={rating.overallScore < 2}
                   size={24}
                   rating={2}
                 />
@@ -196,19 +224,17 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <RatingsSection
                   title="Favicon"
                   description="Has a favicon."
-                  value={websiteQueryData.website.rating.hasFavicon}
+                  value={rating.hasFavicon}
                   error={
-                    !websiteQueryData.website.rating.hasFavicon
-                      ? "Doesn't have a favicon"
-                      : undefined
+                    !rating.hasFavicon ? "Doesn't have a favicon" : undefined
                   }
                 />
                 <RatingsSection
                   title="Description meta tag"
                   description="All resources are loaded over HTTPS."
-                  value={websiteQueryData.website.rating.hasDescription}
+                  value={rating.hasDescription}
                   error={
-                    !websiteQueryData.website.rating.hasDescription
+                    !rating.hasDescription
                       ? 'No description meta tag was found'
                       : undefined
                   }
@@ -216,9 +242,9 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <RatingsSection
                   title="Thumbnail meta tag"
                   description="Contains a thumbnail image for social media sharing."
-                  value={websiteQueryData.website.rating.hasOgImage}
+                  value={rating.hasOgImage}
                   error={
-                    !websiteQueryData.website.rating.hasOgImage
+                    !rating.hasOgImage
                       ? 'No og:image meta tag was found'
                       : undefined
                   }
@@ -235,7 +261,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <span className="text-xl min-w-32">Accessibility</span>
                 <StarRating
                   animated={false}
-                  grayscale={websiteQueryData.website.rating.overallScore < 3}
+                  grayscale={rating.overallScore < 3}
                   size={24}
                   rating={3}
                 />
@@ -243,20 +269,18 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
             </AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-col gap-2 lg:gap-0 mt-2">
-                {websiteQueryData.website.rating.accessibility.length
-                  ? websiteQueryData.website.rating.accessibility.map(
-                      (v, index) => (
-                        <RatingsSection
-                          key={v.violationId + ' ' + index}
-                          title={toHeaderCase(v.violationId)}
-                          description={v.description}
-                          error={v.description}
-                          errorScreenshot={
-                            v.screenshots?.length ? v.screenshots[0] : undefined
-                          }
-                        />
-                      )
-                    )
+                {rating.accessibility.length
+                  ? rating.accessibility.map((v, index) => (
+                      <RatingsSection
+                        key={v.violationId + ' ' + index}
+                        title={toHeaderCase(v.violationId)}
+                        description={v.description}
+                        error={v.description}
+                        errorScreenshot={
+                          v.screenshots?.length ? v.screenshots[0] : undefined
+                        }
+                      />
+                    ))
                   : 'No accessibility issues found.'}
               </div>
             </AccordionContent>
@@ -270,7 +294,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <span className="text-xl min-w-32">Performance</span>
                 <StarRating
                   animated={false}
-                  grayscale={websiteQueryData.website.rating.overallScore < 4}
+                  grayscale={rating.overallScore < 4}
                   size={24}
                   rating={4}
                 />
@@ -281,9 +305,9 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <RatingsSection
                   title="Wifi Load Time"
                   description="Has a decent load time on a wifi connection."
-                  value={websiteQueryData.website.rating.stableLoadTime + 'ms'}
+                  value={rating.stableLoadTime + 'ms'}
                   error={
-                    websiteQueryData.website.rating.stableLoadTime! > 3000
+                    rating.stableLoadTime! > 3000
                       ? 'Takes longer than 3s to load'
                       : undefined
                   }
@@ -291,9 +315,9 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <RatingsSection
                   title="Fast3G Load Time"
                   description="Has a decent load time on a fast 3G connection."
-                  value={websiteQueryData.website.rating.fast3GLoadTime + 'ms'}
+                  value={rating.fast3GLoadTime + 'ms'}
                   error={
-                    websiteQueryData.website.rating.fast3GLoadTime! > 7000
+                    rating.fast3GLoadTime! > 7000
                       ? 'Takes longer than 7s to load'
                       : undefined
                   }
@@ -301,9 +325,9 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <RatingsSection
                   title="Slow3G Load Time"
                   description="Has a decent load time on a slow 3G connection."
-                  value={websiteQueryData.website.rating.slow3GLoadTime + 'ms'}
+                  value={rating.slow3GLoadTime + 'ms'}
                   error={
-                    websiteQueryData.website.rating.slow3GLoadTime! > 15000
+                    rating.slow3GLoadTime! > 15000
                       ? 'Takes longer than 15s to load'
                       : undefined
                   }
@@ -312,41 +336,42 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                   title="Compressed Images"
                   description="Uses compressed images instead of PNG."
                   error={
-                    websiteQueryData.website.rating.webpUsage.length > 0
+                    rating.webpUsage.length > 0
                       ? 'Contains uncompressed images'
                       : undefined
                   }
                   value={
-                    websiteQueryData.website.rating.webpUsage.length === 0
+                    rating.webpUsage.length === 0
                       ? 'No uncompressed images found'
                       : undefined
                   }
+                  files={rating.webpUsage}
                 />
                 <RatingsSection
                   title="Compressed Videos"
                   description="Uses compressed videos instead of uncompressed formats."
                   error={
-                    websiteQueryData.website.rating.avifUsage.length > 0
+                    rating.avifUsage.length > 0
                       ? 'Contains uncompressed videos'
                       : undefined
                   }
                   value={
-                    websiteQueryData.website.rating.avifUsage.length === 0
+                    rating.avifUsage.length === 0
                       ? 'No uncompressed videos found'
                       : undefined
                   }
+                  files={rating.avifUsage}
                 />
                 <RatingsSection
                   title="Cache Controls"
                   description="Uses cache control headers effectively."
                   error={
-                    websiteQueryData.website.rating.cacheControlUsage.length > 0
+                    rating.cacheControlUsage.length > 0
                       ? 'Contains files without proper cache control'
                       : undefined
                   }
                   value={
-                    websiteQueryData.website.rating.cacheControlUsage.length ===
-                    0
+                    rating.cacheControlUsage.length === 0
                       ? 'All files use cache control'
                       : undefined
                   }
@@ -355,16 +380,16 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                   title="Transfer Compression"
                   description="Uses transfer compression effectively."
                   error={
-                    websiteQueryData.website.rating.compressionUsage.length > 0
+                    rating.compressionUsage.length > 0
                       ? 'Some files are uncompressed'
                       : undefined
                   }
                   value={
-                    websiteQueryData.website.rating.compressionUsage.length ===
-                    0
+                    rating.compressionUsage.length === 0
                       ? 'All files use transfer compression'
                       : undefined
                   }
+                  files={rating.compressionUsage}
                 />
               </div>
             </AccordionContent>

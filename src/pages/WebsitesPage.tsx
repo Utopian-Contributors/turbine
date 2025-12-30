@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 
 import Search from '@/components/blocks/search'
 import PreloadImage from '@/components/ui/preload-image-cover'
 import StarRating from '@/components/ui/StarRating'
 import { Globe } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router'
-import { useWebsitesQuery } from '../../generated/graphql'
+import { useWebsitesQuery, type WebsiteHost } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface WebsitesPageProps {}
@@ -20,6 +20,14 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
     const query = params.get('q') || ''
     refetch({ query })
   }, [location.search, refetch])
+
+  const getHighestRating = useCallback((website: WebsiteHost) => {
+    return website.ratings?.find(
+      (r) =>
+        r.overallScore ===
+        Math.max(...(website.ratings?.map((r) => r.overallScore) || []))
+    )
+  }, [])
 
   return (
     <div className="p-6 pb-40 lg:pb-6">
@@ -66,8 +74,14 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                       }
                     </PreloadImage>
                     <div className="lg:max-w-[calc(100%-2px)] w-full p-2 bg-white flex flex-col gap-2">
-                      {website.rating?.overallScore && (
-                        <StarRating rating={website.rating?.overallScore} />
+                      {getHighestRating(website as WebsiteHost)
+                        ?.overallScore && (
+                        <StarRating
+                          rating={
+                            getHighestRating(website as WebsiteHost)
+                              ?.overallScore
+                          }
+                        />
                       )}
                       <div className="max-w-full flex items-center gap-2">
                         {website.latestMeasurement?.icon ? (
