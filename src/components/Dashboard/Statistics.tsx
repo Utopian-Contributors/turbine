@@ -3,11 +3,11 @@ import { TrendingDown, TrendingUp } from 'lucide-react'
 import React from 'react'
 import { Badge } from '../ui/badge'
 import {
-    Card,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '../ui/card'
 
 interface StatisticsProps {
@@ -15,8 +15,8 @@ interface StatisticsProps {
     label: string
     unit?: string
     total: number
-    change: number
-    description: string
+    change?: number
+    description?: string
   }[]
 }
 

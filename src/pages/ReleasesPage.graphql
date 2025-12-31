@@ -1,0 +1,16 @@
+query releases {
+  releases {
+    id
+    version
+    integrated {
+      id
+      name
+    }
+    integratedLibraries {
+      id
+    }
+    integratedFiles {
+      id
+    }
+  }
+}

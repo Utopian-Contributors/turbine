@@ -6,6 +6,7 @@ import {
   PackageIcon,
   Scale,
   SearchIcon,
+  Ship,
   TypeIcon,
   WalletIcon,
 } from 'lucide-react'
@@ -67,7 +68,13 @@ const items: SidebarItem[] = [
       <Globe className={selected ? 'text-black' : 'text-muted-foreground'} />
     ),
   },
-
+  {
+    title: 'Releases',
+    url: '/releases',
+    icon: (selected: boolean) => (
+      <Ship className={selected ? 'text-black' : 'text-muted-foreground'} />
+    ),
+  },
   {
     title: 'Libraries',
     url: '/libraries',

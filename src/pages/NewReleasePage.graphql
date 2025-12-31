@@ -1,0 +1,71 @@
+query newRelease {
+  newRelease {
+    newLibraries {
+      id
+      name
+      description
+      newVersions {
+        id
+        version
+      }
+    }
+    libraries {
+      id
+      name
+      description
+      releasedVersions {
+        id
+        version
+      }
+    }
+    newFiles {
+      id
+      version {
+        id
+        version
+        library {
+          id
+          name
+        }
+      }
+      path
+    }
+    files {
+      id
+      version {
+        id
+        version
+        library {
+          id
+          name
+        }
+      }
+      path
+    }
+    newFonts {
+      id
+      name
+      menu
+      category
+    }
+    fonts {
+      id
+      name
+      menu
+      category
+    }
+  }
+}
+
+query potentialSavings {
+  potentialSavings {
+    totalVersionSavings
+    totalFileSavings
+  }
+}
+
+mutation createRelease {
+  createRelease {
+    id
+  }
+}

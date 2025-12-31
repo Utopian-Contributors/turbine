@@ -73,6 +73,24 @@ export enum DeviceType {
   Tablet = 'TABLET'
 }
 
+export type ExtensionPotentialSavings = {
+  __typename?: 'ExtensionPotentialSavings';
+  totalFileSavings: Scalars['String']['output'];
+  totalFontSavings: Scalars['String']['output'];
+  totalVersionSavings: Scalars['String']['output'];
+};
+
+export type ExtensionRelease = {
+  __typename?: 'ExtensionRelease';
+  changelog?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  integrated?: Maybe<Array<Maybe<Library>>>;
+  integratedFiles?: Maybe<Array<Maybe<VersionFile>>>;
+  integratedFonts?: Maybe<Array<Maybe<Font>>>;
+  integratedLibraries: Array<Version>;
+  version: Scalars['String']['output'];
+};
+
 export type Font = {
   __typename?: 'Font';
   category: FontCategory;
@@ -111,9 +129,13 @@ export type Library = {
   integrated?: Maybe<Scalars['Boolean']['output']>;
   lastVersion?: Maybe<Version>;
   name: Scalars['String']['output'];
+  newVersions?: Maybe<Array<Version>>;
   recentBandwidth?: Maybe<LibraryBandwidth>;
   recentDownloads?: Maybe<LibraryDownloads>;
+  releasedVersions?: Maybe<Array<Version>>;
   repository?: Maybe<Scalars['String']['output']>;
+  sameVersionRequirement?: Maybe<SameVersionRequirement>;
+  subpaths: Array<LibrarySubpath>;
   updatedAt: Scalars['DateTime']['output'];
   versions: Array<Version>;
 };
@@ -166,6 +188,14 @@ export type LibrarySearchResult = {
   repository?: Maybe<Scalars['String']['output']>;
   /** Last updated date of the library */
   updated: Scalars['String']['output'];
+};
+
+export type LibrarySubpath = {
+  __typename?: 'LibrarySubpath';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  path: Scalars['String']['output'];
+  since: Version;
 };
 
 /** Usage statistics for a library */
@@ -224,7 +254,12 @@ export enum MeasurementStatus {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addSubpath?: Maybe<Scalars['Boolean']['output']>;
   createMeasurement?: Maybe<Measurement>;
+  createRelease?: Maybe<ExtensionRelease>;
+  deleteSubpath?: Maybe<Scalars['Boolean']['output']>;
+  editSameVersionRequirement?: Maybe<Scalars['Boolean']['output']>;
+  editSubpath?: Maybe<Scalars['Boolean']['output']>;
   login?: Maybe<User>;
   logout?: Maybe<User>;
   refreshToken?: Maybe<User>;
@@ -239,6 +274,13 @@ export type Mutation = {
 };
 
 
+export type MutationAddSubpathArgs = {
+  library?: InputMaybe<Scalars['String']['input']>;
+  path?: InputMaybe<Scalars['String']['input']>;
+  since?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationCreateMeasurementArgs = {
   connection?: InputMaybe<ConnectionType>;
   device?: InputMaybe<DeviceType>;
@@ -247,6 +289,24 @@ export type MutationCreateMeasurementArgs = {
   txSignature?: InputMaybe<Scalars['String']['input']>;
   url?: InputMaybe<Scalars['String']['input']>;
   walletAddress?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationDeleteSubpathArgs = {
+  subpath?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationEditSameVersionRequirementArgs = {
+  dependingOn?: InputMaybe<Scalars['String']['input']>;
+  library?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationEditSubpathArgs = {
+  path?: InputMaybe<Scalars['String']['input']>;
+  since?: InputMaybe<Scalars['String']['input']>;
+  subpath?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -291,6 +351,16 @@ export type MutationVerifyArgs = {
   code?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type NewExtensionRelease = {
+  __typename?: 'NewExtensionRelease';
+  files?: Maybe<Array<VersionFile>>;
+  fonts?: Maybe<Array<Font>>;
+  libraries?: Maybe<Array<Library>>;
+  newFiles?: Maybe<Array<VersionFile>>;
+  newFonts?: Maybe<Array<Font>>;
+  newLibraries?: Maybe<Array<Library>>;
+};
+
 export type Payment = {
   __typename?: 'Payment';
   amount: Scalars['Float']['output'];
@@ -312,8 +382,11 @@ export type Query = {
   measurementDevices?: Maybe<Array<MeasurementDevice>>;
   measurementPrices?: Maybe<Array<MeasurementPrice>>;
   measurements?: Maybe<Array<Measurement>>;
+  newRelease?: Maybe<NewExtensionRelease>;
   payments?: Maybe<Array<Payment>>;
   popularFonts?: Maybe<Array<Font>>;
+  potentialSavings?: Maybe<ExtensionPotentialSavings>;
+  releases?: Maybe<Array<ExtensionRelease>>;
   searchFonts?: Maybe<Array<Font>>;
   searchLibrary?: Maybe<Array<LibrarySearchResult>>;
   users?: Maybe<Array<Maybe<User>>>;
@@ -411,6 +484,13 @@ export enum Role {
   Admin = 'ADMIN',
   User = 'USER'
 }
+
+export type SameVersionRequirement = {
+  __typename?: 'SameVersionRequirement';
+  createdAt: Scalars['DateTime']['output'];
+  dependingOn: Library;
+  id: Scalars['ID']['output'];
+};
 
 export type User = {
   __typename?: 'User';
@@ -589,7 +669,40 @@ export type LibraryQueryVariables = Exact<{
 }>;
 
 
-export type LibraryQuery = { __typename?: 'Query', library?: { __typename?: 'Library', id: string, name: string, description?: string | null, homepage?: string | null, repository?: string | null, integrated?: boolean | null, lastVersion?: { __typename?: 'Version', version: string, size?: number | null, publishedAt: any } | null, versions: Array<{ __typename?: 'Version', version: string, publishedAt: any }> } | null };
+export type LibraryQuery = { __typename?: 'Query', library?: { __typename?: 'Library', name: string, description?: string | null, homepage?: string | null, repository?: string | null, integrated?: boolean | null, lastVersion?: { __typename?: 'Version', version: string, size?: number | null, publishedAt: any } | null, versions: Array<{ __typename?: 'Version', version: string, publishedAt: any }>, subpaths: Array<{ __typename?: 'LibrarySubpath', id: string, path: string, since: { __typename?: 'Version', id: string, version: string } }>, sameVersionRequirement?: { __typename?: 'SameVersionRequirement', id: string, dependingOn: { __typename?: 'Library', id: string, name: string } } | null } | null };
+
+export type EditSameVersionRequirementMutationVariables = Exact<{
+  library: Scalars['String']['input'];
+  dependingOn: Scalars['String']['input'];
+}>;
+
+
+export type EditSameVersionRequirementMutation = { __typename?: 'Mutation', editSameVersionRequirement?: boolean | null };
+
+export type AddSubpathMutationVariables = Exact<{
+  library: Scalars['String']['input'];
+  path: Scalars['String']['input'];
+  since?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type AddSubpathMutation = { __typename?: 'Mutation', addSubpath?: boolean | null };
+
+export type EditSubpathMutationVariables = Exact<{
+  subpath: Scalars['String']['input'];
+  path: Scalars['String']['input'];
+  since?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type EditSubpathMutation = { __typename?: 'Mutation', editSubpath?: boolean | null };
+
+export type DeleteSubpathMutationVariables = Exact<{
+  subpath: Scalars['String']['input'];
+}>;
+
+
+export type DeleteSubpathMutation = { __typename?: 'Mutation', deleteSubpath?: boolean | null };
 
 export type LibraryUsageQueryVariables = Exact<{
   name: Scalars['String']['input'];
@@ -678,6 +791,21 @@ export type WebsiteQueryVariables = Exact<{
 
 export type WebsiteQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', url: string, overallScore: number, createdAt: any }> | null } | null };
 
+export type NewReleaseQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewReleaseQuery = { __typename?: 'Query', newRelease?: { __typename?: 'NewExtensionRelease', newLibraries?: Array<{ __typename?: 'Library', id: string, name: string, description?: string | null, newVersions?: Array<{ __typename?: 'Version', id: string, version: string }> | null }> | null, libraries?: Array<{ __typename?: 'Library', id: string, name: string, description?: string | null, releasedVersions?: Array<{ __typename?: 'Version', id: string, version: string }> | null }> | null, newFiles?: Array<{ __typename?: 'VersionFile', id: string, path: string, version: { __typename?: 'Version', id: string, version: string, library: { __typename?: 'Library', id: string, name: string } } }> | null, files?: Array<{ __typename?: 'VersionFile', id: string, path: string, version: { __typename?: 'Version', id: string, version: string, library: { __typename?: 'Library', id: string, name: string } } }> | null, newFonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, category: FontCategory }> | null, fonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, category: FontCategory }> | null } | null };
+
+export type PotentialSavingsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PotentialSavingsQuery = { __typename?: 'Query', potentialSavings?: { __typename?: 'ExtensionPotentialSavings', totalVersionSavings: string, totalFileSavings: string } | null };
+
+export type CreateReleaseMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CreateReleaseMutation = { __typename?: 'Mutation', createRelease?: { __typename?: 'ExtensionRelease', id: string } | null };
+
 export type PaymentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -689,6 +817,11 @@ export type WebsiteRatingQueryVariables = Exact<{
 
 
 export type WebsiteRatingQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', url: string, httpsSupport: boolean, noMixedContent: boolean, hasDescription: boolean, hasFavicon: boolean, hasOgImage: boolean, firstContentfulPaint?: number | null, largestContentfulPaint?: number | null, stableLoadTime?: number | null, fast3GLoadTime?: number | null, slow3GLoadTime?: number | null, webpUsage: Array<string>, avifUsage: Array<string>, cacheControlUsage: Array<string>, compressionUsage: Array<string>, overallScore: number, createdAt: any, accessibility: Array<{ __typename?: 'AccessibilityViolation', violationId: string, impact: string, description: string, helpUrl: string, help: string, screenshots: Array<string> }> }> | null } | null };
+
+export type ReleasesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ReleasesQuery = { __typename?: 'Query', releases?: Array<{ __typename?: 'ExtensionRelease', id: string, version: string, integrated?: Array<{ __typename?: 'Library', id: string, name: string } | null> | null, integratedLibraries: Array<{ __typename?: 'Version', id: string }>, integratedFiles?: Array<{ __typename?: 'VersionFile', id: string } | null> | null }> | null };
 
 export type SearchLibraryQueryVariables = Exact<{
   term: Scalars['String']['input'];
@@ -1307,7 +1440,6 @@ export type BigLibrariesQueryResult = Apollo.QueryResult<BigLibrariesQuery, BigL
 export const LibraryDocument = gql`
     query library($name: String!) {
   library(name: $name) {
-    id
     name
     description
     homepage
@@ -1321,6 +1453,21 @@ export const LibraryDocument = gql`
     versions {
       version
       publishedAt
+    }
+    subpaths {
+      id
+      path
+      since {
+        id
+        version
+      }
+    }
+    sameVersionRequirement {
+      id
+      dependingOn {
+        id
+        name
+      }
     }
   }
 }
@@ -1358,6 +1505,135 @@ export type LibraryQueryHookResult = ReturnType<typeof useLibraryQuery>;
 export type LibraryLazyQueryHookResult = ReturnType<typeof useLibraryLazyQuery>;
 export type LibrarySuspenseQueryHookResult = ReturnType<typeof useLibrarySuspenseQuery>;
 export type LibraryQueryResult = Apollo.QueryResult<LibraryQuery, LibraryQueryVariables>;
+export const EditSameVersionRequirementDocument = gql`
+    mutation editSameVersionRequirement($library: String!, $dependingOn: String!) {
+  editSameVersionRequirement(library: $library, dependingOn: $dependingOn)
+}
+    `;
+export type EditSameVersionRequirementMutationFn = Apollo.MutationFunction<EditSameVersionRequirementMutation, EditSameVersionRequirementMutationVariables>;
+
+/**
+ * __useEditSameVersionRequirementMutation__
+ *
+ * To run a mutation, you first call `useEditSameVersionRequirementMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditSameVersionRequirementMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editSameVersionRequirementMutation, { data, loading, error }] = useEditSameVersionRequirementMutation({
+ *   variables: {
+ *      library: // value for 'library'
+ *      dependingOn: // value for 'dependingOn'
+ *   },
+ * });
+ */
+export function useEditSameVersionRequirementMutation(baseOptions?: Apollo.MutationHookOptions<EditSameVersionRequirementMutation, EditSameVersionRequirementMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EditSameVersionRequirementMutation, EditSameVersionRequirementMutationVariables>(EditSameVersionRequirementDocument, options);
+      }
+export type EditSameVersionRequirementMutationHookResult = ReturnType<typeof useEditSameVersionRequirementMutation>;
+export type EditSameVersionRequirementMutationResult = Apollo.MutationResult<EditSameVersionRequirementMutation>;
+export type EditSameVersionRequirementMutationOptions = Apollo.BaseMutationOptions<EditSameVersionRequirementMutation, EditSameVersionRequirementMutationVariables>;
+export const AddSubpathDocument = gql`
+    mutation addSubpath($library: String!, $path: String!, $since: String) {
+  addSubpath(library: $library, path: $path, since: $since)
+}
+    `;
+export type AddSubpathMutationFn = Apollo.MutationFunction<AddSubpathMutation, AddSubpathMutationVariables>;
+
+/**
+ * __useAddSubpathMutation__
+ *
+ * To run a mutation, you first call `useAddSubpathMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddSubpathMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addSubpathMutation, { data, loading, error }] = useAddSubpathMutation({
+ *   variables: {
+ *      library: // value for 'library'
+ *      path: // value for 'path'
+ *      since: // value for 'since'
+ *   },
+ * });
+ */
+export function useAddSubpathMutation(baseOptions?: Apollo.MutationHookOptions<AddSubpathMutation, AddSubpathMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddSubpathMutation, AddSubpathMutationVariables>(AddSubpathDocument, options);
+      }
+export type AddSubpathMutationHookResult = ReturnType<typeof useAddSubpathMutation>;
+export type AddSubpathMutationResult = Apollo.MutationResult<AddSubpathMutation>;
+export type AddSubpathMutationOptions = Apollo.BaseMutationOptions<AddSubpathMutation, AddSubpathMutationVariables>;
+export const EditSubpathDocument = gql`
+    mutation editSubpath($subpath: String!, $path: String!, $since: String) {
+  editSubpath(subpath: $subpath, path: $path, since: $since)
+}
+    `;
+export type EditSubpathMutationFn = Apollo.MutationFunction<EditSubpathMutation, EditSubpathMutationVariables>;
+
+/**
+ * __useEditSubpathMutation__
+ *
+ * To run a mutation, you first call `useEditSubpathMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditSubpathMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editSubpathMutation, { data, loading, error }] = useEditSubpathMutation({
+ *   variables: {
+ *      subpath: // value for 'subpath'
+ *      path: // value for 'path'
+ *      since: // value for 'since'
+ *   },
+ * });
+ */
+export function useEditSubpathMutation(baseOptions?: Apollo.MutationHookOptions<EditSubpathMutation, EditSubpathMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EditSubpathMutation, EditSubpathMutationVariables>(EditSubpathDocument, options);
+      }
+export type EditSubpathMutationHookResult = ReturnType<typeof useEditSubpathMutation>;
+export type EditSubpathMutationResult = Apollo.MutationResult<EditSubpathMutation>;
+export type EditSubpathMutationOptions = Apollo.BaseMutationOptions<EditSubpathMutation, EditSubpathMutationVariables>;
+export const DeleteSubpathDocument = gql`
+    mutation deleteSubpath($subpath: String!) {
+  deleteSubpath(subpath: $subpath)
+}
+    `;
+export type DeleteSubpathMutationFn = Apollo.MutationFunction<DeleteSubpathMutation, DeleteSubpathMutationVariables>;
+
+/**
+ * __useDeleteSubpathMutation__
+ *
+ * To run a mutation, you first call `useDeleteSubpathMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteSubpathMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteSubpathMutation, { data, loading, error }] = useDeleteSubpathMutation({
+ *   variables: {
+ *      subpath: // value for 'subpath'
+ *   },
+ * });
+ */
+export function useDeleteSubpathMutation(baseOptions?: Apollo.MutationHookOptions<DeleteSubpathMutation, DeleteSubpathMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteSubpathMutation, DeleteSubpathMutationVariables>(DeleteSubpathDocument, options);
+      }
+export type DeleteSubpathMutationHookResult = ReturnType<typeof useDeleteSubpathMutation>;
+export type DeleteSubpathMutationResult = Apollo.MutationResult<DeleteSubpathMutation>;
+export type DeleteSubpathMutationOptions = Apollo.BaseMutationOptions<DeleteSubpathMutation, DeleteSubpathMutationVariables>;
 export const LibraryUsageDocument = gql`
     query libraryUsage($name: String!) {
   libraryUsage(name: $name) {
@@ -1846,6 +2122,170 @@ export type WebsiteQueryHookResult = ReturnType<typeof useWebsiteQuery>;
 export type WebsiteLazyQueryHookResult = ReturnType<typeof useWebsiteLazyQuery>;
 export type WebsiteSuspenseQueryHookResult = ReturnType<typeof useWebsiteSuspenseQuery>;
 export type WebsiteQueryResult = Apollo.QueryResult<WebsiteQuery, WebsiteQueryVariables>;
+export const NewReleaseDocument = gql`
+    query newRelease {
+  newRelease {
+    newLibraries {
+      id
+      name
+      description
+      newVersions {
+        id
+        version
+      }
+    }
+    libraries {
+      id
+      name
+      description
+      releasedVersions {
+        id
+        version
+      }
+    }
+    newFiles {
+      id
+      version {
+        id
+        version
+        library {
+          id
+          name
+        }
+      }
+      path
+    }
+    files {
+      id
+      version {
+        id
+        version
+        library {
+          id
+          name
+        }
+      }
+      path
+    }
+    newFonts {
+      id
+      name
+      menu
+      category
+    }
+    fonts {
+      id
+      name
+      menu
+      category
+    }
+  }
+}
+    `;
+
+/**
+ * __useNewReleaseQuery__
+ *
+ * To run a query within a React component, call `useNewReleaseQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNewReleaseQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewReleaseQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewReleaseQuery(baseOptions?: Apollo.QueryHookOptions<NewReleaseQuery, NewReleaseQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<NewReleaseQuery, NewReleaseQueryVariables>(NewReleaseDocument, options);
+      }
+export function useNewReleaseLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<NewReleaseQuery, NewReleaseQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<NewReleaseQuery, NewReleaseQueryVariables>(NewReleaseDocument, options);
+        }
+export function useNewReleaseSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<NewReleaseQuery, NewReleaseQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<NewReleaseQuery, NewReleaseQueryVariables>(NewReleaseDocument, options);
+        }
+export type NewReleaseQueryHookResult = ReturnType<typeof useNewReleaseQuery>;
+export type NewReleaseLazyQueryHookResult = ReturnType<typeof useNewReleaseLazyQuery>;
+export type NewReleaseSuspenseQueryHookResult = ReturnType<typeof useNewReleaseSuspenseQuery>;
+export type NewReleaseQueryResult = Apollo.QueryResult<NewReleaseQuery, NewReleaseQueryVariables>;
+export const PotentialSavingsDocument = gql`
+    query potentialSavings {
+  potentialSavings {
+    totalVersionSavings
+    totalFileSavings
+  }
+}
+    `;
+
+/**
+ * __usePotentialSavingsQuery__
+ *
+ * To run a query within a React component, call `usePotentialSavingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePotentialSavingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePotentialSavingsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePotentialSavingsQuery(baseOptions?: Apollo.QueryHookOptions<PotentialSavingsQuery, PotentialSavingsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PotentialSavingsQuery, PotentialSavingsQueryVariables>(PotentialSavingsDocument, options);
+      }
+export function usePotentialSavingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PotentialSavingsQuery, PotentialSavingsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PotentialSavingsQuery, PotentialSavingsQueryVariables>(PotentialSavingsDocument, options);
+        }
+export function usePotentialSavingsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PotentialSavingsQuery, PotentialSavingsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PotentialSavingsQuery, PotentialSavingsQueryVariables>(PotentialSavingsDocument, options);
+        }
+export type PotentialSavingsQueryHookResult = ReturnType<typeof usePotentialSavingsQuery>;
+export type PotentialSavingsLazyQueryHookResult = ReturnType<typeof usePotentialSavingsLazyQuery>;
+export type PotentialSavingsSuspenseQueryHookResult = ReturnType<typeof usePotentialSavingsSuspenseQuery>;
+export type PotentialSavingsQueryResult = Apollo.QueryResult<PotentialSavingsQuery, PotentialSavingsQueryVariables>;
+export const CreateReleaseDocument = gql`
+    mutation createRelease {
+  createRelease {
+    id
+  }
+}
+    `;
+export type CreateReleaseMutationFn = Apollo.MutationFunction<CreateReleaseMutation, CreateReleaseMutationVariables>;
+
+/**
+ * __useCreateReleaseMutation__
+ *
+ * To run a mutation, you first call `useCreateReleaseMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateReleaseMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createReleaseMutation, { data, loading, error }] = useCreateReleaseMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCreateReleaseMutation(baseOptions?: Apollo.MutationHookOptions<CreateReleaseMutation, CreateReleaseMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateReleaseMutation, CreateReleaseMutationVariables>(CreateReleaseDocument, options);
+      }
+export type CreateReleaseMutationHookResult = ReturnType<typeof useCreateReleaseMutation>;
+export type CreateReleaseMutationResult = Apollo.MutationResult<CreateReleaseMutation>;
+export type CreateReleaseMutationOptions = Apollo.BaseMutationOptions<CreateReleaseMutation, CreateReleaseMutationVariables>;
 export const PaymentsDocument = gql`
     query payments {
   payments {
@@ -1957,6 +2397,56 @@ export type WebsiteRatingQueryHookResult = ReturnType<typeof useWebsiteRatingQue
 export type WebsiteRatingLazyQueryHookResult = ReturnType<typeof useWebsiteRatingLazyQuery>;
 export type WebsiteRatingSuspenseQueryHookResult = ReturnType<typeof useWebsiteRatingSuspenseQuery>;
 export type WebsiteRatingQueryResult = Apollo.QueryResult<WebsiteRatingQuery, WebsiteRatingQueryVariables>;
+export const ReleasesDocument = gql`
+    query releases {
+  releases {
+    id
+    version
+    integrated {
+      id
+      name
+    }
+    integratedLibraries {
+      id
+    }
+    integratedFiles {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useReleasesQuery__
+ *
+ * To run a query within a React component, call `useReleasesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReleasesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReleasesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useReleasesQuery(baseOptions?: Apollo.QueryHookOptions<ReleasesQuery, ReleasesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ReleasesQuery, ReleasesQueryVariables>(ReleasesDocument, options);
+      }
+export function useReleasesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ReleasesQuery, ReleasesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ReleasesQuery, ReleasesQueryVariables>(ReleasesDocument, options);
+        }
+export function useReleasesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ReleasesQuery, ReleasesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ReleasesQuery, ReleasesQueryVariables>(ReleasesDocument, options);
+        }
+export type ReleasesQueryHookResult = ReturnType<typeof useReleasesQuery>;
+export type ReleasesLazyQueryHookResult = ReturnType<typeof useReleasesLazyQuery>;
+export type ReleasesSuspenseQueryHookResult = ReturnType<typeof useReleasesSuspenseQuery>;
+export type ReleasesQueryResult = Apollo.QueryResult<ReleasesQuery, ReleasesQueryVariables>;
 export const SearchLibraryDocument = gql`
     query searchLibrary($term: String!) {
   searchLibrary(term: $term) {

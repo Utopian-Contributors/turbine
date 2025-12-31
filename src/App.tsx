@@ -20,8 +20,10 @@ import LibrariesPage from './pages/LibrariesPage'
 import LibraryPage from './pages/LibraryPage'
 import MeasurePage from './pages/MeasurePage'
 import MeasurementsPage from './pages/MeasurementsPage'
+import NewReleasePage from './pages/NewReleasePage'
 import PaymentsPage from './pages/PaymentsPage'
 import RatingsPage from './pages/RatingsPage'
+import ReleasesPage from './pages/ReleasesPage'
 import SearchPage from './pages/SearchPage'
 import WalletPage from './pages/WalletPage'
 import WebsitesPage from './pages/WebsitesPage'
@@ -60,14 +62,16 @@ const router = createBrowserRouter([
         element: <LibraryPage />,
       },
       {
-        path: 'wallet',
-        element: <WalletPage />,
-      },
-      {
         path: 'fonts',
         element: <FontsPage />,
       },
       { path: 'fonts/:font', element: <FontPage /> },
+      { path: 'releases', element: <ReleasesPage /> },
+      { path: 'releases/new', element: <NewReleasePage /> },
+      {
+        path: 'wallet',
+        element: <WalletPage />,
+      },
     ],
     errorElement: <NotFoundPage />,
   },

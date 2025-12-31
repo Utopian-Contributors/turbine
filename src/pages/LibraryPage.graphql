@@ -1,6 +1,5 @@
 query library($name: String!) {
   library(name: $name) {
-    id
     name
     description
     homepage
@@ -15,7 +14,38 @@ query library($name: String!) {
       version
       publishedAt
     }
+    subpaths {
+      id
+      path
+      since {
+        id
+        version
+      }
+    }
+    sameVersionRequirement {
+      id
+      dependingOn {
+        id
+        name
+      }
+    }
   }
+}
+
+mutation editSameVersionRequirement($library: String!, $dependingOn: String!) {
+  editSameVersionRequirement(library: $library, dependingOn: $dependingOn)
+}
+
+mutation addSubpath($library: String!, $path: String!, $since: String) {
+  addSubpath(library: $library, path: $path, since: $since)
+}
+
+mutation editSubpath($subpath: String!, $path: String!, $since: String) {
+  editSubpath(subpath: $subpath, path: $path, since: $since)
+}
+
+mutation deleteSubpath($subpath: String!) {
+  deleteSubpath(subpath: $subpath)
 }
 
 query libraryUsage($name: String!) {
@@ -87,17 +117,17 @@ mutation toggleIntegrateVersionFile($versionFile: String!) {
 
 fragment VersionFileConfig on VersionFileIntegrations {
   integrated {
-      file {
-        ...VersionFile
-      }
-      bandwidth
+    file {
+      ...VersionFile
     }
-    popular {
-      file {
-        ...VersionFile
-      }
-      bandwidth
+    bandwidth
+  }
+  popular {
+    file {
+      ...VersionFile
     }
+    bandwidth
+  }
 }
 
 fragment VersionFile on VersionFile {
