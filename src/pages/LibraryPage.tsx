@@ -40,19 +40,26 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
   const { data: libraryQueryData, loading } = useLibraryQuery({
     variables: { name: params.name || '' },
   })
-  const { data: libraryUsageQueryData } = useLibraryUsageQuery({
-    variables: { name: params.name || '' },
-  })
-  const { data: versionUsageQueryData } = useVersionUsageQuery({
-    variables: { library: params.name || '' },
-  })
-  const { data: versionIntegrationsQueryData } = useVersionIntegrationsQuery({
-    variables: { library: params.name || '' },
-  })
-  const [versionFilesQuery, { data: versionFilesQueryData }] =
-    useVersionFilesLazyQuery({
+  const { data: libraryUsageQueryData, refetch: refetchLibraryUsage } =
+    useLibraryUsageQuery({
+      variables: { name: params.name || '' },
+    })
+  const { data: versionUsageQueryData, refetch: refetchVersionUsage } =
+    useVersionUsageQuery({
       variables: { library: params.name || '' },
     })
+  const {
+    data: versionIntegrationsQueryData,
+    refetch: refetchVersionIntegrations,
+  } = useVersionIntegrationsQuery({
+    variables: { library: params.name || '' },
+  })
+  const [
+    versionFilesQuery,
+    { data: versionFilesQueryData, refetch: refetchVersionFiles },
+  ] = useVersionFilesLazyQuery({
+    variables: { library: params.name || '' },
+  })
   const [toggleIntegrateVersion] = useToggleIntegrateVersionMutation({
     refetchQueries: [
       {
@@ -120,6 +127,24 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
     },
     [toggleIntegrateVersion, loggedInQueryData?.loggedIn?.role]
   )
+
+  const loadingUsage = useMemo(() => {
+    if (!libraryUsageQueryData || !libraryUsageQueryData.libraryUsage) {
+      setTimeout(() => {
+        refetchLibraryUsage()
+        refetchVersionUsage()
+        refetchVersionIntegrations()
+        refetchVersionFiles()
+      }, 5000)
+      return true
+    }
+  }, [
+    libraryUsageQueryData,
+    refetchLibraryUsage,
+    refetchVersionFiles,
+    refetchVersionIntegrations,
+    refetchVersionUsage,
+  ])
 
   if (loading) {
     return <div>Loading...</div>
@@ -203,6 +228,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             </div>
           </div>
           <Separator className="my-6" />
+          {loadingUsage ? <div className='animate-pulse'>Loading usage...</div> : null}
           {versionIntegrationsQueryData &&
             versionIntegrationsQueryData?.versionIntegrations && (
               <VersionsCard
