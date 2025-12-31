@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router'
 
-import { useReleasesQuery } from '../../generated/graphql'
+import { useLoggedInQuery, useReleasesQuery } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ReleasePageProps {}
@@ -11,6 +11,7 @@ interface ReleasePageProps {}
 const ReleasesPage: React.FC<ReleasePageProps> = () => {
   const navigate = useNavigate()
   const { data } = useReleasesQuery()
+  const { data: loggedInQueryData } = useLoggedInQuery()
 
   useEffect(() => {
     document.title = 'Turbine | Releases'
@@ -20,15 +21,20 @@ const ReleasesPage: React.FC<ReleasePageProps> = () => {
     <div className="max-w-2xl mx-auto p-6">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-bold">Releases</h1>
-        <Button
-          className="flex gap-2"
-          onClick={() => navigate('/releases/new')}
-        >
-          <Plus size={20} />
-          New
-        </Button>
+        {loggedInQueryData?.loggedIn && (
+          <Button
+            className="flex gap-2"
+            onClick={() => navigate('/releases/new')}
+          >
+            <Plus size={20} />
+            New
+          </Button>
+        )}
       </div>
       <div className="flex flex-col gap-2 mt-6">
+        {!data?.releases?.length && (
+          <span className="text-muted-foreground mx-auto">No Releases yet</span>
+        )}
         {data?.releases?.map((r) => {
           return (
             <div key={r.id} className="border rounded-md p-6">
@@ -36,7 +42,10 @@ const ReleasesPage: React.FC<ReleasePageProps> = () => {
               <p>{}</p>
               <div className="flex flex-wrap gap-2">
                 {r.integrated?.map((lib) => (
-                  <div key={lib?.id} className="bg-gray-100 border rounded-sm text-sm px-3 py-1">
+                  <div
+                    key={lib?.id}
+                    className="bg-gray-100 border rounded-sm text-sm px-3 py-1"
+                  >
                     {lib?.name}
                   </div>
                 ))}

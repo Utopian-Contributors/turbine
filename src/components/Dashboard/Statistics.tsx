@@ -15,7 +15,7 @@ interface StatisticsProps {
     label: string
     unit?: string
     total: number
-    change?: number
+    change: number
     description?: string
   }[]
 }
