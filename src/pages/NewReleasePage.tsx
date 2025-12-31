@@ -46,7 +46,7 @@ const NewReleasePage: React.FC<NewReleasePageProps> = () => {
       <Separator className="my-6" />
       <div className="flex gap-4 mt-6">
         <Card className="p-6">
-          <h4>Potential NPM Savings</h4>
+          <h4>Potential NPM Savings (weekly)</h4>
           <span className="text-3xl font-light">
             {filesize(
               potentialSavingsQueryData?.potentialSavings
@@ -55,7 +55,7 @@ const NewReleasePage: React.FC<NewReleasePageProps> = () => {
           </span>
         </Card>
         <Card className="p-6">
-          <h4>Potential CDN Savings</h4>
+          <h4>Potential CDN Savings (weekly)</h4>
           <span className="text-3xl font-light">
             {filesize(
               potentialSavingsQueryData?.potentialSavings?.totalFileSavings ?? 0
