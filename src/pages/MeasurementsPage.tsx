@@ -74,34 +74,43 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     url,
   })
 
+  const completedMeasurements = useMemo(() => {
+    return (
+      measurementsQueryData?.measurements?.filter(
+        (m) => m.status === MeasurementStatus.Completed
+      ) || []
+    )
+  }, [measurementsQueryData?.measurements])
+
   const measurement = useMemo(() => {
     const device = searchParams.get('device') as DeviceType | null
     const connection = searchParams.get('connection') as ConnectionType | null
-    return (
-      measurementsQueryData?.measurements
-        ?.filter((m) => new URL(m.url).pathname === selectedPath)
-        .find((m) => {
-          return (
-            new URL(m.url).host === params.host &&
-            m.connectionType === (connection || ConnectionType.Wifi) &&
-            m.device.type === (device || DeviceType.Desktop) &&
-            m.status === MeasurementStatus.Completed
-          )
-        }) ||
-      measurementsQueryData?.measurements
-        ?.filter((m) => new URL(m.url).pathname === selectedPath)
-        .find((m) => {
-          return m.status === MeasurementStatus.Completed
-        }) ||
-      (measurementsQueryData?.measurements?.filter(
-        (m) =>
-          new URL(m.url).pathname === selectedPath &&
-          m.status === MeasurementStatus.Completed
-      ).length === 0
-        ? measurementsQueryData?.measurements[0]
-        : null)
+    const fullMatch = completedMeasurements
+      ?.filter((m) => new URL(m.url).pathname === selectedPath)
+      .find((m) => {
+        if (
+          (new URL(m.url).host === params.host ||
+            (m.redirect && new URL(m.redirect).host === params.host)) &&
+          m.connectionType === (connection || ConnectionType.Wifi) &&
+          m.device.type === (device || DeviceType.Desktop)
+        ) {
+          return true
+        }
+      })
+    const partialMatch = completedMeasurements?.find(
+      (m) => new URL(m.url).pathname === selectedPath
     )
+
+    const fallbackMatch =
+      completedMeasurements.length === 0 &&
+      measurementsQueryData?.measurements?.length
+        ? measurementsQueryData?.measurements?.find(
+            (m) => new URL(m.url).pathname === selectedPath
+          )
+        : null
+    return fullMatch || partialMatch || fallbackMatch || null
   }, [
+    completedMeasurements,
     measurementsQueryData?.measurements,
     params.host,
     searchParams,
@@ -157,8 +166,14 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
   useEffect(() => {
     if (
       url &&
-      !measurementsQueryData?.measurements?.some((m) => m.url === url)
+      !measurementsQueryData?.measurements?.some(
+        (m) =>
+          (new URL(m.url).host === params.host &&
+            new URL(m.url).pathname === selectedPath) ||
+          (m.redirect && new URL(m.redirect).host === params.host)
+      )
     ) {
+      console.debug('Fetching measurements for, because none were found', url)
       measurementsQuery({
         variables: { url },
         fetchPolicy: 'network-only',
@@ -529,7 +544,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 </div>
               </div>
             </motion.div>
-            <motion.div className="flex gap-2 items-center px-6 py-2">
+            <motion.div className="flex gap-2 items-center lg:px-6">
               <div
                 onClick={() => {
                   const search = new URLSearchParams(location.search)
@@ -549,13 +564,13 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
               {measurementsQueryData.measurements
                 .reduce((acc, m) => {
                   const path = new URL(m.url).pathname
-                  if (!acc.includes(path) && path !== '/') {
-                    acc.push(path)
+                  if (path !== '/' && !acc.some((item) => item.path === path)) {
+                    acc.push({ path, title: m.title || path })
                   }
                   return acc
-                }, [] as string[])
+                }, [] as { path: string; title: string }[])
                 .reverse()
-                .map((path) => {
+                .map(({ path, title }) => {
                   return (
                     <div
                       onClick={() => {
@@ -573,7 +588,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                           : ''
                       )}
                     >
-                      {path}
+                      {title}
                     </div>
                   )
                 })}
@@ -589,7 +604,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 onClick={measure}
               />
             )}
-            <Tabs defaultValue="bundle" className="px-6 lg:pt-2">
+            <Tabs defaultValue="bundle" className="lg:px-6 lg:pt-2">
               <TabsList>
                 <TabsTrigger value="bundle">Bundle</TabsTrigger>
                 {measurement.screenshots?.length ? (

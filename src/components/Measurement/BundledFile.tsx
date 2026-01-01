@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
-import { Globe } from 'lucide-react'
+import { Globe, Info } from 'lucide-react'
 import React from 'react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import type { BundledFileProps } from './Bundle'
 
 const getFilename = (url: string, baseUrl: string) => {
@@ -39,6 +40,26 @@ const abbreviateFilename = (filename: string, maxLength = 40) => {
   return `${start}...${end}${extension}`
 }
 
+const FileTooltip: React.FC<
+  { url: string; contentType: string } & React.HTMLAttributes<HTMLDivElement>
+> = ({ url, contentType }) => {
+  if (contentType.includes('image/png')) {
+    return (
+      <Tooltip>
+        <TooltipTrigger>
+          <Info className="text-gray-400" size={16} />
+        </TooltipTrigger>
+        <TooltipContent className="max-w-48 text-center">
+          <p>
+            Images should use <span className="bg-gray-600 px-1 rounded">.webp</span>{' '}
+            format for better performance.
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+}
+
 const BundledFile: React.FC<BundledFileProps> = ({
   baseUrl,
   url,
@@ -54,9 +75,14 @@ const BundledFile: React.FC<BundledFileProps> = ({
     <div className="flex justify-between">
       <div className="flex items-start gap-2">
         <div className="flex flex-col gap-1">
-          <div>
+          <div className="flex items-center gap-1">
             <a
-              className="max-w-[60ch] text-md truncate"
+              className={cn(
+                'max-w-[60ch] text-md truncate',
+                contentType.includes('image/png')
+                  ? 'text-red-500'
+                  : 'text-primary'
+              )}
               href={url}
               target="_blank"
             >
@@ -64,12 +90,13 @@ const BundledFile: React.FC<BundledFileProps> = ({
                 ? abbreviateFilename(getFilename(url, baseUrl), 26)
                 : new URL(url).hostname}
             </a>
+            <FileTooltip url={url} contentType={contentType} />
           </div>
           <div className="flex items-center gap-1">
             {new URL(url).hostname !== new URL(baseUrl).hostname ? (
               <Globe className="h-3 w-3 text-muted-foreground" />
             ) : null}{' '}
-            <span className="max-w-48 truncate text-xs text-muted-foreground leading-[10px]">
+            <span className="max-w-48 truncate text-xs text-muted-foreground leading-[12px]">
               {abbreviateFilename(new URL(url).hostname, 40)}
             </span>
           </div>
