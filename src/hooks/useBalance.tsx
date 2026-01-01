@@ -1,7 +1,9 @@
 import { preferedPaymentState } from '@/state/payment'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { useCallback, useEffect, useState } from 'react'
+import { useSolana } from '@phantom/react-sdk'
+import { PublicKey } from '@solana/web3.js'
+import { useCallback, useEffect } from 'react'
 import { useRecoilState } from 'recoil'
+import { usePaymentInfoLazyQuery } from '../../generated/graphql'
 
 interface PlatformBalance {
   sol?: { amount: number; mint: string }
@@ -18,9 +20,6 @@ interface UseBalanceReturn {
   refetch: () => Promise<void>
 }
 
-const TOKEN_PROGRAM_ID = new PublicKey(
-  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
-)
 export const UTCC_MINT_ADDRESS = new PublicKey(
   'HGTXnhgyast5fJKhMcE4VgyeEVWhYKEsHxpZtpjhrYqA'
 )
@@ -28,70 +27,22 @@ export const USDC_MINT_ADDRESS = new PublicKey(
   'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
 )
 
-export function useBalance(addressValue: string | null): UseBalanceReturn {
+export function useBalance(): UseBalanceReturn {
   const [preferedPayment, setPreferedPayment] =
     useRecoilState(preferedPaymentState)
-  const [balance, setBalance] = useState<PlatformBalance | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const rpcUrl =
-    import.meta.env.VITE_SOLANA_RPC_ENDPOINT ||
-    'https://api.mainnet-beta.solana.com'
+  const { solana } = useSolana()
+  const [paymentInfoQuery, { data: paymentInfoQueryData, loading, error }] =
+    usePaymentInfoLazyQuery()
 
   const fetchBalance = useCallback(async () => {
-    if (!addressValue) {
-      setBalance(null)
-      setError(null)
-      return
-    }
-
-    setLoading(true)
-    setError(null)
-
-    try {
-      const connection = new Connection(rpcUrl)
-      const publicKey = new PublicKey(addressValue)
-      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-        publicKey,
-        {
-          programId: TOKEN_PROGRAM_ID,
-        }
-      )
-      const utccBalance = tokenAccounts.value.find((accountInfo) => {
-        const accountData = accountInfo.account.data
-        return accountData.parsed.info.mint === UTCC_MINT_ADDRESS.toBase58()
-      })?.account.data.parsed.info.tokenAmount.uiAmount
-      const usdcBalance = tokenAccounts.value
-        .find((accountInfo) => {
-          const accountData = accountInfo.account.data
-          return accountData.parsed.info.mint === USDC_MINT_ADDRESS.toBase58()
-        })
-        ?.account.data.parsed.info.tokenAmount.uiAmount.toFixed(2)
-      const solBalanceLamports = await connection.getBalance(publicKey)
-      const solBalance = solBalanceLamports / 1e9 // Convert lamports to SOL
-      setBalance({
-        utcc: {
-          amount: Number(utccBalance ?? 0),
-          mint: UTCC_MINT_ADDRESS.toBase58(),
-        },
-        sol: {
-          amount: Number(solBalance ?? 0),
-          mint: PublicKey.default.toBase58(),
-        },
-        usdc: {
-          amount: Number(usdcBalance ?? 0),
-          mint: USDC_MINT_ADDRESS.toBase58(),
-        },
+    const publicKey = await solana.getPublicKey()
+    if (publicKey) {
+      await paymentInfoQuery({
+        variables: { publicKey },
+        fetchPolicy: 'network-only',
       })
-    } catch (err) {
-      console.error('Failed to fetch balance:', err)
-      setError(err instanceof Error ? err.message : 'Failed to fetch balance')
-      setBalance(null)
-    } finally {
-      setLoading(false)
     }
-  }, [addressValue, rpcUrl])
+  }, [paymentInfoQuery, solana])
 
   useEffect(() => {
     fetchBalance()
@@ -100,9 +51,13 @@ export function useBalance(addressValue: string | null): UseBalanceReturn {
   return {
     preferedPayment,
     setPreferedPayment,
-    balance,
+    balance: {
+      utcc: paymentInfoQueryData?.paymentInfo?.utccBalance,
+      usdc: paymentInfoQueryData?.paymentInfo?.usdcBalance,
+      sol: paymentInfoQueryData?.paymentInfo?.solBalance,
+    },
     loading,
-    error,
+    error: error ? error.message : null,
     refetch: fetchBalance,
   }
 }

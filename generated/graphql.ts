@@ -84,10 +84,11 @@ export type ExtensionRelease = {
   __typename?: 'ExtensionRelease';
   changelog?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
-  integrated?: Maybe<Array<Maybe<Library>>>;
-  integratedFiles?: Maybe<Array<Maybe<VersionFile>>>;
-  integratedFonts?: Maybe<Array<Maybe<Font>>>;
+  integrated?: Maybe<Array<Library>>;
+  integratedFiles: Array<VersionFile>;
+  integratedFonts: Array<Font>;
   integratedLibraries: Array<Version>;
+  potentialSavings?: Maybe<Scalars['String']['output']>;
   version: Scalars['String']['output'];
 };
 
@@ -383,6 +384,7 @@ export type Query = {
   measurementPrices?: Maybe<Array<MeasurementPrice>>;
   measurements?: Maybe<Array<Measurement>>;
   newRelease?: Maybe<NewExtensionRelease>;
+  paymentInfo?: Maybe<SolanaPaymentInfo>;
   payments?: Maybe<Array<Payment>>;
   popularFonts?: Maybe<Array<Font>>;
   potentialSavings?: Maybe<ExtensionPotentialSavings>;
@@ -420,6 +422,12 @@ export type QueryLibraryUsageArgs = {
 
 export type QueryMeasurementsArgs = {
   url?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryPaymentInfoArgs = {
+  publicKey?: InputMaybe<Scalars['String']['input']>;
+  tokenMint?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -490,6 +498,32 @@ export type SameVersionRequirement = {
   createdAt: Scalars['DateTime']['output'];
   dependingOn: Library;
   id: Scalars['ID']['output'];
+};
+
+/** Information needed for making Solana payments */
+export type SolanaPaymentInfo = {
+  __typename?: 'SolanaPaymentInfo';
+  /** Recent blockhash for transaction */
+  blockhash?: Maybe<Scalars['String']['output']>;
+  /** Sender's public key */
+  fromPubKey?: Maybe<Scalars['String']['output']>;
+  /** SOL token balance */
+  solBalance: TokenBalance;
+  /** Treasury public key */
+  treasuryPubKey?: Maybe<Scalars['String']['output']>;
+  /** USDC token balance */
+  usdcBalance: TokenBalance;
+  /** UTCC token balance */
+  utccBalance: TokenBalance;
+};
+
+/** Represents a token balance in a Solana wallet */
+export type TokenBalance = {
+  __typename?: 'TokenBalance';
+  /** The amount of tokens held */
+  amount: Scalars['Float']['output'];
+  /** The mint address of the token */
+  mint: Scalars['String']['output'];
 };
 
 export type User = {
@@ -583,6 +617,14 @@ export type LoggedInQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LoggedInQuery = { __typename?: 'Query', loggedIn: { __typename?: 'User', id: string, email: string, name: string, role: Role, verified: boolean } };
+
+export type PaymentInfoQueryVariables = Exact<{
+  publicKey: Scalars['String']['input'];
+  tokenMint?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type PaymentInfoQuery = { __typename?: 'Query', paymentInfo?: { __typename?: 'SolanaPaymentInfo', blockhash?: string | null, fromPubKey?: string | null, treasuryPubKey?: string | null, utccBalance: { __typename?: 'TokenBalance', mint: string, amount: number }, usdcBalance: { __typename?: 'TokenBalance', mint: string, amount: number }, solBalance: { __typename?: 'TokenBalance', mint: string, amount: number } } | null };
 
 export type SendResetLinkMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -821,7 +863,7 @@ export type WebsiteRatingQuery = { __typename?: 'Query', website?: { __typename?
 export type ReleasesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ReleasesQuery = { __typename?: 'Query', releases?: Array<{ __typename?: 'ExtensionRelease', id: string, version: string, integrated?: Array<{ __typename?: 'Library', id: string, name: string } | null> | null, integratedLibraries: Array<{ __typename?: 'Version', id: string }>, integratedFiles?: Array<{ __typename?: 'VersionFile', id: string } | null> | null }> | null };
+export type ReleasesQuery = { __typename?: 'Query', releases?: Array<{ __typename?: 'ExtensionRelease', id: string, version: string, integrated?: Array<{ __typename?: 'Library', id: string, name: string }> | null, integratedLibraries: Array<{ __typename?: 'Version', id: string }>, integratedFiles: Array<{ __typename?: 'VersionFile', id: string }> }> | null };
 
 export type SearchLibraryQueryVariables = Exact<{
   term: Scalars['String']['input'];
@@ -972,6 +1014,61 @@ export type LoggedInQueryHookResult = ReturnType<typeof useLoggedInQuery>;
 export type LoggedInLazyQueryHookResult = ReturnType<typeof useLoggedInLazyQuery>;
 export type LoggedInSuspenseQueryHookResult = ReturnType<typeof useLoggedInSuspenseQuery>;
 export type LoggedInQueryResult = Apollo.QueryResult<LoggedInQuery, LoggedInQueryVariables>;
+export const PaymentInfoDocument = gql`
+    query paymentInfo($publicKey: String!, $tokenMint: String) {
+  paymentInfo(publicKey: $publicKey, tokenMint: $tokenMint) {
+    utccBalance {
+      mint
+      amount
+    }
+    usdcBalance {
+      mint
+      amount
+    }
+    solBalance {
+      mint
+      amount
+    }
+    blockhash
+    fromPubKey
+    treasuryPubKey
+  }
+}
+    `;
+
+/**
+ * __usePaymentInfoQuery__
+ *
+ * To run a query within a React component, call `usePaymentInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePaymentInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePaymentInfoQuery({
+ *   variables: {
+ *      publicKey: // value for 'publicKey'
+ *      tokenMint: // value for 'tokenMint'
+ *   },
+ * });
+ */
+export function usePaymentInfoQuery(baseOptions: Apollo.QueryHookOptions<PaymentInfoQuery, PaymentInfoQueryVariables> & ({ variables: PaymentInfoQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PaymentInfoQuery, PaymentInfoQueryVariables>(PaymentInfoDocument, options);
+      }
+export function usePaymentInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PaymentInfoQuery, PaymentInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PaymentInfoQuery, PaymentInfoQueryVariables>(PaymentInfoDocument, options);
+        }
+export function usePaymentInfoSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PaymentInfoQuery, PaymentInfoQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PaymentInfoQuery, PaymentInfoQueryVariables>(PaymentInfoDocument, options);
+        }
+export type PaymentInfoQueryHookResult = ReturnType<typeof usePaymentInfoQuery>;
+export type PaymentInfoLazyQueryHookResult = ReturnType<typeof usePaymentInfoLazyQuery>;
+export type PaymentInfoSuspenseQueryHookResult = ReturnType<typeof usePaymentInfoSuspenseQuery>;
+export type PaymentInfoQueryResult = Apollo.QueryResult<PaymentInfoQuery, PaymentInfoQueryVariables>;
 export const SendResetLinkDocument = gql`
     mutation sendResetLink($email: String!) {
   sendResetLink(email: $email)

@@ -4,7 +4,6 @@ import {
   UTCC_MINT_ADDRESS,
 } from '@/hooks/useBalance'
 import { cn } from '@/lib/utils'
-import { useSolana } from '@phantom/react-sdk'
 import { PublicKey } from '@solana/web3.js'
 import React, { useMemo } from 'react'
 
@@ -15,8 +14,7 @@ interface PricetagProps {
 }
 
 const Pricetag: React.FC<PricetagProps> = ({ className, price, tokenMint }) => {
-  const { solana } = useSolana()
-  const { preferedPayment } = useBalance(solana.publicKey)
+  const { preferedPayment } = useBalance()
 
   const defaultPrice = useMemo(() => {
     if (preferedPayment === UTCC_MINT_ADDRESS.toBase58()) {

@@ -1,6 +1,5 @@
 import { useSolana } from '@phantom/react-sdk'
 import {
-  Connection,
   PublicKey,
   SystemProgram,
   TransactionInstruction,
@@ -8,98 +7,112 @@ import {
   VersionedTransaction,
 } from '@solana/web3.js'
 import { Buffer } from 'buffer'
+import { useCallback } from 'react'
 
-const SOLANA_RPC_ENDPOINT = import.meta.env.VITE_SOLANA_RPC_ENDPOINT!
-const TREASURY_WALLET_ADDRESS = import.meta.env.VITE_TREASURY_WALLET_ADDRESS!
+import { usePaymentInfoLazyQuery } from '../../generated/graphql'
 
 export const useSendTransaction = (tokenMint: string) => {
   const { solana } = useSolana()
+  const [paymentInfoQuery] = usePaymentInfoLazyQuery()
 
-  const sendTransaction = async (amount: number): Promise<string> => {
-    const connection = new Connection(SOLANA_RPC_ENDPOINT)
-    const { blockhash } = await connection.getLatestBlockhash()
-    const fromAddress = (await solana.getPublicKey())!
-    const fromPubkey = new PublicKey(fromAddress)
-    const toPubkey = new PublicKey(TREASURY_WALLET_ADDRESS)
+  const sendTransaction = useCallback(
+    async (amount: number) => {
+      const fromAddress = await solana.getPublicKey()
 
-    // Convert to lamports (smallest unit)
-    const lamports = Math.floor(amount * 1_000_000)
-
-    let instructions
-
-    // Native SOL transfer
-    if (tokenMint === 'SOL' || tokenMint === PublicKey.default.toBase58()) {
-      instructions = [
-        SystemProgram.transfer({
-          fromPubkey,
-          toPubkey,
-          lamports,
-        }),
-      ]
-    } else {
-      // SPL Token transfer (UTCC or USDC)
-      const mintPubkey = new PublicKey(tokenMint)
-
-      // Get or create associated token accounts
-      const fromTokenAccount = await connection.getParsedTokenAccountsByOwner(
-        fromPubkey,
-        { mint: mintPubkey }
-      )
-
-      if (fromTokenAccount.value.length === 0) {
-        throw new Error('No token account found for mint: ' + tokenMint)
+      if (!fromAddress) {
+        throw new Error('Wallet not connected')
       }
 
-      const toTokenAccounts = await connection.getParsedTokenAccountsByOwner(
-        toPubkey,
-        { mint: mintPubkey }
-      )
+      const { data: paymentInfoQueryData } = await paymentInfoQuery({
+        variables: { publicKey: fromAddress as string, tokenMint },
+        fetchPolicy: 'network-only',
+      })
 
-      console.log('Looking for mint:', mintPubkey.toBase58())
-      console.log('Treasury wallet:', toPubkey.toBase58())
+      if (!paymentInfoQueryData?.paymentInfo) {
+        throw new Error('Payment info not found')
+      }
 
-      // Create SPL token transfer instruction manually (without @solana/spl-token)
-      const TOKEN_PROGRAM_ID = new PublicKey(
-        'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
-      )
+      const { blockhash, fromPubKey, treasuryPubKey } =
+        paymentInfoQueryData.paymentInfo
 
-      const keys = [
-        {
-          pubkey: fromTokenAccount.value[0].pubkey,
-          isSigner: false,
-          isWritable: true,
-        },
-        {
-          pubkey: toTokenAccounts.value[0].pubkey,
-          isSigner: false,
-          isWritable: true,
-        },
-        { pubkey: fromPubkey, isSigner: true, isWritable: false },
-      ]
+      if (!blockhash || !fromPubKey || !treasuryPubKey) {
+        throw new Error('Incomplete payment info')
+      }
 
-      const data = Buffer.alloc(9)
-      data.writeUInt8(3, 0) // Transfer instruction discriminator
-      data.writeBigUInt64LE(BigInt(lamports) as unknown as number, 1)
+      // Convert to lamports (smallest unit)
+      const lamports = Math.floor(amount * 1_000_000)
 
-      instructions = [
-        new TransactionInstruction({
-          keys,
-          programId: TOKEN_PROGRAM_ID,
-          data,
-        }),
-      ]
-    }
+      let instructions
 
-    const messageV0 = new TransactionMessage({
-      payerKey: fromPubkey,
-      recentBlockhash: blockhash,
-      instructions,
-    }).compileToV0Message()
+      // Native SOL transfer
+      if (tokenMint === 'SOL' || tokenMint === PublicKey.default.toBase58()) {
+        instructions = [
+          SystemProgram.transfer({
+            fromPubkey: new PublicKey(fromPubKey),
+            toPubkey: new PublicKey(treasuryPubKey),
+            lamports,
+          }),
+        ]
+      } else {
+        // SPL Token transfer (UTCC or USDC)
+        const mintPubkey = new PublicKey(tokenMint)
 
-    const transaction = new VersionedTransaction(messageV0)
-    const result = await solana.signAndSendTransaction(transaction)
-    return result.signature
-  }
+        console.log('Looking for mint:', mintPubkey.toBase58())
+        console.log(
+          'Treasury wallet:',
+          new PublicKey(treasuryPubKey).toBase58()
+        )
+
+        // Create SPL token transfer instruction manually (without @solana/spl-token)
+        const TOKEN_PROGRAM_ID = new PublicKey(
+          'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
+        )
+
+        const keys = [
+          {
+            pubkey: new PublicKey(fromPubKey),
+            isSigner: false,
+            isWritable: true,
+          },
+          {
+            pubkey: new PublicKey(treasuryPubKey),
+            isSigner: false,
+            isWritable: true,
+          },
+          {
+            pubkey: new PublicKey(fromAddress),
+            isSigner: true,
+            isWritable: false,
+          },
+        ]
+
+        const data = Buffer.alloc(9)
+        data.writeUInt8(3, 0) // Transfer instruction discriminator
+        data.writeBigUInt64LE(BigInt(lamports) as unknown as number, 1)
+
+        instructions = [
+          new TransactionInstruction({
+            keys,
+            programId: TOKEN_PROGRAM_ID,
+            data,
+          }),
+        ]
+      }
+
+      const messageV0 = new TransactionMessage({
+        payerKey: new PublicKey(fromAddress),
+        recentBlockhash: blockhash,
+        instructions,
+      }).compileToV0Message()
+
+      console.debug(instructions, blockhash, fromPubKey)
+
+      const transaction = new VersionedTransaction(messageV0)
+      const result = await solana.signAndSendTransaction(transaction)
+      return result.signature
+    },
+    [paymentInfoQuery, solana, tokenMint]
+  )
 
   return { sendTransaction }
 }

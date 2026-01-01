@@ -3,8 +3,7 @@ import { cn } from '@/lib/utils'
 import {
   useDisconnect,
   useModal,
-  usePhantom,
-  useSolana,
+  usePhantom
 } from '@phantom/react-sdk'
 import { abbreviateNumber } from 'js-abbreviation-number'
 import React from 'react'
@@ -14,13 +13,10 @@ interface WalletProps {
   className?: string
 }
 
-const Wallet: React.FC<WalletProps> = ({className}) => {
+const Wallet: React.FC<WalletProps> = ({ className }) => {
   const { open } = useModal()
   const { disconnect, isDisconnecting } = useDisconnect()
-  const { solana } = useSolana()
-  const { balance, preferedPayment, setPreferedPayment } = useBalance(
-    solana.publicKey
-  )
+  const { balance, preferedPayment, setPreferedPayment } = useBalance()
   const { isConnected, isConnecting } = usePhantom()
 
   if (isConnected) {

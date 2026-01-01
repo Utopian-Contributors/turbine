@@ -42,7 +42,7 @@ const abbreviateFilename = (filename: string, maxLength = 40) => {
 
 const FileTooltip: React.FC<
   { url: string; contentType: string } & React.HTMLAttributes<HTMLDivElement>
-> = ({ url, contentType }) => {
+> = ({ contentType }) => {
   if (contentType.includes('image/png')) {
     return (
       <Tooltip>

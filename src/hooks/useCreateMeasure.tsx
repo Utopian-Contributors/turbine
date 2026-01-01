@@ -37,7 +37,7 @@ export const useCreateMeasure = ({ url }: { url: string }) => {
   const { solana } = useSolana()
   const { isConnected } = usePhantom()
   const { open, isOpened } = useModal()
-  const { balance, preferedPayment: tokenMint } = useBalance(solana.publicKey)
+  const { balance, preferedPayment: tokenMint } = useBalance()
 
   const { sendTransaction } = useSendTransaction(tokenMint)
   let signature: string | null = null
