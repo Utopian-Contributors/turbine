@@ -105,8 +105,6 @@ export const useSendTransaction = (tokenMint: string) => {
         instructions,
       }).compileToV0Message()
 
-      console.debug(instructions, blockhash, fromPubKey)
-
       const transaction = new VersionedTransaction(messageV0)
       const result = await solana.signAndSendTransaction(transaction)
       return result.signature

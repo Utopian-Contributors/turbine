@@ -42,8 +42,9 @@ const abbreviateFilename = (filename: string, maxLength = 40) => {
 
 const FileTooltip: React.FC<
   { url: string; contentType: string } & React.HTMLAttributes<HTMLDivElement>
-> = ({ contentType }) => {
-  if (contentType.includes('image/png')) {
+> = ({ url, contentType }) => {
+  console.debug(contentType.includes('png'), contentType, url)
+  if (contentType.includes('png') || url.endsWith('.png')) {
     return (
       <Tooltip>
         <TooltipTrigger>
@@ -51,8 +52,9 @@ const FileTooltip: React.FC<
         </TooltipTrigger>
         <TooltipContent className="max-w-48 text-center">
           <p>
-            Images should use <span className="bg-gray-600 px-1 rounded">.webp</span>{' '}
-            format for better performance.
+            Images should use{' '}
+            <span className="bg-gray-600 px-1 rounded">.webp</span> format for
+            better performance.
           </p>
         </TooltipContent>
       </Tooltip>
