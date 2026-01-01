@@ -242,7 +242,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 />
                 <RatingsSection
                   title="Description meta tag"
-                  description="All resources are loaded over HTTPS."
+                  description="Has a description meta tag."
                   value={rating.hasDescription}
                   error={
                     !rating.hasDescription
