@@ -47,7 +47,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
         <div className="flex lg:flex-row lg:flex-wrap flex-col gap-8 lg:gap-4 mt-6">
           {websitesQueryData?.websites?.map(
             (website) =>
-              website.latestMeasurement && (
+              website.rootMeasurement && (
                 <div
                   key={website.id}
                   onClick={() => {
@@ -57,7 +57,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                 >
                   <div className="relative lg:mx-1 lg:my-2 w-full border rounded-lg overflow-hidden">
                     <PreloadImage
-                      src={website.latestMeasurement.thumbnail}
+                      src={website.rootMeasurement.thumbnail}
                       className="h-48 md:h-128 lg:h-48 w-full bg-cover bg-center"
                     >
                       {(error) =>
@@ -82,20 +82,20 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                         rating={getRating(website as WebsiteHost)?.overallScore}
                       />
                       <div className="max-w-full flex items-center gap-2">
-                        {website.latestMeasurement?.icon ? (
+                        {website.rootMeasurement?.icon ? (
                           <img
-                            src={website.latestMeasurement.icon}
+                            src={website.rootMeasurement.icon}
                             alt={`${website.host} icon`}
                             className="w-[32px] h-[32px]"
                           />
                         ) : null}
                         <div className="w-full flex flex-col">
                           <h3 className="max-w-[calc(100%-40px)] text-lg truncate overflow-hidden m-0">
-                            {website.latestMeasurement?.title}
+                            {website.rootMeasurement?.title}
                           </h3>
                           <span className="text-gray-400 text-xs">
-                            {website.latestMeasurement?.redirect ||
-                              website.latestMeasurement?.url}
+                            {website.rootMeasurement?.redirect ||
+                              website.rootMeasurement?.url}
                           </span>
                         </div>
                       </div>

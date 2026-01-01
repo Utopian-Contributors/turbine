@@ -609,8 +609,8 @@ export type WebsiteHost = {
   __typename?: 'WebsiteHost';
   host: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  latestMeasurement?: Maybe<Measurement>;
   ratings?: Maybe<Array<Rating>>;
+  rootMeasurement?: Maybe<Measurement>;
 };
 
 export type LoggedInQueryVariables = Exact<{ [key: string]: never; }>;
@@ -886,7 +886,7 @@ export type WebsitesQueryVariables = Exact<{
 }>;
 
 
-export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', overallScore: number, createdAt: any }> | null, latestMeasurement?: { __typename?: 'Measurement', icon?: string | null, thumbnail?: string | null, description?: string | null, title?: string | null, url: string, redirect?: string | null } | null }> | null };
+export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', overallScore: number, createdAt: any }> | null, rootMeasurement?: { __typename?: 'Measurement', icon?: string | null, thumbnail?: string | null, description?: string | null, title?: string | null, url: string, redirect?: string | null } | null }> | null };
 
 export const BundledImageFragmentDoc = gql`
     fragment BundledImage on BundledFile {
@@ -2640,7 +2640,7 @@ export const WebsitesDocument = gql`
       overallScore
       createdAt
     }
-    latestMeasurement {
+    rootMeasurement {
       icon
       thumbnail
       description
