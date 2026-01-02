@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import Search from '@/components/blocks/search'
 import PreloadImage from '@/components/ui/preload-image-cover'
@@ -14,6 +14,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { data: websitesQueryData, refetch } = useWebsitesQuery()
+  const [iconError, setIconError] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -82,11 +83,17 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                         rating={getRating(website as WebsiteHost)?.overallScore}
                       />
                       <div className="max-w-full flex items-center gap-2">
-                        {website.rootMeasurement?.icon ? (
+                        {website.rootMeasurement?.icon && !iconError[website.rootMeasurement.icon] ? (
                           <img
                             src={website.rootMeasurement.icon}
                             alt={`${website.host} icon`}
                             className="w-[32px] h-[32px]"
+                            onError={() =>
+                              setIconError({
+                                ...iconError,
+                                [website.rootMeasurement!.icon!]: true,
+                              })
+                            }
                           />
                         ) : null}
                         <div className="w-full flex flex-col">
