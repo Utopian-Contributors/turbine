@@ -607,10 +607,14 @@ export type VersionUsage = {
 
 export type WebsiteHost = {
   __typename?: 'WebsiteHost';
+  description?: Maybe<Scalars['String']['output']>;
   host: Scalars['String']['output'];
+  icon?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   ratings?: Maybe<Array<Rating>>;
   rootMeasurement?: Maybe<Measurement>;
+  thumbnail?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
 };
 
 export type LoggedInQueryVariables = Exact<{ [key: string]: never; }>;
@@ -886,7 +890,7 @@ export type WebsitesQueryVariables = Exact<{
 }>;
 
 
-export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', overallScore: number, createdAt: any }> | null, rootMeasurement?: { __typename?: 'Measurement', id: string, icon?: string | null, thumbnail?: string | null, description?: string | null, title?: string | null, url: string, redirect?: string | null } | null }> | null };
+export type WebsitesQuery = { __typename?: 'Query', websites?: Array<{ __typename?: 'WebsiteHost', id: string, host: string, icon?: string | null, thumbnail?: string | null, title?: string | null, description?: string | null, ratings?: Array<{ __typename?: 'Rating', overallScore: number, createdAt: any }> | null, rootMeasurement?: { __typename?: 'Measurement', id: string, url: string, redirect?: string | null } | null }> | null };
 
 export const BundledImageFragmentDoc = gql`
     fragment BundledImage on BundledFile {
@@ -2640,12 +2644,12 @@ export const WebsitesDocument = gql`
       overallScore
       createdAt
     }
+    icon
+    thumbnail
+    title
+    description
     rootMeasurement {
       id
-      icon
-      thumbnail
-      description
-      title
       url
       redirect
     }
