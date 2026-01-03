@@ -58,7 +58,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                 >
                   <div className="relative lg:mx-1 lg:my-2 w-full border rounded-lg overflow-hidden">
                     <PreloadImage
-                      src={website.rootMeasurement.thumbnail}
+                      src={website.thumbnail}
                       className="h-48 md:h-128 lg:h-48 w-full bg-cover bg-center"
                     >
                       {(error) =>
@@ -83,22 +83,22 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                         rating={getRating(website as WebsiteHost)?.overallScore}
                       />
                       <div className="max-w-full flex items-center gap-2">
-                        {website.rootMeasurement?.icon && !iconError[website.rootMeasurement.icon] ? (
+                        {website.icon && !iconError[website.icon] ? (
                           <img
-                            src={website.rootMeasurement.icon}
+                            src={website.icon}
                             alt={`${website.host} icon`}
                             className="w-[32px] h-[32px]"
                             onError={() =>
                               setIconError({
                                 ...iconError,
-                                [website.rootMeasurement!.icon!]: true,
+                                [website.icon!]: true,
                               })
                             }
                           />
                         ) : null}
                         <div className="w-full flex flex-col">
                           <h3 className="max-w-[calc(100%-40px)] text-lg truncate overflow-hidden m-0">
-                            {website.rootMeasurement?.title}
+                            {website.title}
                           </h3>
                           <span className="text-gray-400 text-xs">
                             {website.rootMeasurement?.redirect ||

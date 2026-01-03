@@ -6,12 +6,12 @@ query websites($query: String) {
       overallScore
       createdAt
     }
+    icon
+    thumbnail
+    title
+    description
     rootMeasurement {
       id
-      icon
-      thumbnail
-      description
-      title
       url
       redirect
     }
