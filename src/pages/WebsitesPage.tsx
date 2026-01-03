@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Search from '@/components/blocks/search'
 import PreloadImage from '@/components/ui/preload-image-cover'
 import StarRating from '@/components/ui/StarRating'
-import { Globe } from 'lucide-react'
+import { CameraOff } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router'
 import { useWebsitesQuery, type WebsiteHost } from '../../generated/graphql'
 
@@ -67,12 +67,12 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                             className="h-48 md:h-128 lg:h-48 w-full"
                             style={{
                               background:
-                                'radial-gradient(var(--color-green-400), transparent), repeating-conic-gradient(#fff 0 25%, #fef 0 50%) 50% / 20px 20px',
+                                'linear-gradient(to bottom, var(--color-green-300), transparent), repeating-conic-gradient(#fff 0 25%, #fef 0 50%) 50% / 20px 20px',
                             }}
                           >
-                            <Globe
-                              className="relative top-1/2 -translate-y-1/2 mx-auto text-white"
-                              size={80}
+                            <CameraOff
+                              className="relative top-1/2 -translate-y-1/2 mx-auto text-white stroke-1"
+                              size={128}
                             />
                           </div>
                         )
