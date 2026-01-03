@@ -45,7 +45,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
             )
           }}
         />
-        <div className="flex lg:flex-row lg:flex-wrap flex-col gap-8 lg:gap-4 mt-6">
+        <div className="flex lg:flex-row lg:flex-wrap flex-col gap-8 lg:gap-1 mt-6">
           {websitesQueryData?.websites?.map(
             (website) =>
               website.rootMeasurement && (
@@ -54,7 +54,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                   onClick={() => {
                     navigate(`/measurements/${website.host}`)
                   }}
-                  className="cursor-pointer lg:w-[calc(100%/3-0.75rem)] shadow-sm lg:shadow-none rounded-lg flex flex-col lg:flex-row lg:gap-2 overflow-hidden"
+                  className="cursor-pointer lg:w-[calc(100%/3-0.25rem)] shadow-sm lg:shadow-none rounded-lg flex flex-col lg:flex-row lg:gap-2 overflow-hidden"
                 >
                   <div className="relative lg:mx-1 lg:my-2 w-full border rounded-lg overflow-hidden">
                     <PreloadImage
