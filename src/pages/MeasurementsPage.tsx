@@ -268,6 +268,8 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     }
   }, [measurementDevicesData?.measurementDevices, searchParams])
 
+  const [iconError, setIconError] = useState<boolean>(false)
+
   const rating = useMemo(() => {
     return websiteQueryData?.website?.ratings?.find(
       (r) => new URL(r.url).pathname === selectedPath
@@ -370,11 +372,12 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     {url && measurement && (
                       <div className="flex flex-col">
                         <div className="flex gap-2 items-center">
-                          {measurement.icon && (
+                          {measurement.icon && !iconError && (
                             <div
                               style={{
                                 backgroundImage: `url(${measurement.icon})`,
                               }}
+                              onError={() => setIconError(true)}
                               className="w-6 h-6 bg-cover bg-center bg-no-repeat"
                             />
                           )}
