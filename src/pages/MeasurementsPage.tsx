@@ -394,7 +394,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     )}
                   </div>
                   {measurement.description ? (
-                    <div className="max-w-sm text-sm">
+                    <div className="max-w-sm text-sm line-clamp-3">
                       {measurement?.description}
                     </div>
                   ) : (
