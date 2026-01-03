@@ -338,7 +338,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         ?.filter((m) => new URL(m.url).pathname === selectedPath)
         .some((m) => m?.status === MeasurementStatus.Completed) &&
         measurement && (
-          <div>
+          <div className='max-w-6xl'>
             <div className="flex flex-col lg:flex-row items-center lg:items-start lg:justify-between gap-6 px-2 py-4 lg:p-6">
               <div className="flex flex-col items-center md-items-start lg:flex-row gap-4">
                 <motion.div
