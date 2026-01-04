@@ -81,28 +81,28 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
         />
         {measurementStatsQueryData && (
           <div className="hidden lg:flex gap-2 my-4">
-            <div className="w-56 flex flex-col gap-2 bg-green-100/10 border border-green-500/50 rounded-md text-white p-4">
+            <div className="w-56 flex flex-col gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
               <p className="text-xl font-bold">Websites</p>
               <p className="text-4xl font-thin">
                 {measurementStatsQueryData.measurementStats
                   ?.totalWebsiteHosts ?? 0}
               </p>
             </div>
-            <div className="w-56 flex flex-col gap-2 bg-green-100/10 border border-green-500/50 rounded-md text-white p-4">
+            <div className="w-56 flex flex-col gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
               <p className="text-xl font-bold">Measurements</p>
               <p className="text-4xl font-thin">
                 {measurementStatsQueryData.measurementStats
                   ?.totalMeasurements ?? 0}
               </p>
             </div>
-            <div className="w-56 flex flex-col gap-2 bg-green-100/10 border border-green-500/50 rounded-md text-white p-4">
+            <div className="w-56 flex flex-col gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
               <p className="text-xl font-bold">Files</p>
               <p className="text-4xl font-thin">
                 {measurementStatsQueryData.measurementStats
                   ?.totalBundledFiles ?? 0}
               </p>
             </div>
-            <div className="w-56 flex flex-col gap-2 bg-green-100/10 border border-green-500/50 rounded-md text-white p-4">
+            <div className="w-56 flex flex-col gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
               <p className="text-md font-bold">Accessibility Violations</p>
               <p className="text-4xl font-thin">
                 {measurementStatsQueryData.measurementStats

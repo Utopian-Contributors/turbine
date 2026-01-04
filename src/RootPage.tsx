@@ -208,7 +208,6 @@ const RootPage: React.FC = () => {
             )}
           </SidebarGroup>
         </SidebarContent>
-
         <SidebarFooter>
           {isLoggedIn && <Wallet />}
           <SidebarGroup>
