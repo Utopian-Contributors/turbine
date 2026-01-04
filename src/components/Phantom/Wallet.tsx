@@ -1,12 +1,10 @@
 import { useBalance } from '@/hooks/useBalance'
 import { cn } from '@/lib/utils'
-import {
-  useDisconnect,
-  useModal,
-  usePhantom
-} from '@phantom/react-sdk'
+import { useDisconnect, useModal, usePhantom } from '@phantom/react-sdk'
 import { abbreviateNumber } from 'js-abbreviation-number'
-import React from 'react'
+import { Check, Copy } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import Phantom from '../icons/phantom'
 import { Button } from '../ui/button'
 
 interface WalletProps {
@@ -16,8 +14,20 @@ interface WalletProps {
 const Wallet: React.FC<WalletProps> = ({ className }) => {
   const { open } = useModal()
   const { disconnect, isDisconnecting } = useDisconnect()
-  const { balance, preferedPayment, setPreferedPayment } = useBalance()
+  const { balance, preferedPayment, setPreferedPayment, walletAddress } =
+    useBalance()
   const { isConnected, isConnecting } = usePhantom()
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (copiedAddress) {
+      navigator.clipboard.writeText(copiedAddress)
+      const timeout = setTimeout(() => {
+        setCopiedAddress(null)
+      }, 2000)
+      return () => clearTimeout(timeout)
+    }
+  }, [copiedAddress])
 
   if (isConnected) {
     return (
@@ -65,6 +75,16 @@ const Wallet: React.FC<WalletProps> = ({ className }) => {
               {abbreviateNumber(balance?.sol?.amount ?? 0)} SOL
             </div>
           </div>
+          <div
+            className={cn(
+              'max-w-[200px] flex items-center gap-1 bg-gray-200 rounded-md mt-4 px-2',
+              copiedAddress ? 'bg-green-500 text-white' : 'cursor-pointer'
+            )}
+            onClick={() => setCopiedAddress(walletAddress)}
+          >
+            {copiedAddress ? <Check className="text-white" /> : <Copy />}
+            <span className="max-w-full text-sm truncate">{walletAddress}</span>
+          </div>
         </div>
         <div className="w-full">
           <Button
@@ -81,8 +101,14 @@ const Wallet: React.FC<WalletProps> = ({ className }) => {
   }
 
   return (
-    <Button onClick={open} disabled={isConnecting} className={className}>
-      Connect Wallet
+    <Button
+      onClick={open}
+      disabled={isConnecting}
+      className={className}
+      style={{ background: '#7d66d9' }}
+    >
+      <Phantom />
+      Phantom Connect
     </Button>
   )
 }

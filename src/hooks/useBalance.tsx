@@ -1,7 +1,7 @@
 import { preferedPaymentState } from '@/state/payment'
 import { useSolana } from '@phantom/react-sdk'
 import { PublicKey } from '@solana/web3.js'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { usePaymentInfoLazyQuery } from '../../generated/graphql'
 
@@ -13,6 +13,7 @@ interface PlatformBalance {
 
 interface UseBalanceReturn {
   preferedPayment: string
+  walletAddress: string | null
   setPreferedPayment: (mint: string) => void
   balance: PlatformBalance | null
   loading: boolean
@@ -30,12 +31,14 @@ export const USDC_MINT_ADDRESS = new PublicKey(
 export function useBalance(): UseBalanceReturn {
   const [preferedPayment, setPreferedPayment] =
     useRecoilState(preferedPaymentState)
+  const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const { solana } = useSolana()
   const [paymentInfoQuery, { data: paymentInfoQueryData, loading, error }] =
     usePaymentInfoLazyQuery()
 
   const fetchBalance = useCallback(async () => {
     const publicKey = await solana.getPublicKey()
+    setWalletAddress(publicKey)
     if (publicKey) {
       await paymentInfoQuery({
         variables: { publicKey },
@@ -51,6 +54,7 @@ export function useBalance(): UseBalanceReturn {
   return {
     preferedPayment,
     setPreferedPayment,
+    walletAddress,
     balance: {
       utcc: paymentInfoQueryData?.paymentInfo?.utccBalance,
       usdc: paymentInfoQueryData?.paymentInfo?.usdcBalance,
