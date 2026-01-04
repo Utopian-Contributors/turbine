@@ -1,7 +1,6 @@
 query measurementStats {
   measurementStats {
     totalMeasurements
-    totalBundledFiles
     totalWebsiteHosts
     totalAccessibilityViolations
   }

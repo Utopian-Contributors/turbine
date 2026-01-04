@@ -120,15 +120,6 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
               <p className="text-5xl font-thin">
                 {abbreviateNumber(
                   measurementStatsQueryData.measurementStats
-                    ?.totalBundledFiles ?? 0
-                )}
-              </p>
-              <p className="text-md font-bold w-24">Bundled files</p>
-            </div>
-            <div className="w-44 flex flex-col justify-between gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
-              <p className="text-5xl font-thin">
-                {abbreviateNumber(
-                  measurementStatsQueryData.measurementStats
                     ?.totalAccessibilityViolations ?? 0
                 )}
               </p>

@@ -819,7 +819,7 @@ export type VersionFileFragment = { __typename?: 'VersionFile', id: string, path
 export type MeasurementStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeasurementStatsQuery = { __typename?: 'Query', measurementStats?: { __typename?: 'MeasurementStats', totalMeasurements?: number | null, totalBundledFiles?: number | null, totalWebsiteHosts?: number | null, totalAccessibilityViolations?: number | null } | null };
+export type MeasurementStatsQuery = { __typename?: 'Query', measurementStats?: { __typename?: 'MeasurementStats', totalMeasurements?: number | null, totalWebsiteHosts?: number | null, totalAccessibilityViolations?: number | null } | null };
 
 export type MeasurementsQueryVariables = Exact<{
   url?: InputMaybe<Scalars['String']['input']>;
@@ -2002,7 +2002,6 @@ export const MeasurementStatsDocument = gql`
     query measurementStats {
   measurementStats {
     totalMeasurements
-    totalBundledFiles
     totalWebsiteHosts
     totalAccessibilityViolations
   }
