@@ -2,19 +2,22 @@ import { cn } from '@/lib/utils'
 import * as React from 'react'
 
 import { Search } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 import { Button } from './button'
 import './input.css'
 
 interface SearchWebsiteProps extends React.ComponentProps<'input'> {
   onSearch: (value: string) => void
   initial?: string
+  autoFocus?: boolean
 }
 
 const SearchWebsite = React.forwardRef<HTMLInputElement, SearchWebsiteProps>(
-  ({ className, type, onSearch, initial, ...props }, ref) => {
+  ({ className, type, onSearch, initial, autoFocus, ...props }) => {
     const [value, setValue] = React.useState('https://')
+    const inputRef = useRef<HTMLInputElement | null>(null)
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (initial) {
         setValue(initial)
       }
@@ -48,7 +51,8 @@ const SearchWebsite = React.forwardRef<HTMLInputElement, SearchWebsiteProps>(
               'p-0 pr-3 italic text-muted-foreground/70 file:me-3 file:h-full file:border-0 file:border-r file:border-solid file:border-input file:bg-transparent file:px-3 file:text-sm file:font-medium file:not-italic file:text-foreground',
             value === 'https://' && 'text-muted-foreground/70'
           )}
-          ref={ref}
+          ref={inputRef}
+          autoFocus={autoFocus}
           {...props}
         />
         <Button

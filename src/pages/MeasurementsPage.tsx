@@ -275,6 +275,12 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     )
   }, [selectedPath, websiteQueryData?.website?.ratings])
 
+  useEffect(() => {
+    document.title = measurement?.title
+      ? `Measurements | ${measurement.title}`
+      : 'Measurements'
+  }, [measurement?.title])
+
   if (isPaying) {
     return (
       <div className="max-w-full flex flex-col items-center gap-2 my-6 mt-[58px]">
@@ -547,43 +553,12 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
               </div>
             </motion.div>
             <motion.div className="flex gap-2 items-center mt-8 lg:px-6">
-              <div
-                onClick={() => {
-                  const search = new URLSearchParams(location.search)
-                  search.set('path', '/')
-                  navigate(
-                    `/measurements/${params.host}?` + search.toString(),
-                    { replace: true }
-                  )
-                }}
-                className={cn(
-                  'cursor-pointer w-20 h-20 bg-gray-100 hover:bg-gray-200 border rounded-md flex items-center justify-center px-2 py-1 text-muted-foreground'
-                )}
-              >
-                <Plus />
-              </div>
-              <div
-                onClick={() => {
-                  const search = new URLSearchParams(location.search)
-                  search.set('path', '/')
-                  navigate(
-                    `/measurements/${params.host}?` + search.toString(),
-                    { replace: true }
-                  )
-                }}
-                className={cn(
-                  'border rounded-md px-2 py-1 pt-6',
-                  '/' === selectedPath ? 'border-green-500 shadow-sm' : ''
-                )}
-              >
-                <p className="text-xs text-muted-foreground px-1 mb-1">/</p>
-                <p className="text-lg">Root Page</p>
-              </div>
               {measurementsQueryData.measurements
                 .reduce((acc, m) => {
                   const path = new URL(m.url).pathname
-                  if (path !== '/' && !acc.some((item) => item.path === path)) {
-                    acc.push({ path, title: m.title || path })
+                  if (!acc.some((item) => item.path === path)) {
+                    if (!m.title) return acc
+                    acc.push({ path, title: m.title })
                   }
                   return acc
                 }, [] as { path: string; title: string }[])
@@ -609,10 +584,22 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                       <p className="text-xs text-muted-foreground px-1 mb-1">
                         {path}
                       </p>
-                      <p className="text-lg">{title}</p>
+                      <p className="text-sm max-w-40 line-clamp-2">{title}</p>
                     </div>
                   )
                 })}
+              <div
+                onClick={() => {
+                  const search = new URLSearchParams(location.search)
+                  search.set('url', `https://${measurement.host?.host}/`)
+                  navigate(`/measure?` + search.toString())
+                }}
+                className={cn(
+                  'cursor-pointer w-8 h-8 bg-gray-100 shadow-sm hover:shadow-none border rounded-full flex items-center justify-center px-2 py-1 text-muted-foreground'
+                )}
+              >
+                <Plus />
+              </div>
             </motion.div>
             {measurementsQueryData.measurements && measurement && (
               <Environments

@@ -134,7 +134,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                           <img
                             src={website.icon}
                             alt={`${website.host} icon`}
-                            className="w-[32px] h-[32px]"
+                            className="bg-gray-100 p-1 rounded-sm w-[32px] h-[32px]"
                             onError={() =>
                               setIconError({
                                 ...iconError,

@@ -3,7 +3,7 @@ import { SearchWebsite } from '@/components/ui/search-website'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { useWalletOrAccLogin } from '@/hooks/useWalletOrAccLogin'
 import { abbreviateNumber } from 'js-abbreviation-number'
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import {
   ConnectionType,
@@ -18,7 +18,7 @@ interface MeasurePageProps {}
 const MeasurePage: React.FC<MeasurePageProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const params = new URLSearchParams(location.search)
+  const searchParams = new URLSearchParams(location.search)
 
   const { data: measurementStatsQueryData } = useMeasurementStatsQuery()
   const [measurementsQuery] = useMeasurementsLazyQuery()
@@ -55,6 +55,21 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     [createMeasure, isConnected, isLoggedIn, login, measurementsQuery, navigate]
   )
 
+  const hero = useMemo(() => {
+    const urlParam = searchParams.get('url')
+    const hostname = urlParam ? new URL(urlParam).hostname : null
+    return hostname ? (
+      <div>
+        <span className="animate-pulse">
+          Measure and optimize the performance of{' '}
+        </span>
+        <span className="underline">{hostname}</span>
+      </div>
+    ) : (
+      'Measure and optimize the performance of your website'
+    )
+  }, [])
+
   if (isPaying) {
     return (
       <div className="flex flex-col items-center gap-2 my-6 mt-[58px]">
@@ -70,13 +85,14 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     <div className="w-full h-screen overflow-hidden">
       <div className="w-full mt-16 flex flex-col items-center">
         <h1 className="max-w-xs lg:max-w-4xl text-white text-center text-3xl lg:text-6xl font-bold lg:leading-16 mb-8">
-          Measure and optimize the performance of your website
+          {hero}
         </h1>
         <SearchWebsite
+          autoFocus={!!searchParams.get('url')}
           type="search"
           prefix="https://"
           size={24}
-          initial={params.get('url') || ''}
+          initial={searchParams.get('url') || ''}
           onSearch={search}
           className="w-xs lg:w-xl mb-4"
         />
