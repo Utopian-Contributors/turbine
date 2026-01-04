@@ -3,12 +3,9 @@ import {
   Github,
   Globe,
   LogOutIcon,
-  PackageIcon,
   Scale,
   SearchIcon,
-  Ship,
-  TypeIcon,
-  WalletIcon,
+  WalletIcon
 } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -68,29 +65,29 @@ const items: SidebarItem[] = [
       <Globe className={selected ? 'text-black' : 'text-muted-foreground'} />
     ),
   },
-  {
-    title: 'Releases',
-    url: '/releases',
-    icon: (selected: boolean) => (
-      <Ship className={selected ? 'text-black' : 'text-muted-foreground'} />
-    ),
-  },
-  {
-    title: 'Libraries',
-    url: '/libraries',
-    icon: (selected: boolean) => (
-      <PackageIcon
-        className={selected ? 'text-black' : 'text-muted-foreground'}
-      />
-    ),
-  },
-  {
-    title: 'Fonts',
-    url: '/fonts',
-    icon: (selected: boolean) => (
-      <TypeIcon className={selected ? 'text-black' : 'text-muted-foreground'} />
-    ),
-  },
+  // {
+  //   title: 'Releases',
+  //   url: '/releases',
+  //   icon: (selected: boolean) => (
+  //     <Ship className={selected ? 'text-black' : 'text-muted-foreground'} />
+  //   ),
+  // },
+  // {
+  //   title: 'Libraries',
+  //   url: '/libraries',
+  //   icon: (selected: boolean) => (
+  //     <PackageIcon
+  //       className={selected ? 'text-black' : 'text-muted-foreground'}
+  //     />
+  //   ),
+  // },
+  // {
+  //   title: 'Fonts',
+  //   url: '/fonts',
+  //   icon: (selected: boolean) => (
+  //     <TypeIcon className={selected ? 'text-black' : 'text-muted-foreground'} />
+  //   ),
+  // },
   {
     title: 'Payments',
     url: '/payments',
