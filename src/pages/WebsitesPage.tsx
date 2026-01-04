@@ -1,10 +1,12 @@
+import { CameraOff } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
+import { useLocation, useNavigate } from 'react-router'
 
 import Search from '@/components/blocks/search'
 import PreloadImage from '@/components/ui/preload-image-cover'
 import StarRating from '@/components/ui/StarRating'
-import { CameraOff } from 'lucide-react'
-import { useLocation, useNavigate } from 'react-router'
+
 import { useWebsitesQuery, type WebsiteHost } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -13,8 +15,48 @@ interface WebsitesPageProps {}
 const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { data: websitesQueryData, refetch } = useWebsitesQuery()
+  const {
+    data: websitesQueryData,
+    refetch,
+    fetchMore: fetchMoreWebsites,
+  } = useWebsitesQuery({ variables: { pagination: { take: 12 } } })
+  const [hasMoreWebsites, setHasMoreWebsites] = useState(true)
   const [iconError, setIconError] = useState<Record<string, boolean>>({})
+
+  const loadMoreWebsites = useCallback(() => {
+    if (hasMoreWebsites) {
+      fetchMoreWebsites({
+        variables: {
+          pagination: {
+            skip: websitesQueryData?.websites?.length,
+            take: 10,
+          },
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if ((fetchMoreResult.websites?.length ?? 0) < 10) {
+            setHasMoreWebsites(false)
+          }
+          if (
+            prev.websites &&
+            fetchMoreResult.websites &&
+            (fetchMoreResult.websites?.length ?? 0) > 0
+          ) {
+            return Object.assign({}, prev, {
+              websites: [...prev.websites, ...fetchMoreResult.websites],
+            })
+          }
+          return prev
+        },
+      })
+    }
+  }, [fetchMoreWebsites, hasMoreWebsites, websitesQueryData?.websites?.length])
+
+  const { ref: lastWebsiteRef, inView: lastWebsiteRefInView } = useInView()
+  useEffect(() => {
+    if (lastWebsiteRefInView && hasMoreWebsites) {
+      loadMoreWebsites()
+    }
+  }, [hasMoreWebsites, lastWebsiteRefInView, loadMoreWebsites])
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -47,7 +89,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
         />
         <div className="flex lg:flex-row lg:flex-wrap flex-col gap-8 lg:gap-1 mt-6">
           {websitesQueryData?.websites?.map(
-            (website) =>
+            (website, index) =>
               website.rootMeasurement && (
                 <div
                   key={website.id}
@@ -55,6 +97,11 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                     navigate(`/measurements/${website.host}`)
                   }}
                   className="cursor-pointer lg:w-[calc(100%/3-0.25rem)] shadow-sm lg:shadow-none rounded-lg flex flex-col lg:flex-row lg:gap-2 overflow-hidden"
+                  ref={
+                    index === websitesQueryData.websites!.length - 1
+                      ? lastWebsiteRef
+                      : null
+                  }
                 >
                   <div className="relative lg:mx-1 lg:my-2 w-full border rounded-lg overflow-hidden">
                     <PreloadImage

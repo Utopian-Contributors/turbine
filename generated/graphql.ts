@@ -370,6 +370,14 @@ export type NewExtensionRelease = {
   newLibraries?: Maybe<Array<Library>>;
 };
 
+/** Input type for pagination */
+export type PaginationInput = {
+  /** Number of items to skip */
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  /** Number of items to take */
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Payment = {
   __typename?: 'Payment';
   amount: Scalars['Float']['output'];
@@ -471,6 +479,7 @@ export type QueryWebsiteArgs = {
 
 
 export type QueryWebsitesArgs = {
+  pagination?: InputMaybe<PaginationInput>;
   query?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -901,6 +910,7 @@ export type FontSearchResultFragment = { __typename?: 'Font', id: string, name: 
 
 export type WebsitesQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
+  pagination?: InputMaybe<PaginationInput>;
 }>;
 
 
@@ -2692,8 +2702,8 @@ export type SearchFontsLazyQueryHookResult = ReturnType<typeof useSearchFontsLaz
 export type SearchFontsSuspenseQueryHookResult = ReturnType<typeof useSearchFontsSuspenseQuery>;
 export type SearchFontsQueryResult = Apollo.QueryResult<SearchFontsQuery, SearchFontsQueryVariables>;
 export const WebsitesDocument = gql`
-    query websites($query: String) {
-  websites(query: $query) {
+    query websites($query: String, $pagination: PaginationInput) {
+  websites(query: $query, pagination: $pagination) {
     id
     host
     ratings {
@@ -2726,6 +2736,7 @@ export const WebsitesDocument = gql`
  * const { data, loading, error } = useWebsitesQuery({
  *   variables: {
  *      query: // value for 'query'
+ *      pagination: // value for 'pagination'
  *   },
  * });
  */

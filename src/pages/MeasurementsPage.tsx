@@ -606,7 +606,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 onClick={measure}
               />
             )}
-            {measurement.screenshots?.length && (
+            {measurement.screenshots?.length ? (
               <motion.div
                 initial={{ opacity: 0, filter: 'blur(10px)' }}
                 animate={{ opacity: 1, filter: 'blur(0px)' }}
@@ -634,7 +634,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   </div>
                 ))}
               </motion.div>
-            )}
+            ) : null}
             {bundle}
           </div>
         )}

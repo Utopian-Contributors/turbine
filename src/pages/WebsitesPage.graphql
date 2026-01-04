@@ -1,5 +1,5 @@
-query websites($query: String) {
-  websites(query: $query) {
+query websites($query: String, $pagination: PaginationInput) {
+  websites(query: $query, pagination: $pagination) {
     id
     host
     ratings {
