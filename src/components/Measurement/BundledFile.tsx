@@ -43,7 +43,6 @@ const abbreviateFilename = (filename: string, maxLength = 40) => {
 const FileTooltip: React.FC<
   { url: string; contentType: string } & React.HTMLAttributes<HTMLDivElement>
 > = ({ url, contentType }) => {
-  console.debug(contentType.includes('png'), contentType, url)
   if (contentType.includes('png') || url.endsWith('.png')) {
     return (
       <Tooltip>
@@ -90,7 +89,7 @@ const BundledFile: React.FC<BundledFileProps> = ({
             >
               {new URL(url).pathname !== '/'
                 ? abbreviateFilename(getFilename(url, baseUrl), 26)
-                : new URL(url).hostname}
+                : new URL(url).hostname} {contentType}
             </a>
             <FileTooltip url={url} contentType={contentType} />
           </div>

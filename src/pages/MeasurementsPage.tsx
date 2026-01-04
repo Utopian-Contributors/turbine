@@ -14,7 +14,6 @@ import {
   SelectTrigger,
 } from '@/components/ui/select'
 import StarRating from '@/components/ui/StarRating'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
@@ -136,7 +135,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         initial={{ opacity: 0, filter: 'blur(10px)' }}
         animate={{ opacity: 1, filter: 'blur(0px)' }}
         transition={{ duration: 0.5 }}
-        className="grid grid-cols-4 gap-6"
+        className="grid grid-cols-4 lg:px-6 py-4 gap-6"
       >
         <div className="col-span-4 lg:col-span-3">
           <Bundle measurement={measurement} />
@@ -338,7 +337,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         ?.filter((m) => new URL(m.url).pathname === selectedPath)
         .some((m) => m?.status === MeasurementStatus.Completed) &&
         measurement && (
-          <div className='max-w-6xl mx-auto'>
+          <div className="max-w-6xl mx-auto">
             <div className="flex flex-col lg:flex-row items-center lg:items-start lg:justify-between gap-6 px-2 py-4 lg:p-6">
               <div className="flex flex-col items-center md-items-start lg:flex-row gap-4">
                 <motion.div
@@ -373,11 +372,11 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                       <div className="flex flex-col">
                         <div className="flex gap-2 items-center">
                           {measurement.icon && !iconError && (
-                            <div
-                              style={{
-                                backgroundImage: `url(${measurement.icon})`,
+                            <img
+                              src={measurement.icon}
+                              onError={() => {
+                                setIconError(true)
                               }}
-                              onError={() => setIconError(true)}
                               className="w-6 h-6 bg-cover bg-center bg-no-repeat"
                             />
                           )}
@@ -547,7 +546,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 </div>
               </div>
             </motion.div>
-            <motion.div className="flex gap-2 items-center lg:px-6">
+            <motion.div className="flex gap-2 items-center mt-8 lg:px-6">
               <div
                 onClick={() => {
                   const search = new URLSearchParams(location.search)
@@ -607,51 +606,36 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 onClick={measure}
               />
             )}
-            <Tabs defaultValue="bundle" className="lg:px-6 lg:pt-2">
-              <TabsList>
-                <TabsTrigger value="bundle">Bundle</TabsTrigger>
-                {measurement.screenshots?.length ? (
-                  <TabsTrigger value="screenshots">Screenshots</TabsTrigger>
-                ) : null}
-              </TabsList>
-              <TabsContent value="bundle">{bundle}</TabsContent>
-              <TabsContent value="screenshots">
-                {measurement.screenshots?.length && (
-                  <motion.div
-                    initial={{ opacity: 0, filter: 'blur(10px)' }}
-                    animate={{ opacity: 1, filter: 'blur(0px)' }}
-                    transition={{ duration: 0.5 }}
-                    className="flex gap-4 p-1 overflow-x-auto"
+            {measurement.screenshots?.length && (
+              <motion.div
+                initial={{ opacity: 0, filter: 'blur(10px)' }}
+                animate={{ opacity: 1, filter: 'blur(0px)' }}
+                transition={{ duration: 0.5 }}
+                className="flex gap-4 px-2 lg:px-6 py-6 overflow-x-auto"
+              >
+                {measurement.screenshots.map((img, index) => (
+                  <div
+                    style={{
+                      backgroundImage: `url(${
+                        new URL(img, import.meta.env.VITE_SCREENSHOTS_FOLDER)
+                          .href
+                      })`,
+                    }}
+                    className="flex-shrink-0 w-60 h-40 bg-gray-100 bg-contain bg-center bg-no-repeat rounded-lg ring ring-gray-200 overflow-hidden"
                   >
-                    {measurement.screenshots.map((img, index) => (
-                      <div
-                        style={{
-                          backgroundImage: `url(${
-                            new URL(
-                              img,
-                              import.meta.env.VITE_SCREENSHOTS_FOLDER
-                            ).href
-                          })`,
-                        }}
-                        className="flex-shrink-0 w-60 h-40 bg-gray-100 bg-contain bg-center bg-no-repeat rounded-lg ring ring-gray-200 overflow-hidden"
-                      >
-                        <div className="relative flex items-center gap-1 w-fit left-1 top-2 border rounded-full bg-background/80 px-2 py-1">
-                          <Clock className="w-3 h-3" />
-                          <span className="text-sm">
-                            {index === measurement.screenshots!.length - 1
-                              ? 'Final'
-                              : `${img
-                                  .split('/')
-                                  .pop()
-                                  ?.replace('.webp', '')}s`}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
-              </TabsContent>
-            </Tabs>
+                    <div className="relative flex items-center gap-1 w-fit left-1 top-2 border rounded-full bg-background/80 px-2 py-1">
+                      <Clock className="w-3 h-3" />
+                      <span className="text-sm">
+                        {index === measurement.screenshots!.length - 1
+                          ? 'Final'
+                          : `${img.split('/').pop()?.replace('.webp', '')}s`}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+            {bundle}
           </div>
         )}
     </div>

@@ -1,4 +1,3 @@
-import Pricetag from '@/components/Pricetag'
 import AutoProgress from '@/components/ui/auto-progress'
 import { SearchWebsite } from '@/components/ui/search-website'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
@@ -9,6 +8,7 @@ import {
   ConnectionType,
   DeviceType,
   useMeasurementsLazyQuery,
+  useMeasurementStatsQuery,
 } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -19,6 +19,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   const location = useLocation()
   const params = new URLSearchParams(location.search)
 
+  const { data: measurementStatsQueryData } = useMeasurementStatsQuery()
   const [measurementsQuery] = useMeasurementsLazyQuery()
   const { createMeasure, isPaying } = useCreateMeasure({
     url: '',
@@ -78,8 +79,39 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
           onSearch={search}
           className="w-xs lg:w-xl mb-4"
         />
-        <Pricetag />
-        <div className="max-w-xl flex flex-wrap justify-center gap-2 lg:mt-2 p-4">
+        {measurementStatsQueryData && (
+          <div className="hidden lg:flex gap-2 my-4">
+            <div className="w-56 flex flex-col gap-2 bg-green-100/10 border border-green-500/50 rounded-md text-white p-4">
+              <p className="text-xl font-bold">Websites</p>
+              <p className="text-4xl font-thin">
+                {measurementStatsQueryData.measurementStats
+                  ?.totalWebsiteHosts ?? 0}
+              </p>
+            </div>
+            <div className="w-56 flex flex-col gap-2 bg-green-100/10 border border-green-500/50 rounded-md text-white p-4">
+              <p className="text-xl font-bold">Measurements</p>
+              <p className="text-4xl font-thin">
+                {measurementStatsQueryData.measurementStats
+                  ?.totalMeasurements ?? 0}
+              </p>
+            </div>
+            <div className="w-56 flex flex-col gap-2 bg-green-100/10 border border-green-500/50 rounded-md text-white p-4">
+              <p className="text-xl font-bold">Files</p>
+              <p className="text-4xl font-thin">
+                {measurementStatsQueryData.measurementStats
+                  ?.totalBundledFiles ?? 0}
+              </p>
+            </div>
+            <div className="w-56 flex flex-col gap-2 bg-green-100/10 border border-green-500/50 rounded-md text-white p-4">
+              <p className="text-md font-bold">Accessibility Violations</p>
+              <p className="text-4xl font-thin">
+                {measurementStatsQueryData.measurementStats
+                  ?.totalAccessibilityViolations ?? 0}
+              </p>
+            </div>
+          </div>
+        )}
+        <div className="max-w-xl flex flex-wrap justify-center gap-2 p-4">
           <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
             Understand SEO
           </span>
