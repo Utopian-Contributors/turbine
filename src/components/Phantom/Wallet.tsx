@@ -77,13 +77,19 @@ const Wallet: React.FC<WalletProps> = ({ className }) => {
           </div>
           <div
             className={cn(
-              'max-w-[200px] flex items-center gap-1 bg-gray-200 rounded-md mt-4 px-2',
+              'w-fit flex items-center gap-1 bg-gray-200 rounded-md mt-4 px-2 py-1 transition-colors duration-300',
               copiedAddress ? 'bg-green-500 text-white' : 'cursor-pointer'
             )}
             onClick={() => setCopiedAddress(walletAddress)}
           >
-            {copiedAddress ? <Check className="text-white" /> : <Copy />}
-            <span className="max-w-full text-sm truncate">{walletAddress}</span>
+            {copiedAddress ? (
+              <Check className="flex-1 text-white" size={16} />
+            ) : (
+              <Copy size={16} />
+            )}
+            <span className="max-w-[180px] text-sm truncate">
+              {walletAddress}
+            </span>
           </div>
         </div>
         <div className="w-full">
