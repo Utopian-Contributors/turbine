@@ -18,7 +18,7 @@ import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { toHeaderCase } from 'js-convert-case'
-import { Clock, EyeOff, Repeat, Rocket } from 'lucide-react'
+import { Clock, EyeOff, Plus, Repeat, Rocket } from 'lucide-react'
 import moment from 'moment'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import {
@@ -377,7 +377,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                               onError={() => {
                                 setIconError(true)
                               }}
-                              className="w-6 h-6 bg-cover bg-center bg-no-repeat"
+                              className="bg-gray-100 p-1 rounded-sm w-6 h-6 bg-cover bg-center bg-no-repeat"
                             />
                           )}
                           <h1 className="text-xl font-bold max-w-md truncate">
@@ -557,11 +557,27 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   )
                 }}
                 className={cn(
-                  'border rounded-md px-2 py-1',
+                  'cursor-pointer w-20 h-20 bg-gray-100 hover:bg-gray-200 border rounded-md flex items-center justify-center px-2 py-1 text-muted-foreground'
+                )}
+              >
+                <Plus />
+              </div>
+              <div
+                onClick={() => {
+                  const search = new URLSearchParams(location.search)
+                  search.set('path', '/')
+                  navigate(
+                    `/measurements/${params.host}?` + search.toString(),
+                    { replace: true }
+                  )
+                }}
+                className={cn(
+                  'border rounded-md px-2 py-1 pt-6',
                   '/' === selectedPath ? 'border-green-500 shadow-sm' : ''
                 )}
               >
-                Root Page
+                <p className="text-xs text-muted-foreground px-1 mb-1">/</p>
+                <p className="text-lg">Root Page</p>
               </div>
               {measurementsQueryData.measurements
                 .reduce((acc, m) => {
@@ -584,13 +600,16 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                         )
                       }}
                       className={cn(
-                        'border rounded-md px-2 py-1',
+                        'border rounded-md px-2 py-1 pt-6',
                         path === selectedPath
                           ? 'border-green-500 shadow-sm'
                           : ''
                       )}
                     >
-                      {title}
+                      <p className="text-xs text-muted-foreground px-1 mb-1">
+                        {path}
+                      </p>
+                      <p className="text-lg">{title}</p>
                     </div>
                   )
                 })}

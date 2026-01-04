@@ -2,6 +2,7 @@ import AutoProgress from '@/components/ui/auto-progress'
 import { SearchWebsite } from '@/components/ui/search-website'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { useWalletOrAccLogin } from '@/hooks/useWalletOrAccLogin'
+import { abbreviateNumber } from 'js-abbreviation-number'
 import React, { useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import {
@@ -81,32 +82,42 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
         />
         {measurementStatsQueryData && (
           <div className="hidden lg:flex gap-2 my-4">
-            <div className="w-56 flex flex-col gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
-              <p className="text-xl font-bold">Websites</p>
-              <p className="text-4xl font-thin">
-                {measurementStatsQueryData.measurementStats
-                  ?.totalWebsiteHosts ?? 0}
+            <div className="w-44 flex flex-col justify-between gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
+              <p className="text-5xl font-thin">
+                {abbreviateNumber(
+                  measurementStatsQueryData.measurementStats
+                    ?.totalWebsiteHosts ?? 0
+                )}
               </p>
+              <p className="text-md font-bold w-32">Websites measured</p>
             </div>
-            <div className="w-56 flex flex-col gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
-              <p className="text-xl font-bold">Measurements</p>
-              <p className="text-4xl font-thin">
-                {measurementStatsQueryData.measurementStats
-                  ?.totalMeasurements ?? 0}
+            <div className="w-44 flex flex-col justify-between gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
+              <p className="text-5xl font-thin">
+                {abbreviateNumber(
+                  measurementStatsQueryData.measurementStats
+                    ?.totalMeasurements ?? 0
+                )}
               </p>
+              <p className="text-md font-bold w-32">Measurements created</p>
             </div>
-            <div className="w-56 flex flex-col gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
-              <p className="text-xl font-bold">Files</p>
-              <p className="text-4xl font-thin">
-                {measurementStatsQueryData.measurementStats
-                  ?.totalBundledFiles ?? 0}
+            <div className="w-44 flex flex-col justify-between gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
+              <p className="text-5xl font-thin">
+                {abbreviateNumber(
+                  measurementStatsQueryData.measurementStats
+                    ?.totalBundledFiles ?? 0
+                )}
               </p>
+              <p className="text-md font-bold w-24">Bundled files</p>
             </div>
-            <div className="w-56 flex flex-col gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
-              <p className="text-md font-bold">Accessibility Violations</p>
-              <p className="text-4xl font-thin">
-                {measurementStatsQueryData.measurementStats
-                  ?.totalAccessibilityViolations ?? 0}
+            <div className="w-44 flex flex-col justify-between gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
+              <p className="text-5xl font-thin">
+                {abbreviateNumber(
+                  measurementStatsQueryData.measurementStats
+                    ?.totalAccessibilityViolations ?? 0
+                )}
+              </p>
+              <p className="text-md font-bold w-32">
+                Accessibility Violations found
               </p>
             </div>
           </div>

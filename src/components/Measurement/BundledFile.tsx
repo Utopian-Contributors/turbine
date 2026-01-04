@@ -89,7 +89,7 @@ const BundledFile: React.FC<BundledFileProps> = ({
             >
               {new URL(url).pathname !== '/'
                 ? abbreviateFilename(getFilename(url, baseUrl), 26)
-                : new URL(url).hostname} {contentType}
+                : new URL(url).hostname}
             </a>
             <FileTooltip url={url} contentType={contentType} />
           </div>
