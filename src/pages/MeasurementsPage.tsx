@@ -345,7 +345,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         measurement && (
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col lg:flex-row items-center lg:items-start lg:justify-between gap-6 px-2 py-4 lg:p-6">
-              <div className="flex flex-col items-center md-items-start lg:flex-row gap-4">
+              <div className="w-full flex flex-col items-center md-items-start lg:flex-row gap-4">
                 <motion.div
                   initial={{ scale: 0, filter: 'blur(10px)' }}
                   animate={{ scale: 1, filter: 'blur(0px)' }}
@@ -371,7 +371,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   initial={{ translateY: 10, opacity: 0 }}
                   animate={{ translateY: 0, opacity: 1 }}
                   transition={{ duration: 1 }}
-                  className="flex flex-col gap-2 pt-2 overflow-hidden"
+                  className="w-full flex flex-col gap-2 pt-2 overflow-hidden"
                 >
                   <div className="flex gap-4 items-center">
                     {url && measurement && (
@@ -386,7 +386,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                               className="bg-gray-100 p-1 rounded-sm w-6 h-6 bg-cover bg-center bg-no-repeat"
                             />
                           )}
-                          <h1 className="text-xl font-bold max-w-md truncate">
+                          <h1 className="max-w-[calc(100%-6rem)] text-xl font-bold lg:max-w-md truncate">
                             {measurement?.title}
                           </h1>
                         </div>
