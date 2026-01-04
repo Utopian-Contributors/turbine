@@ -69,11 +69,13 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
           {files && files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4 lg:mb-6">
               {files.map((f) => {
-                const filename = f.slice(f.lastIndexOf('/') + 1);
-                const filenameWithoutParams = filename.split('?')[0];
-                return <div className="underline" key={f}>
-                  {filenameWithoutParams}
-                </div>
+                const filename = f.slice(f.lastIndexOf('/') + 1)
+                const filenameWithoutParams = filename.split('?')[0]
+                return (
+                  <div className="underline" key={f}>
+                    {filenameWithoutParams}
+                  </div>
+                )
               })}
             </div>
           )}
@@ -326,21 +328,25 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                 <RatingsSection
                   title="Fast3G Load Time"
                   description="Has a decent load time on a fast 3G connection."
-                  value={rating.fast3GLoadTime + 'ms'}
-                  error={
-                    rating.fast3GLoadTime! > 7000
-                      ? 'Takes longer than 7s to load'
+                  value={
+                    typeof rating.fast3GLoadTime === 'number'
+                      ? rating.fast3GLoadTime + 'ms'
                       : undefined
+                  }
+                  error={
+                    typeof rating.fast3GLoadTime === 'number' ? rating.fast3GLoadTime! > 7000
+                      ? 'Takes longer than 7s to load'
+                      : undefined : "No data available"
                   }
                 />
                 <RatingsSection
                   title="Slow3G Load Time"
                   description="Has a decent load time on a slow 3G connection."
-                  value={rating.slow3GLoadTime + 'ms'}
+                  value={typeof rating.slow3GLoadTime === 'number' ? rating.slow3GLoadTime + 'ms' : undefined}
                   error={
-                    rating.slow3GLoadTime! > 15000
+                    typeof rating.slow3GLoadTime === 'number' ? rating.slow3GLoadTime! > 15000
                       ? 'Takes longer than 15s to load'
-                      : undefined
+                      : undefined : "No data available"
                   }
                 />
                 <RatingsSection
