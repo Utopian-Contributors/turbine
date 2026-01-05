@@ -21,6 +21,7 @@ import LibraryPage from './pages/LibraryPage'
 import MeasurePage from './pages/MeasurePage'
 import MeasurementsPage from './pages/MeasurementsPage'
 import NewReleasePage from './pages/NewReleasePage'
+import PathHistoryPage from './pages/PathHistoryPage'
 import PaymentsPage from './pages/PaymentsPage'
 import RatingsPage from './pages/RatingsPage'
 import ReleasesPage from './pages/ReleasesPage'
@@ -47,6 +48,7 @@ const router = createBrowserRouter([
         path: 'measurements/:host/',
         element: <MeasurementsPage />,
       },
+      { path: '/measurements/:host/history', element: <PathHistoryPage /> },
       { path: '/measurements/:host/images', element: <ImageConversionPage /> },
       {
         path: 'measure',

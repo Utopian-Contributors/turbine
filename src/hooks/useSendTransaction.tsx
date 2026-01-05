@@ -13,7 +13,9 @@ import { usePaymentInfoLazyQuery } from '../../generated/graphql'
 
 export const useSendTransaction = (tokenMint: string) => {
   const { solana } = useSolana()
-  const [paymentInfoQuery] = usePaymentInfoLazyQuery()
+  const [paymentInfoQuery] = usePaymentInfoLazyQuery({
+    fetchPolicy: 'network-only',
+  })
 
   const sendTransaction = useCallback(
     async (amount: number) => {
@@ -25,7 +27,6 @@ export const useSendTransaction = (tokenMint: string) => {
 
       const { data: paymentInfoQueryData } = await paymentInfoQuery({
         variables: { publicKey: fromAddress as string, tokenMint },
-        fetchPolicy: 'network-only',
       })
 
       if (!paymentInfoQueryData?.paymentInfo) {

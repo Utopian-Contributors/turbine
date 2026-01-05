@@ -5,17 +5,12 @@ import { toHeaderCase, toSentenceCase } from 'js-convert-case'
 import {
   CircleCheck,
   CircleX,
-  Monitor,
-  Smartphone,
-  Tablet,
-  Wifi,
-  WifiHigh,
-  WifiLow,
-  WifiOff,
+  History
 } from 'lucide-react'
 import React from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
+import { getConnectionIcon, getDeviceIcon } from '@/helpers/icons'
 import { useWalletOrAccLogin } from '@/hooks/useWalletOrAccLogin'
 import { TabsContent } from '@radix-ui/react-tabs'
 import {
@@ -27,38 +22,11 @@ import {
   type Measurement,
 } from '../../../generated/graphql'
 import Pricetag from '../Pricetag'
+import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader } from '../ui/card'
 import { Skeleton } from '../ui/skeleton'
 import { Spinner } from '../ui/spinner'
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
-
-const getDeviceIcon = (type: DeviceType) => {
-  switch (type) {
-    case DeviceType.Mobile:
-      return <Smartphone size={28} />
-    case DeviceType.Tablet:
-      return <Tablet size={28} />
-    default:
-      return <Monitor size={28} />
-  }
-}
-
-const getConnectionIcon = (type: ConnectionType) => {
-  switch (type) {
-    case ConnectionType.Fast_4G:
-      return <WifiHigh size={24} className="text-muted-foreground" />
-    case ConnectionType.Slow_4G:
-      return <WifiHigh size={24} className="text-muted-foreground" />
-    case ConnectionType.Fast_3G:
-      return <WifiLow size={24} className="text-muted-foreground" />
-    case ConnectionType.Slow_3G:
-      return <WifiLow size={24} className="text-muted-foreground" />
-    case ConnectionType.Offline:
-      return <WifiOff size={24} className="text-muted-foreground" />
-    default:
-      return <Wifi size={24} className="text-muted-foreground" />
-  }
-}
 
 interface EnvironmentsProps {
   measurements: (Pick<
@@ -84,6 +52,7 @@ const Environments: React.FC<EnvironmentsProps> = ({
 }) => {
   const { login, isLoggedIn } = useWalletOrAccLogin()
   const navigate = useNavigate()
+  const params = useParams<{ host: string }>()
 
   const { data: measurementDevicesData } = useMeasurementDevicesQuery()
 
@@ -109,20 +78,38 @@ const Environments: React.FC<EnvironmentsProps> = ({
       defaultValue={initial || possibleConnections[0]}
       className="py-4 lg:px-6 lg:py-4"
     >
-      <TabsList>
-        {possibleConnections.map((connection) => (
-          <TabsTrigger
-            key={connection}
-            value={connection}
-            disabled={connection === ConnectionType.Offline}
-          >
-            {toHeaderCase(connection)
-              .replace('3g', '3G')
-              .replace('4g', '4G')
-              .replace('Wifi', 'WiFi')}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="flex flex-col lg:flex-row gap-2">
+        <TabsList>
+          {possibleConnections.map((connection) => (
+            <TabsTrigger
+              key={connection}
+              value={connection}
+              disabled={connection === ConnectionType.Offline}
+            >
+              {toHeaderCase(connection)
+                .replace('3g', '3G')
+                .replace('4g', '4G')
+                .replace('Wifi', 'WiFi')}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <Button
+          variant="outline"
+          className="flex gap-2 text-muted-foreground ml"
+          onClick={() =>
+            navigate(
+              '/measurements/' +
+                params.host +
+                '/history' +
+                `?path=${selectedPath}`
+            )
+          }
+        >
+          <History size={16} />
+          History
+        </Button>
+      </div>
+
       {possibleConnections.map((connection) => (
         <TabsContent key={connection} value={connection}>
           <div className="w-full flex gap-6 overflow-x-auto p-1">
@@ -181,13 +168,14 @@ const Environments: React.FC<EnvironmentsProps> = ({
                           : ''
                       )}
                       onClick={() => {
+                        console.debug(current.id, measurementForDevice?.id)
                         if (isLoggedIn) {
                           onClick(device.type, connection)
                           navigate(
                             `/measurements/${current.host?.host}?path=${selectedPath}&device=${device.type}&connection=${connection}`,
                             { replace: true }
                           )
-                        } else {
+                        } else if (current.id !== measurementForDevice?.id) {
                           login()
                         }
                       }}

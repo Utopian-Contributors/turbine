@@ -22,9 +22,10 @@ interface BundleProps {
       })
     | null
     | undefined
+  className?: string
 }
 
-const Bundle: React.FC<BundleProps> = ({ measurement }) => {
+const Bundle: React.FC<BundleProps> = ({ measurement, className }) => {
   const files = useMemo(() => {
     if (
       (measurement?.redirect || measurement?.url) &&
@@ -68,7 +69,7 @@ const Bundle: React.FC<BundleProps> = ({ measurement }) => {
   )
 
   return (
-    <Accordion type="single" collapsible className="w-full">
+    <Accordion type="single" collapsible className={`w-full ${className}`}>
       {scripts.length > 0 && (
         <BundledFileSection type="scripts" files={scripts} label="Scripts" />
       )}

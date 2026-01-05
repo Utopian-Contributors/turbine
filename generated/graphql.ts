@@ -221,10 +221,12 @@ export type Measurement = {
   host?: Maybe<WebsiteHost>;
   icon?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  largestContentfulPaint?: Maybe<Scalars['Int']['output']>;
   redirect?: Maybe<Scalars['String']['output']>;
   screenshots: Array<Scalars['String']['output']>;
   status: MeasurementStatus;
   thumbnail?: Maybe<Scalars['String']['output']>;
+  timeToInteractive?: Maybe<Scalars['Int']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
   url: Scalars['String']['output'];
@@ -438,7 +440,8 @@ export type QueryLibraryUsageArgs = {
 
 
 export type QueryMeasurementsArgs = {
-  url?: InputMaybe<Scalars['String']['input']>;
+  host?: InputMaybe<Scalars['String']['input']>;
+  path?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -822,7 +825,8 @@ export type MeasurementStatsQueryVariables = Exact<{ [key: string]: never; }>;
 export type MeasurementStatsQuery = { __typename?: 'Query', measurementStats?: { __typename?: 'MeasurementStats', totalMeasurements?: number | null, totalWebsiteHosts?: number | null, totalAccessibilityViolations?: number | null } | null };
 
 export type MeasurementsQueryVariables = Exact<{
-  url?: InputMaybe<Scalars['String']['input']>;
+  host: Scalars['String']['input'];
+  path?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -874,6 +878,14 @@ export type CreateReleaseMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CreateReleaseMutation = { __typename?: 'Mutation', createRelease?: { __typename?: 'ExtensionRelease', id: string } | null };
+
+export type MeasurementHistoryQueryVariables = Exact<{
+  host: Scalars['String']['input'];
+  path: Scalars['String']['input'];
+}>;
+
+
+export type MeasurementHistoryQuery = { __typename?: 'Query', measurements?: Array<{ __typename?: 'Measurement', id: string, url: string, redirect?: string | null, createdAt: any, status: MeasurementStatus, elapsed?: number | null, connectionType: ConnectionType, screenshots: Array<string>, largestContentfulPaint?: number | null, timeToInteractive?: number | null, device: { __typename?: 'MeasurementDevice', id: string, type: DeviceType }, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, type: string, elapsed: number, size?: string | null }> }> | null };
 
 export type PaymentsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2040,8 +2052,8 @@ export type MeasurementStatsLazyQueryHookResult = ReturnType<typeof useMeasureme
 export type MeasurementStatsSuspenseQueryHookResult = ReturnType<typeof useMeasurementStatsSuspenseQuery>;
 export type MeasurementStatsQueryResult = Apollo.QueryResult<MeasurementStatsQuery, MeasurementStatsQueryVariables>;
 export const MeasurementsDocument = gql`
-    query measurements($url: String) {
-  measurements(url: $url) {
+    query measurements($host: String!, $path: String) {
+  measurements(host: $host, path: $path) {
     id
     url
     host {
@@ -2082,11 +2094,12 @@ export const MeasurementsDocument = gql`
  * @example
  * const { data, loading, error } = useMeasurementsQuery({
  *   variables: {
- *      url: // value for 'url'
+ *      host: // value for 'host'
+ *      path: // value for 'path'
  *   },
  * });
  */
-export function useMeasurementsQuery(baseOptions?: Apollo.QueryHookOptions<MeasurementsQuery, MeasurementsQueryVariables>) {
+export function useMeasurementsQuery(baseOptions: Apollo.QueryHookOptions<MeasurementsQuery, MeasurementsQueryVariables> & ({ variables: MeasurementsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<MeasurementsQuery, MeasurementsQueryVariables>(MeasurementsDocument, options);
       }
@@ -2452,6 +2465,67 @@ export function useCreateReleaseMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateReleaseMutationHookResult = ReturnType<typeof useCreateReleaseMutation>;
 export type CreateReleaseMutationResult = Apollo.MutationResult<CreateReleaseMutation>;
 export type CreateReleaseMutationOptions = Apollo.BaseMutationOptions<CreateReleaseMutation, CreateReleaseMutationVariables>;
+export const MeasurementHistoryDocument = gql`
+    query measurementHistory($host: String!, $path: String!) {
+  measurements(host: $host, path: $path) {
+    id
+    url
+    redirect
+    createdAt
+    status
+    elapsed
+    device {
+      id
+      type
+    }
+    connectionType
+    bundledFiles {
+      id
+      url
+      type
+      elapsed
+      size
+    }
+    screenshots
+    largestContentfulPaint
+    timeToInteractive
+  }
+}
+    `;
+
+/**
+ * __useMeasurementHistoryQuery__
+ *
+ * To run a query within a React component, call `useMeasurementHistoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeasurementHistoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeasurementHistoryQuery({
+ *   variables: {
+ *      host: // value for 'host'
+ *      path: // value for 'path'
+ *   },
+ * });
+ */
+export function useMeasurementHistoryQuery(baseOptions: Apollo.QueryHookOptions<MeasurementHistoryQuery, MeasurementHistoryQueryVariables> & ({ variables: MeasurementHistoryQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeasurementHistoryQuery, MeasurementHistoryQueryVariables>(MeasurementHistoryDocument, options);
+      }
+export function useMeasurementHistoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeasurementHistoryQuery, MeasurementHistoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeasurementHistoryQuery, MeasurementHistoryQueryVariables>(MeasurementHistoryDocument, options);
+        }
+export function useMeasurementHistorySuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MeasurementHistoryQuery, MeasurementHistoryQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MeasurementHistoryQuery, MeasurementHistoryQueryVariables>(MeasurementHistoryDocument, options);
+        }
+export type MeasurementHistoryQueryHookResult = ReturnType<typeof useMeasurementHistoryQuery>;
+export type MeasurementHistoryLazyQueryHookResult = ReturnType<typeof useMeasurementHistoryLazyQuery>;
+export type MeasurementHistorySuspenseQueryHookResult = ReturnType<typeof useMeasurementHistorySuspenseQuery>;
+export type MeasurementHistoryQueryResult = Apollo.QueryResult<MeasurementHistoryQuery, MeasurementHistoryQueryVariables>;
 export const PaymentsDocument = gql`
     query payments {
   payments {

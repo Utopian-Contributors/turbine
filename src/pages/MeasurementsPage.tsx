@@ -13,6 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import StarRating from '@/components/ui/StarRating'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { cn } from '@/lib/utils'
@@ -28,6 +29,7 @@ import {
   useMeasurementDevicesQuery,
   useMeasurementsLazyQuery,
   useWebsiteQuery,
+  type Measurement,
 } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -63,7 +65,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
   }, [measurementDevicesData, selectedDevice])
 
   const [measurementsQuery, { data: measurementsQueryData, refetch }] =
-    useMeasurementsLazyQuery()
+    useMeasurementsLazyQuery({ fetchPolicy: 'network-only' })
   const {
     createMeasure,
     error: createMeasureError,
@@ -85,11 +87,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     const device = searchParams.get('device') as DeviceType | null
     const connection = searchParams.get('connection') as ConnectionType | null
     const fullMatch = completedMeasurements
-      ?.filter((m) => new URL(m.url).pathname === selectedPath)
+      ?.filter((m) => new URL(m.redirect || m.url).pathname === selectedPath)
       .find((m) => {
         if (
-          (new URL(m.url).host === params.host ||
-            (m.redirect && new URL(m.redirect).host === params.host)) &&
+          new URL(m.redirect || m.url).host === params.host &&
           m.connectionType === (connection || ConnectionType.Wifi) &&
           m.device.type === (device || DeviceType.Desktop)
         ) {
@@ -97,14 +98,14 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         }
       })
     const partialMatch = completedMeasurements?.find(
-      (m) => new URL(m.url).pathname === selectedPath
+      (m) => new URL(m.redirect || m.url).pathname === selectedPath
     )
 
     const fallbackMatch =
       completedMeasurements.length === 0 &&
       measurementsQueryData?.measurements?.length
         ? measurementsQueryData?.measurements?.find(
-            (m) => new URL(m.url).pathname === selectedPath
+            (m) => new URL(m.redirect || m.url).pathname === selectedPath
           )
         : null
     return fullMatch || partialMatch || fallbackMatch || null
@@ -135,7 +136,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         initial={{ opacity: 0, filter: 'blur(10px)' }}
         animate={{ opacity: 1, filter: 'blur(0px)' }}
         transition={{ duration: 0.5 }}
-        className="grid grid-cols-4 lg:px-6 py-4 gap-6"
+        className="grid grid-cols-4 lg:px-6 pb-4 pt-2 gap-6"
       >
         <div className="col-span-4 lg:col-span-3">
           <Bundle measurement={measurement} />
@@ -149,8 +150,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       const urlObj = new URL(url)
       url = new URL(urlObj.pathname, `https://${urlObj.host}`).href
       measurementsQuery({
-        variables: { url },
-        fetchPolicy: 'network-only',
+        variables: { host: params.host! },
       }).then((data) => {
         if (!data.error && !data.data?.measurements?.length) {
           navigate(`/measure/?url=${encodeURIComponent(url)}`)
@@ -159,30 +159,32 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         }
       })
     },
-    [measurementsQuery, navigate]
+    [measurementsQuery, navigate, params.host]
   )
 
   useEffect(() => {
-    if (
-      url &&
-      !measurementsQueryData?.measurements?.some(
-        (m) =>
+    const hasExistingMeasurements = (
+      measurements?: Pick<Measurement, 'url' | 'redirect'>[] | null
+    ) => {
+      return measurements?.some((m) => {
+        return (
           (new URL(m.url).host === params.host &&
             new URL(m.url).pathname === selectedPath) ||
-          (m.redirect && new URL(m.redirect).host === params.host)
-      )
-    ) {
+          (m.redirect &&
+            new URL(m.redirect).host === params.host &&
+            new URL(m.redirect).pathname === selectedPath)
+        )
+      })
+    }
+    if (url && !hasExistingMeasurements(measurementsQueryData?.measurements)) {
       console.debug('Fetching measurements for, because none were found', url)
       measurementsQuery({
-        variables: { url },
-        fetchPolicy: 'network-only',
+        variables: { host: params.host! },
       }).then((data) => {
         if (
           !data.error &&
           (!data.data?.measurements?.length ||
-            !data.data?.measurements?.some(
-              (m) => new URL(m.url).pathname === selectedPath
-            ))
+            !hasExistingMeasurements(data.data?.measurements))
         ) {
           navigate(`/measure/?url=${encodeURIComponent(url)}`, {
             replace: true,
@@ -230,7 +232,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       const interval = setInterval(() => {
         if (measurement?.url) {
           console.debug('Refetching measurement status for', measurement.url)
-          refetch({ url: measurement.url })
+          refetch({ host: params.host })
         }
       }, 2000)
       return () => clearInterval(interval)
@@ -325,7 +327,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       />
       {measurementsQueryData?.measurements?.filter(
         (m) =>
-          new URL(m.url).pathname === selectedPath &&
+          new URL(m.redirect || m.url).pathname === selectedPath &&
           m.status === MeasurementStatus.Completed
       ).length === 0 &&
         measurement?.status === MeasurementStatus.Pending && (
@@ -340,7 +342,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         <p>Measurement failed. Please try again later.</p>
       )}
       {measurementsQueryData?.measurements
-        ?.filter((m) => new URL(m.url).pathname === selectedPath)
+        ?.filter((m) => new URL(m.redirect || m.url).pathname === selectedPath)
         .some((m) => m?.status === MeasurementStatus.Completed) &&
         measurement && (
           <div className="max-w-6xl mx-auto">
@@ -465,7 +467,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     <SelectContent>
                       {measurementDevicesData?.measurementDevices?.map(
                         (device) => (
-                          <SelectItem value={device.id}>
+                          <SelectItem value={device.id} key={device.id}>
                             {toHeaderCase(device.type)}
                           </SelectItem>
                         )
@@ -493,7 +495,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                         ConnectionType.Slow_3G,
                         ConnectionType.Offline,
                       ].map((connection) => (
-                        <SelectItem value={connection}>
+                        <SelectItem value={connection} key={connection}>
                           {toHeaderCase(connection)
                             .replace('3g', '3G')
                             .replace('4g', '4G')
@@ -555,7 +557,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
             <motion.div className="flex gap-2 items-center mt-8 lg:px-6">
               {measurementsQueryData.measurements
                 .reduce((acc, m) => {
-                  const path = new URL(m.url).pathname
+                  const path = new URL(m.redirect || m.url).pathname
                   if (!acc.some((item) => item.path === path)) {
                     if (!m.title) return acc
                     acc.push({ path, title: m.title })
@@ -566,6 +568,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 .map(({ path, title }) => {
                   return (
                     <div
+                      key={path}
                       onClick={() => {
                         const search = new URLSearchParams(location.search)
                         search.set('path', path)
@@ -601,26 +604,31 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 <Plus />
               </div>
             </motion.div>
+            <Separator className="mt-4" />
             {measurementsQueryData.measurements && measurement && (
               <Environments
                 initial={selectedConnection}
                 measurements={measurementsQueryData.measurements.filter(
-                  (m) => new URL(m.url).pathname === selectedPath
+                  (m) => new URL(m.redirect || m.url).pathname === selectedPath
                 )}
                 selectedPath={selectedPath}
                 current={measurement}
                 onClick={measure}
               />
             )}
+            <h3 className="pl-6 text-sm font-bold uppercase text-gray-200">
+              Screenshots
+            </h3>
             {measurement.screenshots?.length ? (
               <motion.div
                 initial={{ opacity: 0, filter: 'blur(10px)' }}
                 animate={{ opacity: 1, filter: 'blur(0px)' }}
                 transition={{ duration: 0.5 }}
-                className="flex gap-4 px-2 lg:px-6 py-6 overflow-x-auto"
+                className="flex gap-4 px-2 lg:px-7 pb-6 pt-4 overflow-x-auto"
               >
                 {measurement.screenshots.map((img, index) => (
                   <div
+                    key={img}
                     style={{
                       backgroundImage: `url(${
                         new URL(img, import.meta.env.VITE_SCREENSHOTS_FOLDER)
@@ -641,6 +649,9 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 ))}
               </motion.div>
             ) : null}
+            <h3 className="pl-6 text-sm font-bold uppercase text-gray-200">
+              Bundle
+            </h3>
             {bundle}
           </div>
         )}

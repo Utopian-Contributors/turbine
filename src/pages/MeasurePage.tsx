@@ -21,7 +21,9 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   const searchParams = new URLSearchParams(location.search)
 
   const { data: measurementStatsQueryData } = useMeasurementStatsQuery()
-  const [measurementsQuery] = useMeasurementsLazyQuery()
+  const [measurementsQuery] = useMeasurementsLazyQuery({
+    fetchPolicy: 'network-only',
+  })
   const { createMeasure, isPaying } = useCreateMeasure({
     url: '',
   })
@@ -33,7 +35,9 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
         login()
       } else {
         const urlObj = new URL(url)
-        measurementsQuery({ variables: { url }, fetchPolicy: 'network-only' })
+        measurementsQuery({
+          variables: { host: urlObj.host! },
+        })
           .then(async (response) => {
             if (
               !response.error &&

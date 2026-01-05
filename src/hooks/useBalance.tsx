@@ -34,16 +34,19 @@ export function useBalance(): UseBalanceReturn {
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const { solana } = useSolana()
   const [paymentInfoQuery, { data: paymentInfoQueryData, loading, error }] =
-    usePaymentInfoLazyQuery()
+    usePaymentInfoLazyQuery({ fetchPolicy: 'network-only' })
 
   const fetchBalance = useCallback(async () => {
-    const publicKey = await solana.getPublicKey()
-    setWalletAddress(publicKey)
-    if (publicKey) {
-      await paymentInfoQuery({
-        variables: { publicKey },
-        fetchPolicy: 'network-only',
-      })
+    try {
+      const publicKey = await solana.getPublicKey()
+      setWalletAddress(publicKey)
+      if (publicKey) {
+        await paymentInfoQuery({
+          variables: { publicKey },
+        })
+      }
+    } catch {
+      return Promise.resolve()
     }
   }, [paymentInfoQuery, solana])
 

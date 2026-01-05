@@ -94,7 +94,20 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                 <div
                   key={website.id}
                   onClick={() => {
-                    navigate(`/measurements/${website.host}`)
+                    if (
+                      website.host &&
+                      (website.rootMeasurement?.url ||
+                        website.rootMeasurement?.redirect)
+                    ) {
+                      navigate(
+                        `/measurements/${website.host}?path=${
+                          new URL(
+                            website.rootMeasurement?.redirect ||
+                              website.rootMeasurement?.url
+                          ).pathname
+                        }`
+                      )
+                    }
                   }}
                   className="cursor-pointer lg:w-[calc(100%/3-0.25rem)] shadow-sm lg:shadow-none rounded-lg flex flex-col lg:flex-row lg:gap-2 overflow-hidden"
                   ref={

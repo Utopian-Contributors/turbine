@@ -1,5 +1,5 @@
-query measurements($url: String) {
-  measurements(url: $url) {
+query measurements($host: String!, $path: String) {
+  measurements(host: $host, path: $path) {
     id
     url
     host {

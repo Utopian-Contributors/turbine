@@ -1,0 +1,25 @@
+query measurementHistory($host: String!, $path: String!) {
+  measurements(host: $host, path: $path) {
+    id
+    url
+    redirect
+    createdAt
+    status
+    elapsed
+    device {
+      id
+      type
+    }
+    connectionType
+    bundledFiles {
+      id
+      url
+      type
+      elapsed
+      size
+    }
+    screenshots
+    largestContentfulPaint
+    timeToInteractive
+  }
+}
