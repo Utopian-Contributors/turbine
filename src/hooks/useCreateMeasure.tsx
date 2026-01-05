@@ -20,14 +20,14 @@ interface CreateMeasureArgs {
   connection: ConnectionType
 }
 
-export const useCreateMeasure = ({ url }: { url: string }) => {
+export const useCreateMeasure = ({ url }: { url?: string }) => {
   const { data: measurementPricesData } = useMeasurementPricesQuery()
   const [createMeasurement, response] = useCreateMeasurementMutation({
     refetchQueries: [
       {
         query: MeasurementsDocument,
         variables: {
-          host: new URL(url).host,
+          host: url ? new URL(url).host : undefined,
         },
       },
     ],
@@ -128,21 +128,22 @@ export const useCreateMeasure = ({ url }: { url: string }) => {
           throw new Error('Transaction failed, no signature obtained')
         }
 
-        // 2. Create measurement record in backend using transaction signature
-        return await createMeasurement({
-          variables: {
-            url,
-            remeasure: remeasure ?? false,
-            device,
-            connection,
-            tokenMint,
-            walletAddress: walletAddress,
-            txSignature: signature,
-          },
-          onCompleted: () => {
-            setIsPaying(false)
-          },
-        })
+        if (url) {
+          return await createMeasurement({
+            variables: {
+              url,
+              remeasure: remeasure ?? false,
+              device,
+              connection,
+              tokenMint,
+              walletAddress: walletAddress,
+              txSignature: signature,
+            },
+            onCompleted: () => {
+              setIsPaying(false)
+            },
+          })
+        }
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
