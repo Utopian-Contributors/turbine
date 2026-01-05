@@ -19,7 +19,7 @@ import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { toHeaderCase } from 'js-convert-case'
-import { Clock, EyeOff, Plus, Repeat, Rocket } from 'lucide-react'
+import { ChartLine, Clock, EyeOff, Plus, Repeat } from 'lucide-react'
 import moment from 'moment'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import {
@@ -514,7 +514,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
               className="lg:px-6 flex flex-col lg:flex-row gap-4 mb-6"
             >
               <div
-                className="cursor-pointer w-full lg:w-fit border rounded-md shadow-sm flex flex-col gap-1 p-4"
+                className="cursor-pointer w-full lg:w-fit border rounded-md shadow-sm flex flex-col justify-end gap-2 p-4"
                 onClick={() =>
                   navigate(
                     '/ratings/' +
@@ -532,26 +532,19 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     : 'Not rated yet'}
                 </span>
               </div>
-              <div className="opacity-50 w-fit border rounded-md flex items-center gap-3 p-4">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 1, type: 'spring' }}
-                  className="w-fit h-fit p-2 bg-muted rounded-full"
-                >
-                  <Rocket size={20} />
-                </motion.div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm text-primary">
-                    Want to boost visibility for this website?
-                  </span>
-                  {/* <div className="flex text-sm gap-2">
-                    <Pricetag />
-                    </div> */}
-                  <span className="text-xs text-muted-foreground">
-                    Coming Soon
-                  </span>
-                </div>
+              <div
+                className="cursor-pointer w-full lg:w-fit border rounded-md shadow-sm flex flex-col gap-2 p-4"
+                onClick={() =>
+                  navigate(
+                    '/measurements/' +
+                      params.host +
+                      '/history' +
+                      `?path=${selectedPath}`
+                  )
+                }
+              >
+                <ChartLine size={20} className='text-gray-400' />
+                <span className='text-sm text-gray-400'>Performance Insights</span>
               </div>
             </motion.div>
             <motion.div className="flex gap-2 items-center mt-8 lg:px-6">

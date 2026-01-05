@@ -4,11 +4,10 @@ import { motion } from 'framer-motion'
 import { toHeaderCase, toSentenceCase } from 'js-convert-case'
 import {
   CircleCheck,
-  CircleX,
-  History
+  CircleX
 } from 'lucide-react'
 import React from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { getConnectionIcon, getDeviceIcon } from '@/helpers/icons'
 import { useWalletOrAccLogin } from '@/hooks/useWalletOrAccLogin'
@@ -22,7 +21,6 @@ import {
   type Measurement,
 } from '../../../generated/graphql'
 import Pricetag from '../Pricetag'
-import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader } from '../ui/card'
 import { Skeleton } from '../ui/skeleton'
 import { Spinner } from '../ui/spinner'
@@ -52,7 +50,6 @@ const Environments: React.FC<EnvironmentsProps> = ({
 }) => {
   const { login, isLoggedIn } = useWalletOrAccLogin()
   const navigate = useNavigate()
-  const params = useParams<{ host: string }>()
 
   const { data: measurementDevicesData } = useMeasurementDevicesQuery()
 
@@ -93,21 +90,6 @@ const Environments: React.FC<EnvironmentsProps> = ({
             </TabsTrigger>
           ))}
         </TabsList>
-        <Button
-          variant="outline"
-          className="flex gap-2 text-muted-foreground ml"
-          onClick={() =>
-            navigate(
-              '/measurements/' +
-                params.host +
-                '/history' +
-                `?path=${selectedPath}`
-            )
-          }
-        >
-          <History size={16} />
-          History
-        </Button>
       </div>
 
       {possibleConnections.map((connection) => (
