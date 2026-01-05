@@ -72,7 +72,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     ) : (
       'Measure and optimize the performance of your website'
     )
-  }, [])
+  }, [searchParams])
 
   if (isPaying) {
     return (
