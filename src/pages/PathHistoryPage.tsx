@@ -207,9 +207,9 @@ const PathHistoryPage: React.FC<PathHistoryPageProps> = () => {
 
         <Button
           className="flex gap-2 bg-black hover:bg-gray-800 text-white"
-          disabled={!selectedMeasurements || selectedMeasurements.length <= 1}
+          disabled={!selectedMeasurements || selectedMeasurements.length <= 1 || !improvements}
           onClick={() => {
-            if (!selectedMeasurements || selectedMeasurements.length <= 1)
+            if (!selectedMeasurements || selectedMeasurements.length <= 1 || !improvements)
               return
             window.open(
               createShareLink(

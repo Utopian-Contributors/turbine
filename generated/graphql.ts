@@ -441,6 +441,7 @@ export type QueryLibraryUsageArgs = {
 
 export type QueryMeasurementsArgs = {
   host?: InputMaybe<Scalars['String']['input']>;
+  pagination?: InputMaybe<PaginationInput>;
   path?: InputMaybe<Scalars['String']['input']>;
 };
 
