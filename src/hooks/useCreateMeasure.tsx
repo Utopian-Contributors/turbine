@@ -147,6 +147,8 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
     ]
   )
 
+  console.debug(unfinishedRequest)
+
   useEffect(() => {
     if (unfinishedRequest && !isOpened && isConnected) {
       payAndCreate(unfinishedRequest)

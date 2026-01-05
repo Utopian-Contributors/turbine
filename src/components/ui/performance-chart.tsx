@@ -99,7 +99,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
           <ChartContainer
             config={{
               elapsed: {
-                label: 'Elapsed',
+                label: 'Load time',
                 color: 'var(--color-green-500)',
                 unit: 'ms',
               },
@@ -135,7 +135,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                   <ChartTooltipContent
                     hideLabel
                     valueFormatter={(value, label) =>
-                      (label === 'Elapsed' || label === 'LCP') &&
+                      (label === 'Load time' || label === 'LCP') &&
                       typeof value === 'number'
                         ? value / 1_000
                         : label === 'Bundle Size' && typeof value === 'number'
@@ -180,7 +180,9 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             Performance decreased by{' '}
             <div className="flex gap-1 items-center">
               <ArrowDown className="text-red-500" size={24} />{' '}
-              {totalImprovement.toFixed(2)}%
+              <span className="text-red-500">
+                {totalImprovement.toFixed(2)}%
+              </span>
             </div>
           </div>
         ) : totalImprovement ? (
