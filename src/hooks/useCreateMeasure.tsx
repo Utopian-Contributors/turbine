@@ -27,7 +27,7 @@ export const useCreateMeasure = ({ url }: { url: string }) => {
       {
         query: MeasurementsDocument,
         variables: {
-          url,
+          host: new URL(url).host,
         },
       },
     ],
