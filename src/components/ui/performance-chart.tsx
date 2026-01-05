@@ -54,7 +54,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
       <CardHeader>
         <div className="flex gap-2">
           <Select
-            defaultValue={DeviceType.Desktop}
+            defaultValue={selectedDevice}
             onValueChange={(value) => onDeviceChange(value as DeviceType)}
           >
             <SelectTrigger className="w-fit">
@@ -67,7 +67,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </SelectContent>
           </Select>
           <Select
-            defaultValue={ConnectionType.Wifi}
+            defaultValue={selectedConnection}
             onValueChange={(value) =>
               onConnectionChange(value as ConnectionType)
             }
