@@ -33,7 +33,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     (url: string) => {
       if (!isConnected || !isLoggedIn) {
         login()
-      } else {
+      } else if(url) {
         const urlObj = new URL(url)
         measurementsQuery({
           variables: { host: urlObj.host! },
