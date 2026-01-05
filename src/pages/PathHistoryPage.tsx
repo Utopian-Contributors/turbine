@@ -316,17 +316,17 @@ const PathHistoryPage: React.FC<PathHistoryPageProps> = () => {
                 </div>
                 <div className="flex gap-2 items-center">
                   <div className="flex gap-1 items-center">
+                    {getDeviceIcon(m.device.type, 'text-gray-400', 20)}
+                    <span className="text-gray-400">
+                      {toHeaderCase(m.device.type)}
+                    </span>
+                  </div>
+                  <div className="flex gap-1 items-center">
                     {getConnectionIcon(m.connectionType, 'text-gray-400', 20)}
                     <span className="text-gray-400">
                       {toHeaderCase(m.connectionType)
                         .replace('3g', '3G')
                         .replace('4g', '4G')}
-                    </span>
-                  </div>
-                  <div className="flex gap-1 items-center">
-                    {getDeviceIcon(m.device.type, 'text-gray-400', 20)}
-                    <span className="text-gray-400">
-                      {toHeaderCase(m.device.type)}
                     </span>
                   </div>
                 </div>

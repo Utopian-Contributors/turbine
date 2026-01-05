@@ -68,12 +68,37 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     useMeasurementsLazyQuery({ fetchPolicy: 'network-only' })
   const {
     createMeasure,
+    data: createMeasurementData,
     error: createMeasureError,
     setError,
     isPaying,
   } = useCreateMeasure({
     url,
   })
+
+  useEffect(() => {
+    if (createMeasurementData?.createMeasurement) {
+      const newMeasurement = createMeasurementData?.createMeasurement
+      const newUrlObj = new URL(newMeasurement?.url || url)
+      navigate(
+        `/measurements/${newUrlObj.hostname}?path=${
+          newUrlObj.pathname
+        }&device=${
+          measurementDevicesData?.measurementDevices?.find(
+            (d) => d.id === selectedDevice
+          )?.type
+        }&connection=${selectedConnection}`,
+        { replace: true }
+      )
+    }
+  }, [
+    createMeasurementData?.createMeasurement,
+    measurementDevicesData?.measurementDevices,
+    navigate,
+    selectedConnection,
+    selectedDevice,
+    url,
+  ])
 
   const completedMeasurements = useMemo(() => {
     return (
@@ -325,19 +350,6 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         className="hidden lg:flex"
         onSearch={search}
       />
-      {measurementsQueryData?.measurements?.filter(
-        (m) =>
-          new URL(m.redirect || m.url).pathname === selectedPath &&
-          m.status === MeasurementStatus.Completed
-      ).length === 0 &&
-        measurement?.status === MeasurementStatus.Pending && (
-          <div className="flex flex-col items-center gap-2 my-6">
-            <div className="text-2xl animate-pulse m-6 text-muted-foreground whitespace-nowrap overflow-hidden">
-              Measuring website...
-            </div>
-            <AutoProgress />
-          </div>
-        )}
       {measurement?.status === MeasurementStatus.Failed && (
         <p>Measurement failed. Please try again later.</p>
       )}
@@ -432,20 +444,6 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                         device,
                         connection: selectedConnection,
                         remeasure: true,
-                      }).then((createMutation) => {
-                        const newMeasurement =
-                          createMutation.data?.createMeasurement
-                        const newUrlObj = new URL(newMeasurement?.url || url)
-                        navigate(
-                          `/measurements/${newUrlObj.hostname}?path=${
-                            newUrlObj.pathname
-                          }&device=${
-                            measurementDevicesData?.measurementDevices?.find(
-                              (d) => d.id === selectedDevice
-                            )?.type
-                          }&connection=${selectedConnection}`,
-                          { replace: true }
-                        )
                       })
                     }
                   }}
@@ -543,8 +541,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   )
                 }
               >
-                <ChartLine size={20} className='text-gray-400' />
-                <span className='text-sm text-gray-400'>Performance Insights</span>
+                <ChartLine size={20} className="text-gray-400" />
+                <span className="text-sm text-gray-400">
+                  Performance Insights
+                </span>
               </div>
             </motion.div>
             <motion.div className="flex gap-2 items-center mt-8 lg:px-6">

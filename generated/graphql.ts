@@ -398,6 +398,7 @@ export type Query = {
   library?: Maybe<Library>;
   libraryUsage?: Maybe<LibraryUsage>;
   loggedIn: User;
+  measurement?: Maybe<Measurement>;
   measurementDevices?: Maybe<Array<MeasurementDevice>>;
   measurementPrices?: Maybe<Array<MeasurementPrice>>;
   measurementStats?: Maybe<MeasurementStats>;
@@ -439,9 +440,13 @@ export type QueryLibraryUsageArgs = {
 };
 
 
+export type QueryMeasurementArgs = {
+  id?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryMeasurementsArgs = {
   host?: InputMaybe<Scalars['String']['input']>;
-  pagination?: InputMaybe<PaginationInput>;
   path?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -824,6 +829,13 @@ export type MeasurementStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeasurementStatsQuery = { __typename?: 'Query', measurementStats?: { __typename?: 'MeasurementStats', totalMeasurements?: number | null, totalWebsiteHosts?: number | null, totalAccessibilityViolations?: number | null } | null };
+
+export type MeasurementStatusQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type MeasurementStatusQuery = { __typename?: 'Query', measurement?: { __typename?: 'Measurement', id: string, status: MeasurementStatus, url: string, host?: { __typename?: 'WebsiteHost', host: string } | null } | null };
 
 export type MeasurementsQueryVariables = Exact<{
   host: Scalars['String']['input'];
@@ -2052,6 +2064,51 @@ export type MeasurementStatsQueryHookResult = ReturnType<typeof useMeasurementSt
 export type MeasurementStatsLazyQueryHookResult = ReturnType<typeof useMeasurementStatsLazyQuery>;
 export type MeasurementStatsSuspenseQueryHookResult = ReturnType<typeof useMeasurementStatsSuspenseQuery>;
 export type MeasurementStatsQueryResult = Apollo.QueryResult<MeasurementStatsQuery, MeasurementStatsQueryVariables>;
+export const MeasurementStatusDocument = gql`
+    query measurementStatus($id: String!) {
+  measurement(id: $id) {
+    id
+    status
+    url
+    host {
+      host
+    }
+  }
+}
+    `;
+
+/**
+ * __useMeasurementStatusQuery__
+ *
+ * To run a query within a React component, call `useMeasurementStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeasurementStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeasurementStatusQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useMeasurementStatusQuery(baseOptions: Apollo.QueryHookOptions<MeasurementStatusQuery, MeasurementStatusQueryVariables> & ({ variables: MeasurementStatusQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeasurementStatusQuery, MeasurementStatusQueryVariables>(MeasurementStatusDocument, options);
+      }
+export function useMeasurementStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeasurementStatusQuery, MeasurementStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeasurementStatusQuery, MeasurementStatusQueryVariables>(MeasurementStatusDocument, options);
+        }
+export function useMeasurementStatusSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MeasurementStatusQuery, MeasurementStatusQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MeasurementStatusQuery, MeasurementStatusQueryVariables>(MeasurementStatusDocument, options);
+        }
+export type MeasurementStatusQueryHookResult = ReturnType<typeof useMeasurementStatusQuery>;
+export type MeasurementStatusLazyQueryHookResult = ReturnType<typeof useMeasurementStatusLazyQuery>;
+export type MeasurementStatusSuspenseQueryHookResult = ReturnType<typeof useMeasurementStatusSuspenseQuery>;
+export type MeasurementStatusQueryResult = Apollo.QueryResult<MeasurementStatusQuery, MeasurementStatusQueryVariables>;
 export const MeasurementsDocument = gql`
     query measurements($host: String!, $path: String) {
   measurements(host: $host, path: $path) {

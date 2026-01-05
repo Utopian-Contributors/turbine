@@ -5,3 +5,14 @@ query measurementStats {
     totalAccessibilityViolations
   }
 }
+
+query measurementStatus($id: String!) {
+  measurement(id: $id) {
+    id
+    status
+    url
+    host {
+      host
+    }
+  }
+}
