@@ -18,7 +18,10 @@ interface MeasurePageProps {}
 const MeasurePage: React.FC<MeasurePageProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const searchParams = new URLSearchParams(location.search)
+  const searchParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  )
 
   const { data: measurementStatsQueryData } = useMeasurementStatsQuery()
   const [measurementsQuery] = useMeasurementsLazyQuery({
@@ -33,7 +36,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     (url: string) => {
       if (!isConnected || !isLoggedIn) {
         login()
-      } else if(url) {
+      } else if (url) {
         const urlObj = new URL(url)
         measurementsQuery({
           variables: { host: urlObj.host! },
