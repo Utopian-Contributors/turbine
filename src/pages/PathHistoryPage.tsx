@@ -109,10 +109,10 @@ const PathHistoryPage: React.FC<PathHistoryPageProps> = () => {
     [measurementsQueryData?.measurements]
   )
   const [selectedDevice, setSelectedDevice] = useState<DeviceType>(
-    DeviceType.Desktop
+    (search.get('device') as DeviceType) ?? DeviceType.Desktop
   )
   const [selectedConnection, setSelectedConnection] = useState<ConnectionType>(
-    ConnectionType.Wifi
+    (search.get('connection') as ConnectionType) ?? ConnectionType.Wifi
   )
   const selectedMeasurements = useMemo(
     () =>
@@ -207,9 +207,17 @@ const PathHistoryPage: React.FC<PathHistoryPageProps> = () => {
 
         <Button
           className="flex gap-2 bg-black hover:bg-gray-800 text-white"
-          disabled={!selectedMeasurements || selectedMeasurements.length <= 1 || !improvements}
+          disabled={
+            !selectedMeasurements ||
+            selectedMeasurements.length <= 1 ||
+            !improvements
+          }
           onClick={() => {
-            if (!selectedMeasurements || selectedMeasurements.length <= 1 || !improvements)
+            if (
+              !selectedMeasurements ||
+              selectedMeasurements.length <= 1 ||
+              !improvements
+            )
               return
             window.open(
               createShareLink(
@@ -246,8 +254,24 @@ const PathHistoryPage: React.FC<PathHistoryPageProps> = () => {
       <PerformanceChart
         selectedDevice={selectedDevice}
         selectedConnection={selectedConnection}
-        onDeviceChange={(type) => setSelectedDevice(type)}
-        onConnectionChange={(type) => setSelectedConnection(type)}
+        onDeviceChange={(type) => {
+          setSelectedDevice(type)
+          const newParams = new URLSearchParams(location.search)
+          newParams.set('device', type)
+          navigate(
+            `/measurements/${params.host}/history?${newParams.toString()}`,
+            { replace: true }
+          )
+        }}
+        onConnectionChange={(type) => {
+          setSelectedConnection(type)
+          const newParams = new URLSearchParams(location.search)
+          newParams.set('connection', type)
+          navigate(
+            `/measurements/${params.host}/history?${newParams.toString()}`,
+            { replace: true }
+          )
+        }}
         timeframe={
           selectedMeasurements && selectedMeasurements?.length > 1
             ? moment(
@@ -267,13 +291,13 @@ const PathHistoryPage: React.FC<PathHistoryPageProps> = () => {
             .reverse()
             .map((m) => ({
               time: m.createdAt,
-              elapsed: m.elapsed ? m.elapsed * 10_000 : null,
+              elapsed: m.elapsed ? m.elapsed * 1_000 : null,
               bundleSize: m.bundledFiles.reduce(
                 (acc, file) => acc + Number(file.size),
                 0
               ),
               largestContentfulPaint: m.largestContentfulPaint
-                ? m.largestContentfulPaint * 10_000
+                ? m.largestContentfulPaint * 1_000
                 : null,
             })) ?? []
         }

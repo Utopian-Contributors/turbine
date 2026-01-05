@@ -42,7 +42,11 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
     ? ((performanceImprovements.elapsed || 0) +
         (performanceImprovements.bundleSize || 0) +
         (performanceImprovements.lcp || 0)) /
-      3
+      [
+        performanceImprovements.elapsed,
+        performanceImprovements.bundleSize,
+        performanceImprovements.lcp,
+      ].filter(Boolean).length
     : null
 
   return (
@@ -133,7 +137,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                     valueFormatter={(value, label) =>
                       (label === 'Elapsed' || label === 'LCP') &&
                       typeof value === 'number'
-                        ? value / 10_000
+                        ? value / 1_000
                         : label === 'Bundle Size' && typeof value === 'number'
                         ? filesize(value)
                         : value
@@ -190,9 +194,11 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </div>
           </div>
         ) : null}
-        {timeframe ? <div className="text-muted-foreground">
-          Showing performance metrics for the last {timeframe}
-        </div> : null}
+        {timeframe ? (
+          <div className="text-muted-foreground">
+            Showing performance metrics for the last {timeframe}
+          </div>
+        ) : null}
       </CardFooter>
     </Card>
   )
