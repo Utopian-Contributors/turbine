@@ -575,16 +575,16 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                         )
                       }}
                       className={cn(
-                        'min-w-[120px] border rounded-md px-2 py-1 pt-6',
+                        'h-22 w-[120px] border rounded-md px-2 py-1 pt-6',
                         path === selectedPath
                           ? 'border-green-500 shadow-sm'
                           : 'cursor-pointer hover:shadow-md'
                       )}
                     >
-                      <p className="text-xs text-muted-foreground px-1 mb-1">
+                      <p className="text-sm max-w-40 line-clamp-2">{title}</p>
+                      <p className="text-xs text-muted-foreground px-1 mt-1">
                         {path}
                       </p>
-                      <p className="text-sm max-w-40 line-clamp-2">{title}</p>
                     </div>
                   )
                 })}
