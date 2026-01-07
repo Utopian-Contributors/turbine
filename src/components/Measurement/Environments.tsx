@@ -150,7 +150,6 @@ const Environments: React.FC<EnvironmentsProps> = ({
                           : ''
                       )}
                       onClick={() => {
-                        console.debug(current.id, measurementForDevice?.id)
                         if (isLoggedIn) {
                           onClick(device.type, connection)
                           navigate(

@@ -31,11 +31,7 @@ export const VerifyPage: React.FC = () => {
     onError: (error) => console.error(error),
   })
 
-  const [resendCode, resendMutationResult] = useResendCodeMutation({
-    onCompleted: () => {
-      console.debug('Code was sent again.')
-    },
-  })
+  const [resendCode, resendMutationResult] = useResendCodeMutation()
 
   const resendResultMessage = useMemo(() => {
     if (resendMutationResult.data?.resendVerificationCode) {
