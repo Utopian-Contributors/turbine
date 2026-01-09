@@ -9,7 +9,7 @@ export const useWalletOrAccLogin = () => {
   const navigate = useNavigate()
   const location = window.location
   const { data: loggedInQueryData } = useLoggedInQuery()
-  const { open } = useModal()
+  const { open, isOpened } = useModal()
   const { isConnected, addresses } = usePhantom()
 
   useEffect(() => {
@@ -43,6 +43,7 @@ export const useWalletOrAccLogin = () => {
     address:
       addresses.find((addr) => addr.addressType === AddressType.solana)
         ?.address || null,
+    isOpened,
     isConnected: !!loggedInQueryData?.loggedIn && isConnected,
     isLoggedIn: !!loggedInQueryData?.loggedIn,
     login,

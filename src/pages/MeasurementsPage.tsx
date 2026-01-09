@@ -30,6 +30,7 @@ import {
   useMeasurementsLazyQuery,
   useWebsiteQuery,
   type Measurement,
+  type WebsiteHost,
 } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -189,15 +190,18 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
 
   useEffect(() => {
     const hasExistingMeasurements = (
-      measurements?: Pick<Measurement, 'url' | 'redirect'>[] | null
+      measurements?:
+        | (Pick<Measurement, 'url' | 'redirect'> & {
+            host?: Pick<WebsiteHost, 'host'> | null
+          })[]
+        | null
     ) => {
       return measurements?.some((m) => {
         return (
-          (new URL(m.url).host === params.host &&
-            new URL(m.url).pathname === selectedPath) ||
-          (m.redirect &&
-            new URL(m.redirect).host === params.host &&
-            new URL(m.redirect).pathname === selectedPath)
+          m.host?.host === params.host &&
+          (!selectedPath ||
+            new URL(m.url).pathname === selectedPath ||
+            (m.redirect && new URL(m.redirect).pathname === selectedPath))
         )
       })
     }
@@ -238,6 +242,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
           )
         ) {
           createMeasure({
+            url,
             device,
             connection,
           })
@@ -429,7 +434,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 transition={{ duration: 1, delay: 0.5 }}
                 className="flex flex-col items-center lg:items-end gap-2 pt-2"
               >
-                <Pricetag />
+                {!(
+                  searchParams.get('device') === DeviceType.Desktop &&
+                  selectedConnection === ConnectionType.Wifi
+                ) && <Pricetag />}
                 <Button
                   className="flex gap-2"
                   variant="outline"
@@ -441,9 +449,9 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                         )?.type
                       if (!device) return
                       createMeasure({
+                        url,
                         device,
                         connection: selectedConnection,
-                        remeasure: true,
                       })
                     }
                   }}

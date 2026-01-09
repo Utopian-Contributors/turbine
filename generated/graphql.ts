@@ -295,7 +295,6 @@ export type MutationAddSubpathArgs = {
 export type MutationCreateMeasurementArgs = {
   connection?: InputMaybe<ConnectionType>;
   device?: InputMaybe<DeviceType>;
-  remeasure?: InputMaybe<Scalars['Boolean']['input']>;
   tokenMint?: InputMaybe<Scalars['String']['input']>;
   txSignature?: InputMaybe<Scalars['String']['input']>;
   url?: InputMaybe<Scalars['String']['input']>;
@@ -852,12 +851,11 @@ export type MeasurementDevicesQuery = { __typename?: 'Query', measurementDevices
 
 export type CreateMeasurementMutationVariables = Exact<{
   url: Scalars['String']['input'];
-  remeasure?: InputMaybe<Scalars['Boolean']['input']>;
   device?: InputMaybe<DeviceType>;
   connection?: InputMaybe<ConnectionType>;
-  txSignature: Scalars['String']['input'];
-  walletAddress: Scalars['String']['input'];
-  tokenMint: Scalars['String']['input'];
+  txSignature?: InputMaybe<Scalars['String']['input']>;
+  walletAddress?: InputMaybe<Scalars['String']['input']>;
+  tokenMint?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -2216,10 +2214,9 @@ export type MeasurementDevicesLazyQueryHookResult = ReturnType<typeof useMeasure
 export type MeasurementDevicesSuspenseQueryHookResult = ReturnType<typeof useMeasurementDevicesSuspenseQuery>;
 export type MeasurementDevicesQueryResult = Apollo.QueryResult<MeasurementDevicesQuery, MeasurementDevicesQueryVariables>;
 export const CreateMeasurementDocument = gql`
-    mutation createMeasurement($url: String!, $remeasure: Boolean, $device: DeviceType, $connection: ConnectionType, $txSignature: String!, $walletAddress: String!, $tokenMint: String!) {
+    mutation createMeasurement($url: String!, $device: DeviceType, $connection: ConnectionType, $txSignature: String, $walletAddress: String, $tokenMint: String) {
   createMeasurement(
     url: $url
-    remeasure: $remeasure
     device: $device
     connection: $connection
     txSignature: $txSignature
@@ -2257,7 +2254,6 @@ export type CreateMeasurementMutationFn = Apollo.MutationFunction<CreateMeasurem
  * const [createMeasurementMutation, { data, loading, error }] = useCreateMeasurementMutation({
  *   variables: {
  *      url: // value for 'url'
- *      remeasure: // value for 'remeasure'
  *      device: // value for 'device'
  *      connection: // value for 'connection'
  *      txSignature: // value for 'txSignature'

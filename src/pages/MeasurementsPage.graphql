@@ -38,16 +38,14 @@ query measurementDevices {
 
 mutation createMeasurement(
   $url: String!
-  $remeasure: Boolean
   $device: DeviceType
   $connection: ConnectionType
-  $txSignature: String!
-  $walletAddress: String!
-  $tokenMint: String!
+  $txSignature: String
+  $walletAddress: String
+  $tokenMint: String
 ) {
   createMeasurement(
     url: $url
-    remeasure: $remeasure
     device: $device
     connection: $connection
     txSignature: $txSignature

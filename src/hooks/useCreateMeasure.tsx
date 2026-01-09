@@ -1,19 +1,19 @@
-import { useModal, usePhantom, useSolana } from '@phantom/react-sdk'
+import { useSolana } from '@phantom/react-sdk'
 import { PublicKey } from '@solana/web3.js'
 import { useCallback, useEffect, useState } from 'react'
 import {
+  ConnectionType,
   DeviceType,
   MeasurementsDocument,
   useCreateMeasurementMutation,
   useMeasurementPricesQuery,
-  type ConnectionType
 } from '../../generated/graphql'
 import { USDC_MINT_ADDRESS, useBalance, UTCC_MINT_ADDRESS } from './useBalance'
 import { useSendTransaction } from './useSendTransaction'
+import { useWalletOrAccLogin } from './useWalletOrAccLogin'
 
 interface CreateMeasureArgs {
-  url?: string
-  remeasure?: boolean
+  url: string
   device: DeviceType
   connection: ConnectionType
 }
@@ -24,8 +24,7 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
   const [isPaying, setIsPaying] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { solana } = useSolana()
-  const { isConnected } = usePhantom()
-  const { open, isOpened } = useModal()
+  const { login, isOpened, isLoggedIn, isConnected } = useWalletOrAccLogin()
   const { balance, preferedPayment: tokenMint } = useBalance()
 
   const { sendTransaction } = useSendTransaction(tokenMint)
@@ -33,9 +32,36 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
   const [unfinishedRequest, setUnfinishedRequest] =
     useState<CreateMeasureArgs | null>(null)
 
+  const create = useCallback(
+    async (options: CreateMeasureArgs) => {
+      const { url, device, connection } = options
+      return await createMeasurement({
+        variables: {
+          url,
+          device,
+          connection,
+        },
+        refetchQueries: [
+          {
+            query: MeasurementsDocument,
+            variables: {
+              host: url ? new URL(url).host : undefined,
+            },
+          },
+        ],
+        onError: () => {
+          setIsPaying(false)
+        },
+        onCompleted: () => {
+          setIsPaying(false)
+        },
+      })
+    },
+    [createMeasurement]
+  )
+
   const payAndCreate = useCallback(
     async (options: CreateMeasureArgs) => {
-      const { remeasure, device, connection } = options
       const walletAddress = await solana.getPublicKey()
       if (!walletAddress) {
         throw new Error('Wallet not connected')
@@ -107,38 +133,14 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
       }
 
       if (url) {
-        return await createMeasurement({
-          variables: {
-            url,
-            remeasure: remeasure ?? false,
-            device,
-            connection,
-            tokenMint,
-            walletAddress: walletAddress,
-            txSignature: signature,
-          },
-          refetchQueries: [
-            {
-              query: MeasurementsDocument,
-              variables: {
-                host: url ? new URL(url).host : undefined,
-              },
-            },
-          ],
-          onError: () => {
-            setIsPaying(false)
-          },
-          onCompleted: () => {
-            setIsPaying(false)
-          },
-        })
+        return create(options)
       }
     },
     [
       balance?.sol?.amount,
       balance?.usdc?.amount,
       balance?.utcc?.amount,
-      createMeasurement,
+      create,
       measurementPricesData?.measurementPrices,
       sendTransaction,
       solana,
@@ -154,19 +156,25 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
     }
   }, [isConnected, isOpened, payAndCreate, unfinishedRequest])
 
-  const createMeasure = async (
-    options: CreateMeasureArgs
-  ): Promise<void> => {
+  const createMeasure = async (options: CreateMeasureArgs): Promise<void> => {
     if (options.url) {
       url = options.url
     }
 
     try {
       setError(null)
-      if (!isConnected && !isOpened) {
-        setUnfinishedRequest(options)
+      if (
+        options.device === DeviceType.Desktop &&
+        options.connection === ConnectionType.Wifi &&
+        isLoggedIn
+      ) {
+        await create(options)
+      } else if (!isConnected && !isOpened) {
+        if (isLoggedIn) {
+          setUnfinishedRequest(options)
+        }
         console.debug('Opening modal for payment...')
-        await open()
+        await login()
       } else if (isConnected) {
         await payAndCreate(options)
       }

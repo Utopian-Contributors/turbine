@@ -37,9 +37,6 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     string | null
   >(null)
 
-  console.debug('Measurement status data:', measurementStatusData)
-  console.debug('Pending measurement ID:', pendingMeasurementId)
-
   useEffect(() => {
     if (
       measurementStatusData?.measurement?.status === MeasurementStatus.Pending
@@ -76,6 +73,9 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     async (url: string) => {
       if (url) {
         const urlObj = new URL(url)
+        navigate(`/measure?url=${encodeURIComponent(urlObj.href)}`, {
+          replace: true,
+        })
         await createMeasure({
           url: new URL(urlObj.pathname, `https://${urlObj.host}`).href,
           device: DeviceType.Desktop,
@@ -83,7 +83,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
         })
       }
     },
-    [createMeasure]
+    [createMeasure, navigate]
   )
 
   useEffect(() => {

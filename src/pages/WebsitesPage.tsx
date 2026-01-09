@@ -161,8 +161,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                             {website.title}
                           </h3>
                           <span className="text-gray-400 text-xs">
-                            {website.rootMeasurement?.redirect ||
-                              website.rootMeasurement?.url}
+                            {website.host}
                           </span>
                         </div>
                       </div>
