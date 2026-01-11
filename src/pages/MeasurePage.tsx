@@ -1,6 +1,7 @@
 import AutoProgress from '@/components/ui/auto-progress'
 import { SearchWebsite } from '@/components/ui/search-website'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
+import { motion } from 'framer-motion'
 import { abbreviateNumber } from 'js-abbreviation-number'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
@@ -145,12 +146,76 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
           />
         ) : null}
         {measurementStatusData?.measurement?.status ===
-        MeasurementStatus.Pending ? (
+          MeasurementStatus.Pending ? (
           <div className="flex flex-col items-center gap-2 my-6">
-            <div className="text-4xl animate-pulse m-6 text-white whitespace-nowrap overflow-hidden">
+            <div className="text-4xl m-6 text-white whitespace-nowrap overflow-hidden">
               Measuring website...
             </div>
             <AutoProgress />
+            <motion.div
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 0 }}
+              transition={{
+                delay: 5,
+                repeat: Infinity,
+                repeatType: 'reverse',
+                repeatDelay: 4,
+              }}
+              className="flex flex-col gap-2 mt-6 items-center"
+            >
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  delay: 1,
+                  repeat: Infinity,
+                  repeatType: 'reverse',
+                  repeatDelay: 4,
+                }}
+                className="text-lg text-green-100 px-3 py-1"
+              >
+                Reading SEO metadata
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  delay: 2,
+                  repeat: Infinity,
+                  repeatType: 'reverse',
+                  repeatDelay: 4,
+                }}
+                className="text-lg text-green-100 px-3 py-1"
+              >
+                Analyzing the website bundle
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  delay: 3,
+                  repeat: Infinity,
+                  repeatType: 'reverse',
+                  repeatDelay: 4,
+                }}
+                className="text-lg text-green-100 px-3 py-1"
+              >
+                Measuring image dimensions
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  delay: 4,
+                  repeat: Infinity,
+                  repeatType: 'reverse',
+                  repeatDelay: 4,
+                }}
+                className="text-lg text-green-100 px-3 py-1"
+              >
+                Tracking performance
+              </motion.span>
+            </motion.div>
           </div>
         ) : null}
         {measurementStatusData?.measurement?.status !==
