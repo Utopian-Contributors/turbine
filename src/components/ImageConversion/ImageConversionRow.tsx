@@ -35,7 +35,6 @@ interface ImageConversionRowProps {
 const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
   id,
   url,
-  // originalSize from GraphQL is the transferred size, not actual blob size - not used
   width,
   height,
   clientWidth,
@@ -194,6 +193,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
               <label className="text-xs text-muted-foreground">Quality</label>
               <Select
                 value={settings.quality}
+                disabled={!settings.convertToWebp}
                 onValueChange={(v) =>
                   setSettings((s) => ({ ...s, quality: v as QualityOption }))
                 }
