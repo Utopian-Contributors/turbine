@@ -145,7 +145,7 @@ const ImageConversionPage: React.FC = () => {
       </div>
 
       {/* Sticky Savings Summary */}
-      {processedStates.size > 0 && totalSavings.originalTotal > 0 && (
+      {processedStates.size > 0 && totalSavings.saved > 0 && (
         <div className="sticky top-4 z-10 mb-6">
           <Card className="border-green-500/30 bg-background/80 backdrop-blur py-0">
             <CardContent className="py-4">
@@ -154,7 +154,7 @@ const ImageConversionPage: React.FC = () => {
                   <span className="text-2xl font-bold text-green-500">
                     {filesize(totalSavings.saved)} saved
                   </span>
-                  <span className="text-sm text-muted-foreground uppercase">
+                  <span className="text-sm text-muted-foreground">
                     Total Savings
                   </span>
                 </div>

@@ -116,8 +116,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
     link.href = processed.processedUrl
     const originalName = url.split('/').pop() || 'image'
     const extension = settings.convertToWebp ? '.webp' : '.png'
-    link.download =
-      originalName.replace(/\.[^.]+$/, '') + extension
+    link.download = originalName.replace(/\.[^.]+$/, '') + extension
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -135,7 +134,14 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
 
   // Don't render if hidden due to error
   if (hidden) {
-    return null
+    return (
+      <div>
+        <p className="text-red-500">Error displaying: </p>
+        <a href={url} target="_blank" className="underline">
+          {url}
+        </a>
+      </div>
+    )
   }
 
   return (
@@ -156,14 +162,18 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
               />
             </div>
             <div className="mt-2 text-sm">
-              <div className="truncate text-muted-foreground" title={url}>
-                {url.split('/').pop()}
-              </div>
               <div className="flex justify-between">
-                <span>
-                  {actualWidth} × {actualHeight}
+                <div className="flex flex-col">
+                  <div className="truncate text-muted-foreground" title={url}>
+                    {abbreviateFilename(url.split('/').pop()!, 30)}
+                  </div>
+                  <span className="text-xs">
+                    {actualWidth} × {actualHeight}
+                  </span>
+                </div>
+                <span className="h-fit">
+                  {processed ? filesize(originalBlobSize) : '...'}
                 </span>
-                <span>{processed ? filesize(originalBlobSize) : '...'}</span>
               </div>
             </div>
           </div>
@@ -262,16 +272,16 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
             </div>
             <div className="mt-2 text-sm">
               {processed && !processing ? (
-                <div className='w-full flex justify-between gap-2'>
+                <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-2">
                   <div className="w-full flex justify-between">
-                    <div>
+                    <div className="flex flex-col">
                       <div
                         className="truncate text-muted-foreground"
                         title={processed.processedFilename}
                       >
-                        {abbreviateFilename(processed.processedFilename, 28)}
+                        {abbreviateFilename(processed.processedFilename, 24)}
                       </div>
-                      <span>
+                      <span className="text-xs h-[16px]">
                         {processed.processedWidth} × {processed.processedHeight}
                       </span>
                     </div>
@@ -296,9 +306,17 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
                       </span>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" onClick={handleDownload}>
-                    <Download className="w-4 h-4" />
-                  </Button>
+                  {savings > 0 && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full lg:w-fit flex gap-2 items-center"
+                      onClick={handleDownload}
+                    >
+                      <Download className="w-4 h-4" />
+                      <span className="lg:hidden">Download</span>
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <div className="text-muted-foreground">...</div>

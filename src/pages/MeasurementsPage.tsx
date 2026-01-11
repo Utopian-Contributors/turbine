@@ -21,7 +21,14 @@ import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { toHeaderCase } from 'js-convert-case'
-import { ChartLine, Clock, EyeOff, FileWarning, Plus, Repeat } from 'lucide-react'
+import {
+  ChartLine,
+  Clock,
+  EyeOff,
+  FileWarning,
+  Plus,
+  Repeat,
+} from 'lucide-react'
 import moment from 'moment'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import {
@@ -531,22 +538,28 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
               transition={{ duration: 1 }}
               className="lg:px-6 flex flex-col lg:flex-row gap-4 mb-6"
             >
-              <div
-                className="cursor-pointer w-full lg:w-fit border rounded-md border-amber-200 bg-amber-500/10 shadow-sm flex flex-col gap-2 p-4"
-                onClick={() =>
-                  navigate(
-                    '/measurements/' +
-                      params.host +
-                      '/images' +
-                      `?path=${selectedPath}`
-                  )
-                }
-              >
-                <FileWarning className='text-amber-500'/>
-                <span className="text-sm text-amber-500">
-                  Convert large images
-                </span>
-              </div>
+              {measurement.bundledFiles.filter(
+                (f) =>
+                  f.type.includes('png') ||
+                  f.url.split('?')[0].toLowerCase().endsWith('.png')
+              ).length > 0 && (
+                <div
+                  className="cursor-pointer w-full lg:w-fit border rounded-md border-amber-200 bg-amber-500/10 shadow-sm flex flex-col gap-2 p-4"
+                  onClick={() =>
+                    navigate(
+                      '/measurements/' +
+                        params.host +
+                        '/images' +
+                        `?path=${selectedPath}`
+                    )
+                  }
+                >
+                  <FileWarning className="text-amber-500" />
+                  <span className="text-sm text-amber-500">
+                    Convert large images
+                  </span>
+                </div>
+              )}
               <div
                 className="cursor-pointer w-full lg:w-fit border rounded-md shadow-sm flex flex-col justify-end gap-2 p-4"
                 onClick={() =>
