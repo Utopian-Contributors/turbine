@@ -425,7 +425,8 @@ export type QueryFontArgs = {
 
 
 export type QueryImagesToConvertArgs = {
-  url?: InputMaybe<Scalars['String']['input']>;
+  host?: InputMaybe<Scalars['String']['input']>;
+  path?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -723,7 +724,8 @@ export type PopularFontsQueryVariables = Exact<{ [key: string]: never; }>;
 export type PopularFontsQuery = { __typename?: 'Query', popularFonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, integrated: boolean, publishedAt: any }> | null };
 
 export type ImagesToConvertQueryVariables = Exact<{
-  url: Scalars['String']['input'];
+  host: Scalars['String']['input'];
+  path?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -1481,8 +1483,8 @@ export type PopularFontsLazyQueryHookResult = ReturnType<typeof usePopularFontsL
 export type PopularFontsSuspenseQueryHookResult = ReturnType<typeof usePopularFontsSuspenseQuery>;
 export type PopularFontsQueryResult = Apollo.QueryResult<PopularFontsQuery, PopularFontsQueryVariables>;
 export const ImagesToConvertDocument = gql`
-    query imagesToConvert($url: String!) {
-  imagesToConvert(url: $url) {
+    query imagesToConvert($host: String!, $path: String) {
+  imagesToConvert(host: $host, path: $path) {
     desktop {
       ...BundledImage
     }
@@ -1508,7 +1510,8 @@ export const ImagesToConvertDocument = gql`
  * @example
  * const { data, loading, error } = useImagesToConvertQuery({
  *   variables: {
- *      url: // value for 'url'
+ *      host: // value for 'host'
+ *      path: // value for 'path'
  *   },
  * });
  */

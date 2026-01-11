@@ -2,6 +2,8 @@ import { SearchWebsite } from '@/components/ui/search-website'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Bundle from '@/components/Measurement/Bundle'
+import BundleOverheadCTA from '@/components/Measurement/BundleOverheadCTA'
+import ConvertImagesCTA from '@/components/Measurement/ConvertImagesCTA'
 import Environments from '@/components/Measurement/Environments'
 import Pricetag from '@/components/Pricetag'
 import AutoProgress from '@/components/ui/auto-progress'
@@ -167,9 +169,16 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         <div className="col-span-4 lg:col-span-3">
           <Bundle measurement={measurement} />
         </div>
+        <div className="lg:col-span-1 flex flex-col gap-4">
+          {measurement.bundledFiles.find(
+            (f) => f.type === 'image/png' || f.url.endsWith('.png')
+          ) && params.host && <ConvertImagesCTA host={params.host} path={selectedPath} />}
+          {measurement.bundledFiles.filter((f) => f.type === 'js').length >
+            6 && <BundleOverheadCTA />}
+        </div>
       </motion.div>
     )
-  }, [measurement])
+  }, [measurement, params.host, selectedPath])
 
   const search = useCallback(
     (url: string) => {

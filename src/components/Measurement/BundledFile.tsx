@@ -1,3 +1,4 @@
+import { abbreviateFilename } from '@/helpers/strings'
 import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
 import { Globe, Info } from 'lucide-react'
@@ -21,29 +22,10 @@ const getFilename = (url: string, baseUrl: string) => {
   }
 }
 
-const abbreviateFilename = (filename: string, maxLength = 40) => {
-  if (filename.length <= maxLength) return filename
-
-  const lastDotIndex = filename.lastIndexOf('.')
-  const extension = lastDotIndex !== -1 ? filename.slice(lastDotIndex) : ''
-  const nameWithoutExt =
-    lastDotIndex !== -1 ? filename.slice(0, lastDotIndex) : filename
-
-  // Calculate how many characters to show on each side
-  const availableLength = maxLength - extension.length - 3 // 3 for "..."
-  const startLength = Math.ceil(availableLength / 2)
-  const endLength = Math.floor(availableLength / 8)
-
-  const start = nameWithoutExt.slice(0, startLength)
-  const end = nameWithoutExt.slice(-endLength)
-
-  return `${start}...${end}${extension}`
-}
-
 const FileTooltip: React.FC<
   { url: string; contentType: string } & React.HTMLAttributes<HTMLDivElement>
 > = ({ url, contentType }) => {
-  if (contentType.includes('png') || url.endsWith('.png')) {
+  if (contentType.includes('png') || url.split("?")[0].endsWith('.png')) {
     return (
       <Tooltip>
         <TooltipTrigger>
@@ -59,6 +41,7 @@ const FileTooltip: React.FC<
       </Tooltip>
     )
   }
+  return null
 }
 
 const BundledFile: React.FC<BundledFileProps> = ({
@@ -80,7 +63,7 @@ const BundledFile: React.FC<BundledFileProps> = ({
             <a
               className={cn(
                 'max-w-[60ch] text-md truncate',
-                contentType.includes('image/png')
+                contentType.includes('png') || url.split("?")[0].endsWith('.png')
                   ? 'text-red-500'
                   : 'text-primary'
               )}
@@ -97,7 +80,7 @@ const BundledFile: React.FC<BundledFileProps> = ({
             {new URL(url).hostname !== new URL(baseUrl).hostname ? (
               <Globe className="h-3 w-3 text-muted-foreground" />
             ) : null}{' '}
-            <span className="max-w-48 truncate text-xs text-muted-foreground leading-[12px]">
+            <span className="max-w-48 truncate text-xs text-muted-foreground leading-[14px]">
               {abbreviateFilename(new URL(url).hostname, 40)}
             </span>
           </div>

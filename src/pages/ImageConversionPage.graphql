@@ -1,5 +1,5 @@
-query imagesToConvert($url: String!) {
-  imagesToConvert(url: $url) {
+query imagesToConvert($host: String!, $path: String) {
+  imagesToConvert(host: $host, path: $path) {
     desktop {
       ...BundledImage
     }

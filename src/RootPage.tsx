@@ -5,7 +5,7 @@ import {
   LogOutIcon,
   Scale,
   SearchIcon,
-  WalletIcon
+  WalletIcon,
 } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
