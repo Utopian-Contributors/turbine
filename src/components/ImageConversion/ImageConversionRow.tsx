@@ -75,6 +75,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
   const [processed, setProcessed] = useState<ProcessedResult | null>(null)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [hidden, setHidden] = useState(false)
 
   const { processImage } = useImageProcessor()
 
@@ -96,6 +97,8 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
       setError(err instanceof Error ? err.message : 'Processing failed')
       setProcessed(null)
       onProcessed(id, null)
+      // Hide the row on error (image failed to load)
+      setHidden(true)
     } finally {
       setProcessing(false)
     }
@@ -130,6 +133,11 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
     processed && originalBlobSize > 0
       ? Math.round((1 - processed.processedSize / originalBlobSize) * 100)
       : 0
+
+  // Don't render if hidden due to error
+  if (hidden) {
+    return null
+  }
 
   return (
     <Card className="overflow-hidden py-0 mx-4">
