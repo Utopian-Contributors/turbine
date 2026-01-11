@@ -169,7 +169,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         <div className="col-span-4 lg:col-span-3">
           <Bundle measurement={measurement} />
         </div>
-        <div className="lg:col-span-1 flex flex-col gap-4">
+        <div className="col-span-4 lg:col-span-1 flex flex-col gap-4">
           {measurement.bundledFiles.find(
             (f) => f.type === 'image/png' || f.url.endsWith('.png')
           ) && params.host && <ConvertImagesCTA host={params.host} path={selectedPath} />}
