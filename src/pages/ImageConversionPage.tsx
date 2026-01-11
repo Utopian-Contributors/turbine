@@ -199,7 +199,7 @@ const ImageConversionPage: React.FC = () => {
       {pngImages.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           <ImageIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>No PNG images found for this page.</p>
+          <p>No PNG images found.</p>
         </div>
       )}
     </div>
