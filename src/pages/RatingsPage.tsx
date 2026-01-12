@@ -9,7 +9,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { toHeaderCase } from 'js-convert-case'
-import { ArrowLeft, CheckIcon, XIcon } from 'lucide-react'
+import { ArrowLeft, CheckIcon, CircleQuestionMark, XIcon } from 'lucide-react'
 import { useWebsiteRatingQuery } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -22,6 +22,7 @@ interface RatingsSectionProps {
   files?: string[]
   error?: string
   errorScreenshot?: string
+  learnMoreUrl?: string
 }
 
 const RatingsSection: React.FC<RatingsSectionProps> = ({
@@ -31,6 +32,7 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
   files,
   error,
   errorScreenshot,
+  learnMoreUrl,
 }) => {
   return (
     <div className="flex flex-col lg:flex-row lg:justify-between items-start lg:items-center p-1">
@@ -58,7 +60,15 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
             ) : null}
           </div>
           <h3 className="hidden md:block text-lg font-medium">{title}</h3>
-          <p className="text-sm text-gray-500 mb-1 lg:mb-2">{description}</p>
+          <div className="flex gap-1 items-center mb-1 lg:mb-2">
+            <p className="text-sm text-gray-500">{description}</p>
+            <a href={learnMoreUrl} target="_blank">
+              <CircleQuestionMark
+                size={16}
+                className="cursor-pointer text-gray-400"
+              />
+            </a>
+          </div>
           {errorScreenshot && (
             <img
               src={errorScreenshot}
@@ -203,6 +213,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       ? "Doesn't have HTTPS support"
                       : undefined
                   }
+                  learnMoreUrl="https://developer.mozilla.org/en-US/docs/Glossary/HTTPS"
                 />
                 <RatingsSection
                   title="No mixed content"
@@ -213,6 +224,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       ? 'Contains mixed content'
                       : undefined
                   }
+                  learnMoreUrl="https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Mixed_content"
                 />
               </div>
             </AccordionContent>
@@ -241,6 +253,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                   error={
                     !rating.hasFavicon ? "Doesn't have a favicon" : undefined
                   }
+                  learnMoreUrl="https://developer.mozilla.org/en-US/docs/Glossary/Favicon"
                 />
                 <RatingsSection
                   title="Description meta tag"
@@ -251,16 +264,18 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       ? 'No description meta tag was found'
                       : undefined
                   }
+                  learnMoreUrl="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta#setting_a_meta_description"
                 />
                 <RatingsSection
                   title="Thumbnail meta tag"
-                  description="Contains a thumbnail image for social media sharing."
+                  description="Contains an og:image meta tag for social media sharing."
                   value={rating.hasOgImage}
                   error={
                     !rating.hasOgImage
                       ? 'No og:image meta tag was found'
                       : undefined
                   }
+                  learnMoreUrl="https://ogp.me/"
                 />
               </div>
             </AccordionContent>
@@ -292,6 +307,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                         errorScreenshot={
                           v.screenshots?.length ? v.screenshots[0] : undefined
                         }
+                        learnMoreUrl={v.helpUrl}
                       />
                     ))
                   : 'No accessibility issues found.'}
@@ -324,6 +340,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       ? 'Takes longer than 3s to load'
                       : undefined
                   }
+                  learnMoreUrl="https://developer.mozilla.org/en-US/docs/Web/Performance"
                 />
                 <RatingsSection
                   title="Fast3G Load Time"
@@ -334,20 +351,30 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       : undefined
                   }
                   error={
-                    typeof rating.fast3GLoadTime === 'number' ? rating.fast3GLoadTime! > 7000
-                      ? 'Takes longer than 7s to load'
-                      : undefined : "No data available"
+                    typeof rating.fast3GLoadTime === 'number'
+                      ? rating.fast3GLoadTime! > 7000
+                        ? 'Takes longer than 7s to load'
+                        : undefined
+                      : 'No data available'
                   }
+                  learnMoreUrl="https://developer.mozilla.org/en-US/docs/Web/Performance"
                 />
                 <RatingsSection
                   title="Slow3G Load Time"
                   description="Has a decent load time on a slow 3G connection."
-                  value={typeof rating.slow3GLoadTime === 'number' ? rating.slow3GLoadTime + 'ms' : undefined}
-                  error={
-                    typeof rating.slow3GLoadTime === 'number' ? rating.slow3GLoadTime! > 15000
-                      ? 'Takes longer than 15s to load'
-                      : undefined : "No data available"
+                  value={
+                    typeof rating.slow3GLoadTime === 'number'
+                      ? rating.slow3GLoadTime + 'ms'
+                      : undefined
                   }
+                  error={
+                    typeof rating.slow3GLoadTime === 'number'
+                      ? rating.slow3GLoadTime! > 15000
+                        ? 'Takes longer than 15s to load'
+                        : undefined
+                      : 'No data available'
+                  }
+                  learnMoreUrl="https://developer.mozilla.org/en-US/docs/Web/Performance"
                 />
                 <RatingsSection
                   title="Compressed Images"
@@ -363,6 +390,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       : undefined
                   }
                   files={rating.webpUsage}
+                  learnMoreUrl="https://developers.google.com/speed/webp"
                 />
                 <RatingsSection
                   title="Compressed Videos"
@@ -378,6 +406,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       : undefined
                   }
                   files={rating.avifUsage}
+                  learnMoreUrl="https://en.wikipedia.org/wiki/AVIF"
                 />
                 <RatingsSection
                   title="Cache Controls"
@@ -392,6 +421,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       ? 'All files use cache control'
                       : undefined
                   }
+                  learnMoreUrl="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching"
                 />
                 <RatingsSection
                   title="Transfer Compression"
@@ -407,6 +437,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                       : undefined
                   }
                   files={rating.compressionUsage}
+                  learnMoreUrl="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Encoding"
                 />
               </div>
             </AccordionContent>
