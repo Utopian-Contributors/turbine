@@ -488,6 +488,7 @@ export type QueryWebsiteArgs = {
 
 
 export type QueryWebsitesArgs = {
+  order?: InputMaybe<WebsiteHostQueryOrder>;
   pagination?: InputMaybe<PaginationInput>;
   query?: InputMaybe<Scalars['String']['input']>;
 };
@@ -643,6 +644,13 @@ export type WebsiteHost = {
   thumbnail?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
 };
+
+export enum WebsiteHostQueryOrder {
+  CreatedAtAsc = 'CREATED_AT_ASC',
+  CreatedAtDesc = 'CREATED_AT_DESC',
+  HostAsc = 'HOST_ASC',
+  HostDesc = 'HOST_DESC'
+}
 
 export type LoggedInQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -935,6 +943,7 @@ export type FontSearchResultFragment = { __typename?: 'Font', id: string, name: 
 
 export type WebsitesQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
+  order?: InputMaybe<WebsiteHostQueryOrder>;
   pagination?: InputMaybe<PaginationInput>;
 }>;
 
@@ -2832,8 +2841,8 @@ export type SearchFontsLazyQueryHookResult = ReturnType<typeof useSearchFontsLaz
 export type SearchFontsSuspenseQueryHookResult = ReturnType<typeof useSearchFontsSuspenseQuery>;
 export type SearchFontsQueryResult = Apollo.QueryResult<SearchFontsQuery, SearchFontsQueryVariables>;
 export const WebsitesDocument = gql`
-    query websites($query: String, $pagination: PaginationInput) {
-  websites(query: $query, pagination: $pagination) {
+    query websites($query: String, $order: WebsiteHostQueryOrder, $pagination: PaginationInput) {
+  websites(query: $query, order: $order, pagination: $pagination) {
     id
     host
     ratings {
@@ -2866,6 +2875,7 @@ export const WebsitesDocument = gql`
  * const { data, loading, error } = useWebsitesQuery({
  *   variables: {
  *      query: // value for 'query'
+ *      order: // value for 'order'
  *      pagination: // value for 'pagination'
  *   },
  * });

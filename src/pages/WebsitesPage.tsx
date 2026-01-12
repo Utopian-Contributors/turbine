@@ -1,4 +1,4 @@
-import { CameraOff } from 'lucide-react'
+import { CameraOff, List } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { useLocation, useNavigate } from 'react-router'
@@ -7,10 +7,35 @@ import Search from '@/components/blocks/search'
 import PreloadImage from '@/components/ui/preload-image-cover'
 import StarRating from '@/components/ui/StarRating'
 
-import { useWebsitesQuery, type WebsiteHost } from '../../generated/graphql'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '@/components/ui/select'
+import {
+  useWebsitesQuery,
+  WebsiteHostQueryOrder,
+  type WebsiteHost,
+} from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface WebsitesPageProps {}
+
+const renderSelectedOrder = (order: WebsiteHostQueryOrder | null) => {
+  switch (order) {
+    case WebsiteHostQueryOrder.CreatedAtAsc:
+      return 'Oldest'
+    case WebsiteHostQueryOrder.CreatedAtDesc:
+      return 'Newest'
+    case WebsiteHostQueryOrder.HostAsc:
+      return 'A-Z'
+    case WebsiteHostQueryOrder.HostDesc:
+      return 'Z-A'
+    default:
+      return 'Sort By'
+  }
+}
 
 const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   const navigate = useNavigate()
@@ -20,6 +45,10 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
     refetch,
     fetchMore: fetchMoreWebsites,
   } = useWebsitesQuery({ variables: { pagination: { take: 12 } } })
+  const [selectedOrder, setSelectedOrder] =
+    useState<WebsiteHostQueryOrder | null>(
+      new URLSearchParams(location.search).get('order') as WebsiteHostQueryOrder
+    )
   const [hasMoreWebsites, setHasMoreWebsites] = useState(true)
   const [iconError, setIconError] = useState<Record<string, boolean>>({})
 
@@ -31,6 +60,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
             skip: websitesQueryData?.websites?.length,
             take: 10,
           },
+          order: selectedOrder,
         },
         updateQuery: (prev, { fetchMoreResult }) => {
           if ((fetchMoreResult.websites?.length ?? 0) < 10) {
@@ -49,7 +79,12 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
         },
       })
     }
-  }, [fetchMoreWebsites, hasMoreWebsites, websitesQueryData?.websites?.length])
+  }, [
+    fetchMoreWebsites,
+    hasMoreWebsites,
+    selectedOrder,
+    websitesQueryData?.websites?.length,
+  ])
 
   const { ref: lastWebsiteRef, inView: lastWebsiteRefInView } = useInView()
   useEffect(() => {
@@ -61,8 +96,8 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const query = params.get('q') || ''
-    refetch({ query })
-  }, [location.search, refetch])
+    refetch({ query, order: selectedOrder })
+  }, [location.search, refetch, selectedOrder])
 
   const getRating = useCallback((website: WebsiteHost) => {
     return website.ratings?.find(
@@ -79,14 +114,49 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   return (
     <div className="p-6 pb-40 lg:pb-6">
       <div className="lg:max-w-5xl mx-auto">
-        <Search
-          placeholder="Search websites..."
-          onChange={(value) => {
-            navigate(
-              '/websites?' + new URLSearchParams({ q: value }).toString()
-            )
-          }}
-        />
+        <div className="h-12 sticky flex items-center top-6 z-10 mb-6">
+          <Search
+            className="absolute"
+            placeholder="Search websites..."
+            onChange={(value) => {
+              navigate(
+                '/websites?' + new URLSearchParams({ q: value }).toString()
+              )
+            }}
+          />
+          <Select
+            onValueChange={(order) => {
+              setSelectedOrder(order as WebsiteHostQueryOrder)
+              const search = new URLSearchParams(location.search)
+              search.set('order', order)
+              navigate(
+                {
+                  pathname: '/websites',
+                  search: search.toString(),
+                },
+                { replace: true }
+              )
+            }}
+            defaultValue={WebsiteHostQueryOrder.CreatedAtDesc}
+          >
+            <SelectTrigger className="w-fit relative left-0">
+              <List size={16} />
+              {renderSelectedOrder(selectedOrder)}
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={WebsiteHostQueryOrder.CreatedAtDesc}>
+                Newest
+              </SelectItem>
+              <SelectItem value={WebsiteHostQueryOrder.CreatedAtAsc}>
+                Oldest
+              </SelectItem>
+              <SelectItem value={WebsiteHostQueryOrder.HostAsc}>A-Z</SelectItem>
+              <SelectItem value={WebsiteHostQueryOrder.HostDesc}>
+                Z-A
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="flex lg:flex-row lg:flex-wrap flex-col gap-8 lg:gap-1 mt-6">
           {websitesQueryData?.websites?.map(
             (website, index) =>
