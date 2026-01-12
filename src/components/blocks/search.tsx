@@ -24,7 +24,7 @@ const Search: React.FC<SearchProps> = ({
     <div className="max-w-xs mx-auto w-[420px] flex gap-1 items-center">
       <Input
         className={cn(
-          `w-md bg-transparent backdrop-blur-xs m-0 p-6 text-lg rounded-full ${className}`
+          `w-md bg-white/40 backdrop-blur-xs m-0 p-6 text-lg rounded-full ${className}`
         )}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
