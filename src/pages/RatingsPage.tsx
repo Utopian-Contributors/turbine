@@ -62,12 +62,12 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
           <h3 className="hidden md:block text-lg font-medium">{title}</h3>
           <div className="flex gap-1 items-center mb-1 lg:mb-2">
             <p className="text-sm text-gray-500">{description}</p>
-            <a href={learnMoreUrl} target="_blank">
+            {learnMoreUrl ? <a href={learnMoreUrl} target="_blank">
               <CircleQuestionMark
                 size={16}
                 className="cursor-pointer text-gray-400"
               />
-            </a>
+            </a> : null}
           </div>
           {errorScreenshot && (
             <img
