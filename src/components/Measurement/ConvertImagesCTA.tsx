@@ -11,7 +11,7 @@ interface ConvertImagesCTAProps {
 const ConvertImagesCTA: React.FC<ConvertImagesCTAProps> = ({ host, path }) => {
   const navigate = useNavigate()
   return (
-    <div className="border rounded-xl border-amber-600 bg-amber-500/10 p-4">
+    <div className="border border-amber-200 rounded-xl shadow-sm bg-amber-500/10 p-4">
       <div className="flex gap-2 items-center mb-2">
         <FileWarning className="shrink-0 text-amber-600" size={24} />
         <h2 className="text-lg font-semibold text-amber-600">

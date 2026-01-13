@@ -5,7 +5,7 @@ interface BundleOverheadCTAProps {}
 
 const BundleOverheadCTA: React.FC<BundleOverheadCTAProps> = () => {
   return (
-    <div className="border border-gray-600 rounded-xl bg-gray-500/10 p-4">
+    <div className="border border-gray-200 rounded-xl shadow-sm bg-gray-500/10 p-4">
       <h2 className="text-lg font-semibold text-gray-600 mb-2">
         Optimize the network overhead
       </h2>
