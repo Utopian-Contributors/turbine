@@ -201,7 +201,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
             </div>
 
             {/* Popular Libraries */}
-            <div className='mb-4'>
+            <div className="mb-4">
               <h3 className="text-sm text-gray-300 uppercase mb-2">
                 Popular Libraries
               </h3>
@@ -209,7 +209,9 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                 {emptyStateData.bigLibraries?.slice(0, 8).map((lib) => (
                   <button
                     key={lib.id}
-                    onClick={() => navigate('/l/' + lib.name)}
+                    onClick={() =>
+                      navigate('/l/' + encodeURIComponent(lib.name))
+                    }
                     className={cn(
                       'cursor-pointer bg-white px-3 py-1 rounded-full border text-sm hover:shadow-sm transition-all',
                       lib.integrated
@@ -244,7 +246,9 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                 {emptyStateData.popularFonts?.slice(0, 8).map((font) => (
                   <button
                     key={font.id}
-                    onClick={() => navigate('/fonts/' + font.name)}
+                    onClick={() =>
+                      navigate('/fonts/' + encodeURIComponent(font.name))
+                    }
                     className={cn(
                       'cursor-pointer bg-white px-3 py-1 rounded-full border text-sm hover:shadow-sm transition-all',
                       font.integrated
