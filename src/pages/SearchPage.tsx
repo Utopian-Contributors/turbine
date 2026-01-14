@@ -117,7 +117,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
         )}
         {showEmptyState && emptyStateData && (
           <div className="overflow-hidden">
-            <div className="absolute inset-0 -z-1">
+            <div className="absolute inset-0 -z-1 opacity-10">
               <div className="relative">
                 <CurvedLoop
                   svgClassname="mt-80"
@@ -130,7 +130,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                 />
               </div>
             </div>
-            <div className="absolute inset-0 -z-1">
+            <div className="absolute inset-0 -z-1 opacity-10">
               <div className="relative h-fit">
                 <CurvedLoop
                   svgClassname="mb-32"
@@ -148,7 +148,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
           </div>
         )}
         {showEmptyState && emptyStateData && (
-          <div className="absolute top-1/2 transform -translate-y-1/2 max-w-[50vw] flex flex-col rounded-xl border border-gray-300 bg-gray-500/10 backdrop-blur-lg shadow-sm gap-2 px-4 py-8">
+          <div className="absolute top-1/2 transform -translate-y-1/2 max-w-[50vw] flex flex-col rounded-xl border border-gray-300 bg-white/80 backdrop-blur-xs shadow-sm gap-2 px-4 py-8">
             {/* Floating word cloud background */}
 
             {/* Guidance text */}
@@ -160,11 +160,11 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                 defaultValue={initialSearchTerm}
                 autoFocus
               />
-              <p className="text-sm text-muted-foreground font-light mt-1">
+              <p className="text-sm text-gray-300 font-light mt-1">
                 Try: react, lodash, Roboto, Open Sans
               </p>
               <div className="w-fit text-xs rounded-full border border-green-200 bg-green-50 text-green-500 px-2 py-1 mx-auto mt-4">
-                Native to the Utopian Browser
+                Native to the Utopia Browser
               </div>
             </div>
 
@@ -201,8 +201,8 @@ const SearchPage: React.FC<SearchPageProps> = () => {
             </div>
 
             {/* Popular Libraries */}
-            <div>
-              <h3 className="text-sm text-muted-foreground mb-2">
+            <div className='mb-4'>
+              <h3 className="text-sm text-gray-300 uppercase mb-2">
                 Popular Libraries
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -237,7 +237,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
 
             {/* Popular Fonts */}
             <div>
-              <h3 className="text-sm text-muted-foreground mb-2">
+              <h3 className="text-sm text-gray-300 uppercase mb-2">
                 Popular Fonts
               </h3>
               <div className="flex flex-wrap gap-2">
