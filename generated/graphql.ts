@@ -410,6 +410,7 @@ export type Query = {
   releases?: Maybe<Array<ExtensionRelease>>;
   searchFonts?: Maybe<Array<Font>>;
   searchLibrary?: Maybe<Array<LibrarySearchResult>>;
+  searchStats?: Maybe<SearchStats>;
   users?: Maybe<Array<Maybe<User>>>;
   versionFileIntegrations: VersionFileIntegrations;
   versionIntegrations: VersionIntegrations;
@@ -526,6 +527,17 @@ export type SameVersionRequirement = {
   createdAt: Scalars['DateTime']['output'];
   dependingOn: Library;
   id: Scalars['ID']['output'];
+};
+
+/** Statistics for the search page empty state */
+export type SearchStats = {
+  __typename?: 'SearchStats';
+  /** Total number of fonts available */
+  totalFonts: Scalars['Int']['output'];
+  /** Total number of integrated library versions */
+  totalIntegratedLibraries: Scalars['Int']['output'];
+  /** Total number of libraries tracked */
+  totalLibraries: Scalars['Int']['output'];
 };
 
 /** Information needed for making Solana payments */
@@ -940,6 +952,11 @@ export type SearchFontsQueryVariables = Exact<{
 export type SearchFontsQuery = { __typename?: 'Query', searchFonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, integrated: boolean, publishedAt: any }> | null };
 
 export type FontSearchResultFragment = { __typename?: 'Font', id: string, name: string, menu: string, tags: Array<string>, category: FontCategory, integrated: boolean, publishedAt: any };
+
+export type SearchPageEmptyStateQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SearchPageEmptyStateQuery = { __typename?: 'Query', searchStats?: { __typename?: 'SearchStats', totalLibraries: number, totalFonts: number, totalIntegratedLibraries: number } | null, bigLibraries?: Array<{ __typename?: 'Library', id: string, name: string, integrated?: boolean | null }> | null, popularFonts?: Array<{ __typename?: 'Font', id: string, name: string, menu: string, integrated: boolean }> | null };
 
 export type WebsitesQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
@@ -2840,6 +2857,58 @@ export type SearchFontsQueryHookResult = ReturnType<typeof useSearchFontsQuery>;
 export type SearchFontsLazyQueryHookResult = ReturnType<typeof useSearchFontsLazyQuery>;
 export type SearchFontsSuspenseQueryHookResult = ReturnType<typeof useSearchFontsSuspenseQuery>;
 export type SearchFontsQueryResult = Apollo.QueryResult<SearchFontsQuery, SearchFontsQueryVariables>;
+export const SearchPageEmptyStateDocument = gql`
+    query searchPageEmptyState {
+  searchStats {
+    totalLibraries
+    totalFonts
+    totalIntegratedLibraries
+  }
+  bigLibraries {
+    id
+    name
+    integrated
+  }
+  popularFonts {
+    id
+    name
+    menu
+    integrated
+  }
+}
+    `;
+
+/**
+ * __useSearchPageEmptyStateQuery__
+ *
+ * To run a query within a React component, call `useSearchPageEmptyStateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchPageEmptyStateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchPageEmptyStateQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSearchPageEmptyStateQuery(baseOptions?: Apollo.QueryHookOptions<SearchPageEmptyStateQuery, SearchPageEmptyStateQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchPageEmptyStateQuery, SearchPageEmptyStateQueryVariables>(SearchPageEmptyStateDocument, options);
+      }
+export function useSearchPageEmptyStateLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchPageEmptyStateQuery, SearchPageEmptyStateQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchPageEmptyStateQuery, SearchPageEmptyStateQueryVariables>(SearchPageEmptyStateDocument, options);
+        }
+export function useSearchPageEmptyStateSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SearchPageEmptyStateQuery, SearchPageEmptyStateQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SearchPageEmptyStateQuery, SearchPageEmptyStateQueryVariables>(SearchPageEmptyStateDocument, options);
+        }
+export type SearchPageEmptyStateQueryHookResult = ReturnType<typeof useSearchPageEmptyStateQuery>;
+export type SearchPageEmptyStateLazyQueryHookResult = ReturnType<typeof useSearchPageEmptyStateLazyQuery>;
+export type SearchPageEmptyStateSuspenseQueryHookResult = ReturnType<typeof useSearchPageEmptyStateSuspenseQuery>;
+export type SearchPageEmptyStateQueryResult = Apollo.QueryResult<SearchPageEmptyStateQuery, SearchPageEmptyStateQueryVariables>;
 export const WebsitesDocument = gql`
     query websites($query: String, $order: WebsiteHostQueryOrder, $pagination: PaginationInput) {
   websites(query: $query, order: $order, pagination: $pagination) {

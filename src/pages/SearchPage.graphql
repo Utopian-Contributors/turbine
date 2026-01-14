@@ -26,3 +26,22 @@ fragment FontSearchResult on Font {
   integrated
   publishedAt
 }
+
+query searchPageEmptyState {
+  searchStats {
+    totalLibraries
+    totalFonts
+    totalIntegratedLibraries
+  }
+  bigLibraries {
+    id
+    name
+    integrated
+  }
+  popularFonts {
+    id
+    name
+    menu
+    integrated
+  }
+}

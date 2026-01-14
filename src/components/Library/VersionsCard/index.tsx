@@ -26,10 +26,10 @@ const VersionsCard: React.FC<VersionsCardProps> = ({
     <Card className="bg-gradient-to-t from-primary/2 to-card border rounded-xl">
       <Tabs defaultValue="stats">
         <CardContent>
-          <TabsList className="mb-2">
+          {isAdmin && <TabsList className="mb-2">
             <TabsTrigger value="stats">Stats</TabsTrigger>
             <TabsTrigger value="popular">Popular</TabsTrigger>
-          </TabsList>
+          </TabsList>}
           <TabsContent value="popular">
             <VersionConfig
               toggleIntegrateVersion={toggleIntegrateVersion}
