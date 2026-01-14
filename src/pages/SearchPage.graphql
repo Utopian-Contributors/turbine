@@ -33,12 +33,12 @@ query searchPageEmptyState {
     totalFonts
     totalIntegratedLibraries
   }
-  bigLibraries {
+  bigLibraries(pagination: { take: 8 }) {
     id
     name
     integrated
   }
-  popularFonts {
+  popularFonts(pagination: { take: 8 }) {
     id
     name
     menu

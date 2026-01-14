@@ -206,7 +206,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                 Popular Libraries
               </h3>
               <div className="flex flex-wrap gap-2">
-                {emptyStateData.bigLibraries?.slice(0, 8).map((lib) => (
+                {emptyStateData.bigLibraries?.map((lib) => (
                   <button
                     key={lib.id}
                     onClick={() =>
@@ -243,7 +243,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                 Popular Fonts
               </h3>
               <div className="flex flex-wrap gap-2">
-                {emptyStateData.popularFonts?.slice(0, 8).map((font) => (
+                {emptyStateData.popularFonts?.map((font) => (
                   <button
                     key={font.id}
                     onClick={() =>

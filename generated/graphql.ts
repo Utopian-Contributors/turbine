@@ -420,6 +420,11 @@ export type Query = {
 };
 
 
+export type QueryBigLibrariesArgs = {
+  pagination?: InputMaybe<PaginationInput>;
+};
+
+
 export type QueryFontArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
@@ -455,6 +460,11 @@ export type QueryMeasurementsArgs = {
 export type QueryPaymentInfoArgs = {
   publicKey?: InputMaybe<Scalars['String']['input']>;
   tokenMint?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryPopularFontsArgs = {
+  pagination?: InputMaybe<PaginationInput>;
 };
 
 
@@ -2864,12 +2874,12 @@ export const SearchPageEmptyStateDocument = gql`
     totalFonts
     totalIntegratedLibraries
   }
-  bigLibraries {
+  bigLibraries(pagination: {take: 8}) {
     id
     name
     integrated
   }
-  popularFonts {
+  popularFonts(pagination: {take: 8}) {
     id
     name
     menu
