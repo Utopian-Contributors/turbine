@@ -121,7 +121,9 @@ const SearchPage: React.FC<SearchPageProps> = () => {
               <div className="relative">
                 <CurvedLoop
                   svgClassname="mt-80"
-                  className="font-thin fill-primary"
+                  className="grayscale font-thin fill-primary"
+                  speed={0.5}
+                  interactive={false}
                   marqueeText={marqueeWords[0]
                     .map((word) => word.text)
                     .join(' 📦 ')}
@@ -131,10 +133,12 @@ const SearchPage: React.FC<SearchPageProps> = () => {
             <div className="absolute inset-0 -z-1">
               <div className="relative h-fit">
                 <CurvedLoop
-                  svgClassname="mb-48"
-                  className="font-thin fill-primary"
+                  svgClassname="mb-32"
+                  className="grayscale font-thin fill-primary"
                   direction="right"
                   curveAmount={-400}
+                  speed={0.5}
+                  interactive={false}
                   marqueeText={marqueeWords[1]
                     .map((word) => word.text)
                     .join(' 🖋️ ')}
