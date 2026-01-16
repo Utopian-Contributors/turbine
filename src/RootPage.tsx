@@ -150,7 +150,7 @@ const RootPage: React.FC = () => {
       <Sidebar collapsible="none" className="hidden lg:flex min-w-[256px]">
         <SidebarContent>
           <SidebarGroup>
-            <img src="/turbine-wordmark.png" width="120px" className="mb-2" />
+            <img src="/turbine-wordmark.webp" width="120px" className="mb-2" />
             <Separator className="mb-2" />
             <SidebarGroupContent>
               <SidebarMenu>
