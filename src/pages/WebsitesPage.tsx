@@ -116,7 +116,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
       <div className="lg:max-w-5xl mx-auto">
         <div className="h-12 sticky flex items-center top-6 z-10 mb-6">
           <Search
-            className="absolute w-full lg:w-1/2"
+            className="w-full lg:w-md lg:ml-32"
             placeholder="Search websites..."
             onChange={(value) => {
               navigate(
@@ -139,7 +139,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
             }}
             defaultValue={WebsiteHostQueryOrder.CreatedAtDesc}
           >
-            <SelectTrigger className="hidden lg:flex w-fit relative left-0">
+            <SelectTrigger className="hidden lg:flex w-32 relative left-0">
               <List size={16} />
               {renderSelectedOrder(selectedOrder)}
             </SelectTrigger>

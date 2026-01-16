@@ -148,7 +148,7 @@ const SearchPage: React.FC<SearchPageProps> = () => {
           </div>
         )}
         {showEmptyState && emptyStateData && (
-          <div className="absolute top-1/2 transform -translate-y-1/2 max-w-[50vw] flex flex-col rounded-xl border border-gray-300 bg-gray-500/5 backdrop-blur-xs shadow-sm gap-2 px-4 py-8">
+          <div className="max-w-fit flex flex-col rounded-xl border border-gray-300 bg-gray-500/5 backdrop-blur-xs shadow-sm gap-2 px-4 py-8">
             {/* Floating word cloud background */}
 
             {/* Guidance text */}
