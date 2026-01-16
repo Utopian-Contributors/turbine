@@ -32,20 +32,18 @@ const Search: React.FC<SearchProps> = ({
         ref={ref}
         {...props}
       />
-      {ref.current?.value ? (
-        <div className='relative right-12 p-1 bg-primary/4 rounded-full'>
-          <XIcon
-            className="h-4 w-4 cursor-pointer text-gray-500/50"
-            onClick={() => {
-              onChange('')
-              if (ref.current) {
-                ref.current.value = ''
-                ref.current.focus()
-              }
-            }}
-          />
-        </div>
-      ) : null}
+      <div className={cn("relative right-12 p-1 bg-primary/4 rounded-full", ref.current?.value ? 'visible' : 'invisible')}>
+        <XIcon
+          className="h-4 w-4 cursor-pointer text-gray-500/50"
+          onClick={() => {
+            onChange('')
+            if (ref.current) {
+              ref.current.value = ''
+              ref.current.focus()
+            }
+          }}
+        />
+      </div>
     </div>
   )
 }
