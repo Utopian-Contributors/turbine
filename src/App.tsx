@@ -16,6 +16,7 @@ import { NotFoundPage } from './pages/Error/404Page'
 import FontPage from './pages/FontPage'
 import FontsPage from './pages/FontsPage'
 import ImageConversionPage from './pages/ImageConversionPage'
+import LocalImageConversionPage from './pages/LocalImageConversionPage'
 import LibrariesPage from './pages/LibrariesPage'
 import LibraryPage from './pages/LibraryPage'
 import MeasurePage from './pages/MeasurePage'
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
       },
       { path: '/measurements/:host/history', element: <PathHistoryPage /> },
       { path: '/measurements/:host/images', element: <ImageConversionPage /> },
+      { path: '/images', element: <LocalImageConversionPage /> },
       {
         path: 'measure',
         element: <MeasurePage />,

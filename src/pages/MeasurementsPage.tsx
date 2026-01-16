@@ -328,7 +328,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
 
   useEffect(() => {
     document.title = measurement?.title
-      ? `Measurements | ${measurement.title}`
+      ? `Measurements ${measurement.title}`
       : 'Measurements'
   }, [measurement?.title])
 

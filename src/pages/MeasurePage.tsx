@@ -70,6 +70,14 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     refetch,
   ])
 
+  useEffect(() => {
+    if (searchParams.get('url')) {
+      document.title = `Measure ${new URL(searchParams.get('url')!).hostname}`
+    } else {
+      document.title = 'Measure'
+    }
+  }, [searchParams])
+
   const search = useCallback(
     async (url: string) => {
       if (url) {
@@ -146,7 +154,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
           />
         ) : null}
         {measurementStatusData?.measurement?.status ===
-          MeasurementStatus.Pending ? (
+        MeasurementStatus.Pending ? (
           <div className="flex flex-col items-center gap-2 my-6">
             <div className="text-4xl m-6 text-white whitespace-nowrap overflow-hidden">
               Measuring website...

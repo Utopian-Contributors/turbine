@@ -78,7 +78,10 @@ export const useImageProcessor = () => {
 
       return new Promise((resolve, reject) => {
         const img = new Image()
-        img.crossOrigin = 'anonymous'
+        // Only set crossOrigin for remote URLs, not for blob URLs
+        if (!imageUrl.startsWith('blob:')) {
+          img.crossOrigin = 'anonymous'
+        }
 
         img.onload = () => {
           const canvas = getCanvas()

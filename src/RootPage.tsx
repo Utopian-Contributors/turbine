@@ -2,6 +2,7 @@ import {
   CreditCardIcon,
   Github,
   Globe,
+  ImageIcon,
   LogOutIcon,
   Scale,
   SearchIcon,
@@ -88,6 +89,15 @@ const items: SidebarItem[] = [
   //     <TypeIcon className={selected ? 'text-black' : 'text-muted-foreground'} />
   //   ),
   // },
+  {
+    title: 'Images',
+    url: '/images',
+    icon: (selected: boolean) => (
+      <ImageIcon
+        className={cn(selected ? 'text-black' : 'text-muted-foreground')}
+      />
+    ),
+  },
   {
     title: 'Payments',
     url: '/payments',

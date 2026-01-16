@@ -2,19 +2,19 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
 } from '@/components/ui/select'
 import { abbreviateFilename } from '@/helpers/strings'
 import {
-    DEFAULT_SETTINGS,
-    type ImageSettings,
-    type ProcessedResult,
-    type QualityOption,
-    type ScaleOption,
-    useImageProcessor,
+  DEFAULT_SETTINGS,
+  type ImageSettings,
+  type ProcessedResult,
+  type QualityOption,
+  type ScaleOption,
+  useImageProcessor,
 } from '@/hooks/useImageProcessor'
 import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
@@ -29,6 +29,7 @@ interface ImageConversionRowProps {
   height: number
   clientWidth?: number
   clientHeight?: number
+  filename?: string
   onProcessed: (id: string, result: ProcessedResult | null) => void
 }
 
@@ -39,6 +40,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
   height,
   clientWidth,
   clientHeight,
+  filename,
   onProcessed,
 }) => {
   // Detect optimal scale based on display size vs actual size
@@ -88,7 +90,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
         URL.revokeObjectURL(processed.processedUrl)
       }
 
-      const originalFilename = url.split('/').pop() || 'image'
+      const originalFilename = filename || url.split('/').pop() || 'image'
       const result = await processImage(url, settings, originalFilename)
       setProcessed(result)
       onProcessed(id, result)
@@ -101,7 +103,15 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
     } finally {
       setProcessing(false)
     }
-  }, [id, url, settings, processImage, onProcessed, processed?.processedUrl])
+  }, [
+    processed?.processedUrl,
+    filename,
+    url,
+    processImage,
+    settings,
+    onProcessed,
+    id,
+  ])
 
   // Auto-process when settings change
   useEffect(() => {
@@ -114,13 +124,13 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
 
     const link = document.createElement('a')
     link.href = processed.processedUrl
-    const originalName = url.split('/').pop() || 'image'
+    const originalName = filename || url.split('/').pop() || 'image'
     const extension = settings.convertToWebp ? '.webp' : '.png'
     link.download = originalName.replace(/\.[^.]+$/, '') + extension
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  }, [processed?.processedUrl, url, settings.convertToWebp])
+  }, [processed?.processedUrl, url, filename, settings.convertToWebp])
 
   // Use actual values from the fetched/processed image
   const originalBlobSize = processed?.originalBlobSize ?? 0
@@ -145,27 +155,32 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
   }
 
   return (
-    <Card className="overflow-hidden py-0 mx-4">
+    <Card className="overflow-hidden py-0 mx-2">
       <CardContent className="p-4">
         <div className="flex flex-col lg:flex-row gap-4 items-stretch">
           {/* Original Preview */}
           <div className="flex-1 min-w-0">
-            <div className="text-xs text-muted-foreground uppercase mb-2">
-              Original
+            <div className="flex justify-between items-center mb-2">
+              <div className="text-xs text-muted-foreground uppercase">
+                Original
+              </div>
             </div>
             <div className="aspect-video bg-muted rounded-md flex items-center justify-center overflow-hidden">
               <img
                 src={url}
                 alt=""
                 className="max-w-full max-h-full object-contain"
-                crossOrigin="anonymous"
+                crossOrigin={url.startsWith('blob:') ? undefined : 'anonymous'}
               />
             </div>
             <div className="mt-2 text-sm">
               <div className="flex justify-between">
                 <div className="flex flex-col">
-                  <div className="truncate text-muted-foreground" title={url}>
-                    {abbreviateFilename(url.split('/').pop()!, 30)}
+                  <div
+                    className="truncate text-muted-foreground"
+                    title={filename || url}
+                  >
+                    {abbreviateFilename(filename || url.split('/').pop()!, 30)}
                   </div>
                   <span className="text-xs">
                     {actualWidth} × {actualHeight}
