@@ -175,9 +175,8 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
       {typeof rating?.overallScore === 'undefined' && (
         <div className="border rounded-lg p-4 mt-6">
           <h2 className="text-lg lg:text-xl">No ratings available.</h2>
-          <p className="text-muted-foreground mt-2">
-            A website must be measured using WiFi, Fast 3G & Slow 3G in order to
-            get a rating.
+          <p className="text-pretty text-muted-foreground mt-2">
+            A website must be measured using multiple bandwidth environments (WiFi & 4G or 3G) in order to get a rating.
           </p>
         </div>
       )}

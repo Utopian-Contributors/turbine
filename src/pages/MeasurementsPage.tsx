@@ -413,7 +413,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 >
                   <div className="flex gap-4 items-center">
                     {url && measurement && (
-                      <div className="flex flex-col">
+                      <div className="w-full flex flex-col">
                         <div className="flex gap-2 items-center">
                           {measurement.icon && !iconError && (
                             <img
