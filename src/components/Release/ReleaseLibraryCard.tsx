@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { useNavigate } from 'react-router'
 
-import { LibraryGroup } from './types'
+import { type LibraryGroup } from './types'
 
 interface ReleaseLibraryCardProps {
   library: LibraryGroup

@@ -9,6 +9,14 @@ export interface ImageSettings {
   convertToWebp: boolean
 }
 
+export interface LoadedImage {
+  originalBlob: Blob
+  originalBlobSize: number
+  originalWidth: number
+  originalHeight: number
+  imageElement: HTMLImageElement
+}
+
 export interface ProcessedResult {
   originalBlobSize: number
   originalWidth: number
@@ -53,95 +61,124 @@ const getQualityValue = (quality: QualityOption): number => {
 }
 
 export const useImageProcessor = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const loadedImageRef = useRef<LoadedImage | null>(null)
 
-  const getCanvas = useCallback(() => {
-    if (!canvasRef.current) {
-      canvasRef.current = document.createElement('canvas')
-    }
-    return canvasRef.current
-  }, [])
+  // Load an image from a Blob/File directly (for local files)
+  const loadImageFromBlob = useCallback(
+    async (blob: Blob): Promise<LoadedImage> => {
+      const blobUrl = URL.createObjectURL(blob)
 
-  const processImage = useCallback(
-    async (
-      imageUrl: string,
-      settings: ImageSettings,
-      originalFilename?: string
-    ): Promise<ProcessedResult> => {
-      // First, fetch the original image to get its actual blob size
-      const originalResponse = await fetch(imageUrl)
+      return new Promise((resolve, reject) => {
+        const img = new Image()
+
+        img.onload = () => {
+          URL.revokeObjectURL(blobUrl)
+
+          const loadedImage: LoadedImage = {
+            originalBlob: blob,
+            originalBlobSize: blob.size,
+            originalWidth: img.width,
+            originalHeight: img.height,
+            imageElement: img,
+          }
+          loadedImageRef.current = loadedImage
+          resolve(loadedImage)
+        }
+
+        img.onerror = () => {
+          URL.revokeObjectURL(blobUrl)
+          reject(new Error('Failed to load image'))
+        }
+
+        img.src = blobUrl
+      })
+    },
+    []
+  )
+
+  // Fetch and load an image from a remote URL
+  const loadImageFromUrl = useCallback(
+    async (imageUrl: string): Promise<LoadedImage> => {
+      const originalResponse = await fetch(imageUrl, {
+        mode: 'cors',
+        credentials: 'omit',
+      })
       if (!originalResponse.ok) {
         throw new Error('Failed to fetch original image')
       }
       const originalBlob = await originalResponse.blob()
-      const originalBlobSize = originalBlob.size
 
-      return new Promise((resolve, reject) => {
-        const img = new Image()
-        // Only set crossOrigin for remote URLs, not for blob URLs
-        if (!imageUrl.startsWith('blob:')) {
-          img.crossOrigin = 'anonymous'
-        }
-
-        img.onload = () => {
-          const canvas = getCanvas()
-          const ctx = canvas.getContext('2d')
-          if (!ctx) {
-            reject(new Error('Canvas context not available'))
-            return
-          }
-
-          const scaleValue = getScaleValue(settings.scale)
-          const newWidth = Math.floor(img.width * scaleValue)
-          const newHeight = Math.floor(img.height * scaleValue)
-
-          canvas.width = newWidth
-          canvas.height = newHeight
-
-          ctx.drawImage(img, 0, 0, newWidth, newHeight)
-
-          const mimeType = settings.convertToWebp ? 'image/webp' : 'image/png'
-          const quality = settings.convertToWebp
-            ? getQualityValue(settings.quality)
-            : undefined
-
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                reject(new Error('Failed to create blob'))
-                return
-              }
-
-              // Generate processed filename
-              const baseName = originalFilename
-                ? originalFilename.replace(/\.[^.]+$/, '')
-                : 'image'
-              const extension = settings.convertToWebp ? '.webp' : '.png'
-              const processedFilename = `${baseName}${extension}`
-
-              const processedUrl = URL.createObjectURL(blob)
-              resolve({
-                originalBlobSize,
-                originalWidth: img.width,
-                originalHeight: img.height,
-                processedSize: blob.size,
-                processedWidth: newWidth,
-                processedHeight: newHeight,
-                processedFilename,
-                processedUrl,
-              })
-            },
-            mimeType,
-            quality
-          )
-        }
-
-        img.onerror = () => reject(new Error('Failed to load image'))
-        img.src = imageUrl
-      })
+      return loadImageFromBlob(originalBlob)
     },
-    [getCanvas]
+    [loadImageFromBlob]
   )
 
-  return { processImage }
+  // Process an already-loaded image with given settings
+  const processImage = useCallback(
+    async (
+      loadedImage: LoadedImage,
+      settings: ImageSettings,
+      originalFilename?: string
+    ): Promise<ProcessedResult> => {
+      return new Promise((resolve, reject) => {
+        // Create a fresh canvas each time to avoid tainted canvas issues
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Canvas context not available'))
+          return
+        }
+
+        const { imageElement, originalBlobSize, originalWidth, originalHeight } =
+          loadedImage
+
+        const scaleValue = getScaleValue(settings.scale)
+        const newWidth = Math.floor(originalWidth * scaleValue)
+        const newHeight = Math.floor(originalHeight * scaleValue)
+
+        canvas.width = newWidth
+        canvas.height = newHeight
+
+        ctx.drawImage(imageElement, 0, 0, newWidth, newHeight)
+
+        const mimeType = settings.convertToWebp ? 'image/webp' : 'image/png'
+        const quality = settings.convertToWebp
+          ? getQualityValue(settings.quality)
+          : undefined
+
+        canvas.toBlob(
+          (blob: Blob | null) => {
+            if (!blob) {
+              reject(new Error('Failed to create blob'))
+              return
+            }
+
+            // Generate processed filename
+            const baseName = originalFilename
+              ? originalFilename.replace(/\.[^.]+$/, '')
+              : 'image'
+            const extension = settings.convertToWebp ? '.webp' : '.png'
+            const processedFilename = `${baseName}${extension}`
+
+            const processedUrl = URL.createObjectURL(blob)
+            resolve({
+              originalBlobSize,
+              originalWidth,
+              originalHeight,
+              processedSize: blob.size,
+              processedWidth: newWidth,
+              processedHeight: newHeight,
+              processedFilename,
+              processedUrl,
+            })
+          },
+          mimeType,
+          quality
+        )
+      })
+    },
+    []
+  )
+
+  return { loadImageFromUrl, loadImageFromBlob, processImage, loadedImageRef }
 }

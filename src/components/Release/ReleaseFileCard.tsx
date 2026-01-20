@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { useNavigate } from 'react-router'
 
-import { FileGroup } from './types'
+import { type FileGroup } from './types'
 
 interface ReleaseFileCardProps {
   fileGroup: FileGroup

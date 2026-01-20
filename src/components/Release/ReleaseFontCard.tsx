@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 import { toHeaderCase } from 'js-convert-case'
 import { useNavigate } from 'react-router'
 
-import { FontItem } from './types'
+import { type FontItem } from './types'
 
 interface ReleaseFontCardProps {
   font: FontItem

@@ -1,10 +1,12 @@
 import { ImageConversionRow } from '@/components/ImageConversion'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { type ProcessedResult } from '@/hooks/useImageProcessor'
 import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
-import { Upload } from 'lucide-react'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import JSZip from 'jszip'
+import { Download, Loader2, Upload } from 'lucide-react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 interface LocalImage {
   id: string
@@ -17,6 +19,8 @@ interface LocalImage {
 interface ProcessedState {
   originalBlobSize: number
   processedSize: number
+  processedUrl: string
+  processedFilename: string
 }
 
 const LocalImageConversionPage: React.FC = () => {
@@ -41,14 +45,15 @@ const LocalImageConversionPage: React.FC = () => {
     (files: FileList | File[]) => {
       const fileArray = Array.from(files)
       const imageFiles = fileArray.filter((file) =>
-        file.type.startsWith('image/')
+        file.type.startsWith('image/'),
       )
 
       imageFiles.forEach((file) => {
         // Check for duplicates by name and size
         const isDuplicate = images.some(
           (existing) =>
-            existing.file.name === file.name && existing.file.size === file.size
+            existing.file.name === file.name &&
+            existing.file.size === file.size,
         )
         if (isDuplicate) {
           return
@@ -69,7 +74,7 @@ const LocalImageConversionPage: React.FC = () => {
             const alreadyExists = prev.some(
               (existing) =>
                 existing.file.name === file.name &&
-                existing.file.size === file.size
+                existing.file.size === file.size,
             )
             if (alreadyExists) {
               URL.revokeObjectURL(url)
@@ -81,7 +86,7 @@ const LocalImageConversionPage: React.FC = () => {
         img.src = url
       })
     },
-    [images]
+    [images],
   )
 
   const handleDrop = useCallback(
@@ -90,7 +95,7 @@ const LocalImageConversionPage: React.FC = () => {
       setDragOver(false)
       handleFiles(e.dataTransfer.files)
     },
-    [handleFiles]
+    [handleFiles],
   )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -108,7 +113,7 @@ const LocalImageConversionPage: React.FC = () => {
         handleFiles(e.target.files)
       }
     },
-    [handleFiles]
+    [handleFiles],
   )
 
   const handleProcessed = useCallback(
@@ -119,6 +124,8 @@ const LocalImageConversionPage: React.FC = () => {
           next.set(id, {
             originalBlobSize: result.originalBlobSize,
             processedSize: result.processedSize,
+            processedUrl: result.processedUrl,
+            processedFilename: result.processedFilename,
           })
         } else {
           next.delete(id)
@@ -126,7 +133,7 @@ const LocalImageConversionPage: React.FC = () => {
         return next
       })
     },
-    []
+    [],
   )
 
   const totalSavings = useMemo(() => {
@@ -142,6 +149,41 @@ const LocalImageConversionPage: React.FC = () => {
       saved: originalTotal - processedTotal,
     }
   }, [processedStates])
+
+  const [downloading, setDownloading] = useState(false)
+  const zipDownloadRef = useRef<HTMLAnchorElement>(null)
+  const [zipUrl, setZipUrl] = useState<string | null>(null)
+
+  const handleDownloadAll = useCallback(async () => {
+    setDownloading(true)
+    try {
+      const zip = new JSZip()
+
+      // Fetch each processed image and add to zip
+      for (const [, state] of processedStates) {
+        const response = await fetch(state.processedUrl)
+        const blob = await response.blob()
+        zip.file(state.processedFilename, blob)
+      }
+
+      // Generate the zip file
+      const zipBlob = await zip.generateAsync({ type: 'blob' })
+      const url = URL.createObjectURL(zipBlob)
+
+      // Revoke old URL if exists
+      if (zipUrl) {
+        URL.revokeObjectURL(zipUrl)
+      }
+      setZipUrl(url)
+
+      // Trigger download after state update
+      setTimeout(() => {
+        zipDownloadRef.current?.click()
+      }, 0)
+    } finally {
+      setDownloading(false)
+    }
+  }, [processedStates, zipUrl])
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -159,7 +201,7 @@ const LocalImageConversionPage: React.FC = () => {
           'border-2 border-dashed rounded-lg p-12 text-center mb-6 transition-colors cursor-pointer',
           dragOver
             ? 'border-green-500 bg-green-50'
-            : 'border-gray-300 hover:border-gray-400'
+            : 'border-gray-300 hover:border-gray-400',
         )}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -183,35 +225,47 @@ const LocalImageConversionPage: React.FC = () => {
         </p>
       </div>
 
+      {/* Hidden download link for zip */}
+      {zipUrl && (
+        <a
+          ref={zipDownloadRef}
+          href={zipUrl}
+          download="converted-images.zip"
+          className="hidden"
+        >
+          Download Zip
+        </a>
+      )}
+
       {/* Sticky Savings Summary */}
       {processedStates.size > 0 && totalSavings.saved > 0 && (
         <div className="sticky top-4 z-10 mb-6">
           <Card className="border-green-500/30 bg-background/80 backdrop-blur py-0">
             <CardContent className="py-4">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex flex-col">
                   <span className="text-2xl font-bold text-green-500">
-                    {filesize(totalSavings.saved)} saved
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    Total Savings ({images.length} images)
-                  </span>
-                </div>
-                <div className="flex flex-col items-end text-sm text-muted-foreground">
-                  <span className="text-2xl font-bold ml-2 text-green-500">
                     {Math.round(
                       (1 -
                         totalSavings.processedTotal /
                           totalSavings.originalTotal) *
-                        100
+                        100,
                     )}
-                    % reduction
+                    % reduction ({filesize(totalSavings.saved)})
                   </span>
                   <span className="text-sm text-muted-foreground">
                     {filesize(totalSavings.originalTotal)} →{' '}
                     {filesize(totalSavings.processedTotal)}
                   </span>
                 </div>
+                <Button onClick={handleDownloadAll} disabled={downloading} className="gap-2">
+                  {downloading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4" />
+                  )}
+                  {downloading ? 'Creating Zip...' : 'Download All'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -229,6 +283,7 @@ const LocalImageConversionPage: React.FC = () => {
             width={image.width}
             height={image.height}
             filename={image.file.name}
+            file={image.file}
             onProcessed={handleProcessed}
           />
         ))}

@@ -11,6 +11,7 @@ import { abbreviateFilename } from '@/helpers/strings'
 import {
   DEFAULT_SETTINGS,
   type ImageSettings,
+  type LoadedImage,
   type ProcessedResult,
   type QualityOption,
   type ScaleOption,
@@ -19,7 +20,7 @@ import {
 import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
 import { Download, Loader2 } from 'lucide-react'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 interface ImageConversionRowProps {
   id: string
@@ -30,6 +31,7 @@ interface ImageConversionRowProps {
   clientWidth?: number
   clientHeight?: number
   filename?: string
+  file?: File
   onProcessed: (id: string, result: ProcessedResult | null) => void
 }
 
@@ -41,6 +43,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
   clientWidth,
   clientHeight,
   filename,
+  file,
   onProcessed,
 }) => {
   // Detect optimal scale based on display size vs actual size
@@ -73,51 +76,71 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
     ...DEFAULT_SETTINGS,
     scale: detectOptimalScale(),
   }))
+  const [loadedImage, setLoadedImage] = useState<LoadedImage | null>(null)
   const [processed, setProcessed] = useState<ProcessedResult | null>(null)
+  const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hidden, setHidden] = useState(false)
 
-  const { processImage } = useImageProcessor()
+  const { loadImageFromUrl, loadImageFromBlob, processImage } = useImageProcessor()
+  const initialLoadDone = useRef(false)
 
-  const doProcess = useCallback(async () => {
-    setProcessing(true)
-    setError(null)
-
-    try {
-      // Revoke old URL to prevent memory leak
-      if (processed?.processedUrl) {
-        URL.revokeObjectURL(processed.processedUrl)
-      }
-
-      const originalFilename = filename || url.split('/').pop() || 'image'
-      const result = await processImage(url, settings, originalFilename)
-      setProcessed(result)
-      onProcessed(id, result)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Processing failed')
-      setProcessed(null)
-      onProcessed(id, null)
-      // Hide the row on error (image failed to load)
-      setHidden(true)
-    } finally {
-      setProcessing(false)
-    }
-  }, [
-    processed?.processedUrl,
-    filename,
-    url,
-    processImage,
-    settings,
-    onProcessed,
-    id,
-  ])
-
-  // Auto-process when settings change
+  // Load the image once on mount
   useEffect(() => {
+    if (initialLoadDone.current) return
+    initialLoadDone.current = true
+
+    const doLoad = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        // Use File directly if available (local files), otherwise fetch from URL
+        const loaded = file
+          ? await loadImageFromBlob(file)
+          : await loadImageFromUrl(url)
+        setLoadedImage(loaded)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load image')
+        setHidden(true)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    doLoad()
+  }, [url, file, loadImageFromUrl, loadImageFromBlob])
+
+  // Process when settings change (and image is loaded)
+  useEffect(() => {
+    if (!loadedImage) return
+
+    const doProcess = async () => {
+      setProcessing(true)
+      setError(null)
+
+      try {
+        // Revoke old URL to prevent memory leak
+        if (processed?.processedUrl) {
+          URL.revokeObjectURL(processed.processedUrl)
+        }
+
+        const originalFilename = filename || url.split('/').pop() || 'image'
+        const result = await processImage(loadedImage, settings, originalFilename)
+        setProcessed(result)
+        onProcessed(id, result)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Processing failed')
+        setProcessed(null)
+        onProcessed(id, null)
+      } finally {
+        setProcessing(false)
+      }
+    }
+
     doProcess()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings])
+  }, [loadedImage, settings])
 
   const handleDownload = useCallback(() => {
     if (!processed?.processedUrl) return
@@ -153,6 +176,8 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
       </div>
     )
   }
+
+  const isWorking = loading || processing
 
   return (
     <Card className="overflow-hidden py-0 mx-2">
@@ -264,7 +289,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
               Converted
             </div>
             <div className="aspect-video bg-muted rounded-md flex items-center justify-center overflow-hidden relative">
-              {processing ? (
+              {isWorking ? (
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
               ) : error ? (
                 <div className="text-red-500 text-sm p-4 text-center">
@@ -286,7 +311,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
               ) : null}
             </div>
             <div className="mt-2 text-sm">
-              {processed && !processing ? (
+              {processed && !isWorking ? (
                 <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-2">
                   <div className="w-full flex justify-between">
                     <div className="flex flex-col">
