@@ -6,6 +6,7 @@ import {
   LogOutIcon,
   Scale,
   SearchIcon,
+  Ship,
   WalletIcon,
 } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
@@ -66,13 +67,13 @@ const items: SidebarItem[] = [
       <Globe className={selected ? 'text-black' : 'text-muted-foreground'} />
     ),
   },
-  // {
-  //   title: 'Releases',
-  //   url: '/releases',
-  //   icon: (selected: boolean) => (
-  //     <Ship className={selected ? 'text-black' : 'text-muted-foreground'} />
-  //   ),
-  // },
+  {
+    title: 'Releases',
+    url: '/releases',
+    icon: (selected: boolean) => (
+      <Ship className={selected ? 'text-black' : 'text-muted-foreground'} />
+    ),
+  },
   // {
   //   title: 'Libraries',
   //   url: '/libraries',

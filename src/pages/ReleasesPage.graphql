@@ -2,6 +2,11 @@ query releases {
   releases {
     id
     version
+    status
+    changelog
+    buildError
+    downloadUrl
+    createdAt
     integrated {
       id
       name
@@ -12,5 +17,94 @@ query releases {
     integratedFiles {
       id
     }
+  }
+}
+
+query release($id: String!) {
+  release(id: $id) {
+    id
+    version
+    status
+    changelog
+    buildError
+    downloadUrl
+    checksum
+    createdAt
+    integrated {
+      id
+      name
+    }
+    integratedLibraries {
+      id
+      version
+      library {
+        id
+        name
+      }
+    }
+    integratedFiles {
+      id
+      path
+      version {
+        id
+        version
+        library {
+          id
+          name
+        }
+      }
+    }
+    integratedFonts {
+      id
+      name
+      category
+    }
+    previousRelease {
+      id
+      integratedLibraries {
+        id
+        version
+        library {
+          id
+          name
+        }
+      }
+      integratedFiles {
+        id
+        path
+        version {
+          id
+          version
+          library {
+            id
+            name
+          }
+        }
+      }
+      integratedFonts {
+        id
+        name
+      }
+    }
+  }
+}
+
+mutation buildRelease($id: String!) {
+  buildRelease(id: $id) {
+    id
+    status
+  }
+}
+
+mutation publishRelease($id: String!) {
+  publishRelease(id: $id) {
+    id
+    status
+  }
+}
+
+mutation deleteRelease($id: String!) {
+  deleteRelease(id: $id) {
+    id
   }
 }

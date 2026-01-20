@@ -1,17 +1,23 @@
 import {
+  ReleaseFileCard,
+  ReleaseFontCard,
+  ReleaseLibraryCard,
+} from '@/components/Release'
+import type { FileGroup, FontItem, LibraryGroup } from '@/components/Release'
+import {
   Accordion,
   AccordionContent,
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import { AccordionItem } from '@radix-ui/react-accordion'
-import React, { useEffect } from 'react'
-
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { AccordionItem } from '@radix-ui/react-accordion'
 import { filesize } from 'filesize'
-import { toHeaderCase } from 'js-convert-case'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
+
 import {
   ReleasesDocument,
   useCreateReleaseMutation,
@@ -19,19 +25,152 @@ import {
   usePotentialSavingsQuery,
 } from '../../generated/graphql'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface NewReleasePageProps {}
-
-const NewReleasePage: React.FC<NewReleasePageProps> = () => {
+const NewReleasePage: React.FC = () => {
   const navigate = useNavigate()
+  const [versionType, setVersionType] = useState<'PATCH' | 'MINOR' | 'MAJOR'>(
+    'PATCH'
+  )
   const { data: newReleaseQueryData } = useNewReleaseQuery()
   const { data: potentialSavingsQueryData } = usePotentialSavingsQuery()
   const [createRelease] = useCreateReleaseMutation({
+    variables: { versionType },
     refetchQueries: [{ query: ReleasesDocument }],
     onCompleted: () => {
       navigate('/releases')
     },
   })
+
+  // Merge newLibraries and libraries into unified groups
+  const librariesByName = useMemo((): Map<string, LibraryGroup> => {
+    const map = new Map<string, LibraryGroup>()
+    const newRelease = newReleaseQueryData?.newRelease
+
+    // Add libraries with new versions (hasChanges = true)
+    for (const lib of newRelease?.newLibraries ?? []) {
+      map.set(lib.name, {
+        libraryName: lib.name,
+        description: lib.description,
+        versions: (lib.newVersions ?? []).map((v) => ({
+          id: v.id,
+          version: v.version,
+          isNew: true,
+        })),
+        hasChanges: true,
+      })
+    }
+
+    // Add libraries with only existing versions (hasChanges = false)
+    for (const lib of newRelease?.libraries ?? []) {
+      if (!map.has(lib.name)) {
+        map.set(lib.name, {
+          libraryName: lib.name,
+          description: lib.description,
+          versions: (lib.releasedVersions ?? []).map((v) => ({
+            id: v.id,
+            version: v.version,
+            isNew: false,
+          })),
+          hasChanges: false,
+        })
+      }
+    }
+
+    // Sort versions within each group: new first, then existing
+    for (const group of map.values()) {
+      group.versions.sort((a, b) => (a.isNew === b.isNew ? 0 : a.isNew ? -1 : 1))
+    }
+
+    // Sort groups: hasChanges first, then by name
+    return new Map(
+      [...map.entries()].sort(([, a], [, b]) => {
+        if (a.hasChanges !== b.hasChanges) return a.hasChanges ? -1 : 1
+        return a.libraryName.localeCompare(b.libraryName)
+      })
+    )
+  }, [newReleaseQueryData?.newRelease])
+
+  // Merge newFiles and files into unified groups by library
+  const filesByLibrary = useMemo((): Map<string, FileGroup> => {
+    const map = new Map<string, FileGroup>()
+    const newRelease = newReleaseQueryData?.newRelease
+
+    // Add new files
+    for (const file of newRelease?.newFiles ?? []) {
+      const name = file.version.library.name
+      if (!map.has(name)) {
+        map.set(name, { libraryName: name, files: [], hasChanges: true })
+      }
+      const group = map.get(name)!
+      group.files.push({
+        id: file.id,
+        path: file.path,
+        version: file.version.version,
+        isNew: true,
+      })
+      group.hasChanges = true
+    }
+
+    // Add existing files
+    for (const file of newRelease?.files ?? []) {
+      const name = file.version.library.name
+      if (!map.has(name)) {
+        map.set(name, { libraryName: name, files: [], hasChanges: false })
+      }
+      const group = map.get(name)!
+      group.files.push({
+        id: file.id,
+        path: file.path,
+        version: file.version.version,
+        isNew: false,
+      })
+    }
+
+    // Sort files within each group: new first, then existing
+    for (const group of map.values()) {
+      group.files.sort((a, b) => (a.isNew === b.isNew ? 0 : a.isNew ? -1 : 1))
+    }
+
+    // Sort groups: hasChanges first, then by name
+    return new Map(
+      [...map.entries()].sort(([, a], [, b]) => {
+        if (a.hasChanges !== b.hasChanges) return a.hasChanges ? -1 : 1
+        return a.libraryName.localeCompare(b.libraryName)
+      })
+    )
+  }, [newReleaseQueryData?.newRelease])
+
+  // Merge newFonts and fonts into unified list
+  const fontsWithStatus = useMemo((): FontItem[] => {
+    const fonts: FontItem[] = []
+    const newRelease = newReleaseQueryData?.newRelease
+
+    // Add new fonts
+    for (const font of newRelease?.newFonts ?? []) {
+      fonts.push({
+        id: font.id,
+        name: font.name,
+        category: font.category,
+        menu: font.menu,
+        isNew: true,
+      })
+    }
+
+    // Add existing fonts
+    for (const font of newRelease?.fonts ?? []) {
+      fonts.push({
+        id: font.id,
+        name: font.name,
+        category: font.category,
+        menu: font.menu,
+        isNew: false,
+      })
+    }
+
+    // Sort: new first, then existing
+    fonts.sort((a, b) => (a.isNew === b.isNew ? 0 : a.isNew ? -1 : 1))
+
+    return fonts
+  }, [newReleaseQueryData?.newRelease])
 
   useEffect(() => {
     document.title = 'Turbine | New Release'
@@ -41,7 +180,20 @@ const NewReleasePage: React.FC<NewReleasePageProps> = () => {
     <div className="max-w-2xl mx-auto p-6">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl">New Release</h1>
-        <Button onClick={() => createRelease()}>Create</Button>
+        <div className="flex items-center gap-4">
+          <ToggleGroup
+            type="single"
+            value={versionType}
+            onValueChange={(value) => {
+              if (value) setVersionType(value as 'PATCH' | 'MINOR' | 'MAJOR')
+            }}
+          >
+            <ToggleGroupItem value="PATCH">Patch</ToggleGroupItem>
+            <ToggleGroupItem value="MINOR">Minor</ToggleGroupItem>
+            <ToggleGroupItem value="MAJOR">Major</ToggleGroupItem>
+          </ToggleGroup>
+          <Button onClick={() => createRelease()}>Create</Button>
+        </div>
       </div>
       <Separator className="my-6" />
       <div className="flex gap-4 mt-6">
@@ -49,8 +201,8 @@ const NewReleasePage: React.FC<NewReleasePageProps> = () => {
           <h4>Potential NPM Savings (weekly)</h4>
           <span className="text-3xl font-light">
             {filesize(
-              potentialSavingsQueryData?.potentialSavings
-                ?.totalVersionSavings ?? 0
+              potentialSavingsQueryData?.potentialSavings?.totalVersionSavings ??
+                0
             )}
           </span>
         </Card>
@@ -64,139 +216,45 @@ const NewReleasePage: React.FC<NewReleasePageProps> = () => {
         </Card>
       </div>
       <Accordion type="multiple" className="mt-6">
-        <AccordionItem value="newLibraries">
+        <AccordionItem value="libraries">
           <AccordionTrigger className="mx-1">
             <h2 className="text-xl font-light">Libraries</h2>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 pb-0">
-            {newReleaseQueryData?.newRelease?.newLibraries?.map((library) => (
-              <div
-                key={library.id}
-                onClick={() => {
-                  navigate('/l/' + library.name)
-                }}
-                className="cursor-pointer hover:shadow-md border rounded-md mx-1 p-4"
-              >
-                <h3 className="text-lg font-medium">{library.name}</h3>
-                <p className="text-sm text-gray-500">{library.description}</p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {library.newVersions?.map((version) => (
-                    <div
-                      key={version.id}
-                      className="rounded-md bg-green-100 px-2 py-1"
-                    >
-                      {version.version}
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {Array.from(librariesByName.values()).map((lib) => (
+              <ReleaseLibraryCard key={lib.libraryName} library={lib} />
             ))}
-            {newReleaseQueryData?.newRelease?.libraries?.map((library) => (
-              <div
-                key={library.id}
-                onClick={() => {
-                  navigate('/l/' + library.name)
-                }}
-                className="cursor-pointer opacity-50 hover:opacity-100 hover:shadow-md border rounded-md mx-1 p-4"
-              >
-                <h3 className="text-lg font-medium">{library.name}</h3>
-                <p className="text-sm text-gray-500">{library.description}</p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {library.releasedVersions?.map((version) => (
-                    <div
-                      key={version.id}
-                      className="rounded-md bg-gray-100 px-2 py-1"
-                    >
-                      {version.version}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+            {librariesByName.size === 0 && (
+              <span className="text-muted-foreground mx-1">No libraries</span>
+            )}
           </AccordionContent>
         </AccordionItem>
-        {newReleaseQueryData?.newRelease?.newFiles?.length || newReleaseQueryData?.newRelease?.files?.length ? (
-          <AccordionItem value="newFiles">
+
+        {filesByLibrary.size > 0 && (
+          <AccordionItem value="files">
             <AccordionTrigger className="mx-1">
               <h2 className="text-xl font-light">Files</h2>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-4 pb-0">
-              {newReleaseQueryData?.newRelease?.newFiles?.map((file) => (
-                <div
-                  key={file.id}
-                  onClick={() => {
-                    navigate('/l/' + file.version.library.name)
-                  }}
-                  className="hover:shadow-md border rounded-md mx-1 p-4"
-                >
-                  <h3 className="text-lg font-medium">
-                    {file.version.library.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">{file.path}</p>
-                  <div className="w-fit rounded-md bg-green-100 px-2 py-1 mt-2">
-                    {file.version.version}
-                  </div>
-                </div>
-              ))}
-              {newReleaseQueryData?.newRelease?.files?.map((file) => (
-                <div
-                  key={file.id}
-                  className="opacity-50 hover:opacity-100 hover:shadow-md border rounded-md mx-1 p-4"
-                >
-                  <h3 className="text-lg font-medium">
-                    {file.version.library.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">{file.path}</p>
-                  <div className="w-fit rounded-md bg-gray-100 px-2 py-1 mt-2">
-                    {file.version.version}
-                  </div>
-                </div>
+              {Array.from(filesByLibrary.values()).map((lib) => (
+                <ReleaseFileCard key={lib.libraryName} fileGroup={lib} />
               ))}
             </AccordionContent>
           </AccordionItem>
-        ) : null}
-        {newReleaseQueryData?.newRelease?.newFonts?.length ? (
-          <AccordionItem value="newFonts">
+        )}
+
+        {fontsWithStatus.length > 0 && (
+          <AccordionItem value="fonts">
             <AccordionTrigger className="mx-1">
               <h2 className="text-xl font-light">Fonts</h2>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-4 pb-0">
-              {newReleaseQueryData?.newRelease?.newFonts?.map((font) => {
-                const fontFace = `
-                  @font-face {
-                    font-family: "${font.name}-menu";
-                    src: url("${font.menu}");
-                    font-display: block;
-                  }
-                `
-
-                return (
-                  <div
-                    key={font.id}
-                    onClick={() => {
-                      navigate('/fonts/' + font.name)
-                    }}
-                    className="hover:shadow-md border rounded-md mx-1 mb-4 p-4"
-                  >
-                    <style>{fontFace}</style>
-                    <h3
-                      className="text-xl mb-4"
-                      style={{ fontFamily: `${font.name}-menu` }}
-                    >
-                      {font.name}
-                    </h3>
-                    <span
-                      key="category"
-                      className="h-[fit-content] bg-white border border-gray-200 px-2 py-1 rounded-sm text-xs text-muted-foreground"
-                    >
-                      {toHeaderCase(font.category)}
-                    </span>
-                  </div>
-                )
-              })}
+              {fontsWithStatus.map((font) => (
+                <ReleaseFontCard key={font.id} font={font} />
+              ))}
             </AccordionContent>
           </AccordionItem>
-        ) : null}
+        )}
       </Accordion>
     </div>
   )

@@ -412,7 +412,6 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                         Subpath
                         <Input
                           id="path"
-                          placeholder="/"
                           className="w-fit"
                           value={subpath.path}
                           onChange={(e) => {
@@ -495,7 +494,6 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                   New Subpath
                   <Input
                     id="path"
-                    placeholder="/"
                     className="w-fit"
                     value={newSubpath.path}
                     onChange={(e) => {
@@ -630,7 +628,9 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             />
           </div>
           {libraryUsageQueryData?.libraryUsage?.downloads &&
-            libraryUsageQueryData.libraryUsage.bandwidth && (
+            libraryUsageQueryData.libraryUsage.bandwidth &&
+            libraryUsageQueryData.libraryUsage.prev.bandwidth &&
+            libraryUsageQueryData.libraryUsage.prev.downloads && (
               <div className="w-full lg:w-fit bg-gradient-to-t from-primary/2 to-card border rounded-xl lg:max-w-[16rem] flex flex-col gap-2 lg:ml-8 p-4 border rounded-xl">
                 <Downloads
                   library={libraryQueryData?.library.name || ''}

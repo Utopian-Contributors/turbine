@@ -31,7 +31,7 @@ export const Auth: React.FC = () => {
       <div className="flex flex-col gap-4 p-5 lg:p-4">
         <div className="flex justify-center gap-2 lg:justify-start">
           <a href="/" className="flex items-center gap-2 font-medium">
-            <img src="/turbine-wordmark.png" width="132px" className="mb-2" />
+            <img src="/turbine-wordmark.webp" width="132px" className="mb-2" />
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">

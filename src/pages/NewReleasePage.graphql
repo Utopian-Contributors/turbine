@@ -64,8 +64,8 @@ query potentialSavings {
   }
 }
 
-mutation createRelease {
-  createRelease {
+mutation createRelease($versionType: String) {
+  createRelease(versionType: $versionType) {
     id
   }
 }

@@ -22,6 +22,7 @@ import LibraryPage from './pages/LibraryPage'
 import MeasurePage from './pages/MeasurePage'
 import MeasurementsPage from './pages/MeasurementsPage'
 import NewReleasePage from './pages/NewReleasePage'
+import ReleaseDetailPage from './pages/ReleaseDetailPage'
 import PathHistoryPage from './pages/PathHistoryPage'
 import PaymentsPage from './pages/PaymentsPage'
 import RatingsPage from './pages/RatingsPage'
@@ -72,6 +73,7 @@ const router = createBrowserRouter([
       { path: 'fonts/:font', element: <FontPage /> },
       { path: 'releases', element: <ReleasesPage /> },
       { path: 'releases/new', element: <NewReleasePage /> },
+      { path: 'releases/:id', element: <ReleaseDetailPage /> },
       {
         path: 'wallet',
         element: <WalletPage />,
