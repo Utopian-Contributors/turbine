@@ -89,7 +89,7 @@ export const useSendTransaction = (tokenMint: string) => {
 
         const data = Buffer.alloc(9)
         data.writeUInt8(3, 0) // Transfer instruction discriminator
-        data.writeBigUInt64LE(BigInt(lamports) as unknown as number, 1)
+        data.writeBigUInt64LE(BigInt(lamports), 1)
 
         instructions = [
           new TransactionInstruction({
