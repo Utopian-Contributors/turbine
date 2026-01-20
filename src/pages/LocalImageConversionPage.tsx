@@ -44,9 +44,8 @@ const LocalImageConversionPage: React.FC = () => {
   const handleFiles = useCallback(
     (files: FileList | File[]) => {
       const fileArray = Array.from(files)
-      const imageFiles = fileArray.filter((file) =>
-        file.type.startsWith('image/'),
-      )
+      const imageFiles = fileArray
+        .filter((file) => file.type.startsWith('image/png'))
 
       imageFiles.forEach((file) => {
         // Check for duplicates by name and size
@@ -212,7 +211,7 @@ const LocalImageConversionPage: React.FC = () => {
           id="file-input"
           type="file"
           multiple
-          accept="image/*"
+          accept="image/png"
           className="hidden"
           onChange={handleFileInput}
         />
@@ -220,9 +219,7 @@ const LocalImageConversionPage: React.FC = () => {
         <p className="text-lg font-medium mb-1">
           Drop images here or click to select
         </p>
-        <p className="text-sm text-gray-400">
-          Supports PNG, JPG, WebP, and other image formats
-        </p>
+        <p className="text-sm text-gray-400">Supports PNG images</p>
       </div>
 
       {/* Hidden download link for zip */}
@@ -258,7 +255,11 @@ const LocalImageConversionPage: React.FC = () => {
                     {filesize(totalSavings.processedTotal)}
                   </span>
                 </div>
-                <Button onClick={handleDownloadAll} disabled={downloading} className="gap-2">
+                <Button
+                  onClick={handleDownloadAll}
+                  disabled={downloading}
+                  className="gap-2"
+                >
                   {downloading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (

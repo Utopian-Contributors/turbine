@@ -54,6 +54,17 @@ const ImageConversionPage: React.FC = () => {
     // Select images based on environment
     const environmentImages = imagesData.imagesToConvert[environment] || []
     
+    // Filter for PNG images and deduplicate by URL
+    const seen = new Set<string>()
+    return environmentImages.filter((img) => {
+      if (seen.has(img.url)) return false
+      seen.add(img.url)
+      return (
+        img.type === 'image/png' ||
+        img.url.toLowerCase().split('?')[0].endsWith('.png')
+      )
+    })
+    
     return environmentImages
   }, [imagesData, environment])
 
