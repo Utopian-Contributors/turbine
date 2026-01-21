@@ -360,6 +360,20 @@ const ThumbnailPage: React.FC = () => {
               <p className="text-xs text-muted-foreground">
                 Add these meta tags to your page's {'<head>'} section.
               </p>
+
+              {/* Info box about OG images */}
+              <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/50 p-3">
+                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                  What are OG images?
+                </h4>
+                <p className="text-xs text-blue-800 dark:text-blue-200">
+                  Open Graph (OG) images are the preview thumbnails that appear
+                  when your page is shared on social media platforms like
+                  Twitter, Facebook, LinkedIn, Slack, and Discord. A
+                  well-designed OG image can significantly increase
+                  click-through rates and make your content stand out in feeds.
+                </p>
+              </div>
             </div>
           )}
         </div>
