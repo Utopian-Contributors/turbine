@@ -150,7 +150,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
             size={24}
             initial={searchParams.get('url') || ''}
             onSearch={search}
-            className="w-xs lg:w-xl mb-4"
+            className="w-xs lg:w-xl"
           />
         ) : null}
         {measurementStatusData?.measurement?.status ===
@@ -160,7 +160,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
         {measurementStatusData?.measurement?.status !==
           MeasurementStatus.Pending &&
           measurementStatsQueryData && (
-            <div className="hidden lg:flex gap-2 my-4">
+            <div className="hidden lg:flex gap-2 mt-8 mb-4">
               <div className="w-44 flex flex-col justify-between gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
                 <p className="text-5xl font-thin">
                   {abbreviateNumber(

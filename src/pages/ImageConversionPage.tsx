@@ -11,9 +11,17 @@ import {
 import { type ProcessedResult } from '@/hooks/useImageProcessor'
 import { filesize } from 'filesize'
 import JSZip from 'jszip'
-import { Download, ImageIcon, Loader2, Monitor, Smartphone, Tablet } from 'lucide-react'
+import {
+  ArrowLeft,
+  Download,
+  ImageIcon,
+  Loader2,
+  Monitor,
+  Smartphone,
+  Tablet,
+} from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useImagesToConvertQuery } from '../../generated/graphql'
 
 type Environment = 'desktop' | 'tablet' | 'mobile'
@@ -27,6 +35,7 @@ interface ProcessedState {
 
 const ImageConversionPage: React.FC = () => {
   const params = useParams()
+  const navigate = useNavigate()
   const location = useLocation()
   const search = new URLSearchParams(location.search)
 
@@ -50,10 +59,10 @@ const ImageConversionPage: React.FC = () => {
   // Get PNG images for the selected environment
   const pngImages = useMemo(() => {
     if (!imagesData?.imagesToConvert) return []
-    
+
     // Select images based on environment
     const environmentImages = imagesData.imagesToConvert[environment] || []
-    
+
     // Filter for PNG images and deduplicate by URL
     const seen = new Set<string>()
     return environmentImages.filter((img) => {
@@ -64,7 +73,7 @@ const ImageConversionPage: React.FC = () => {
         img.url.toLowerCase().split('?')[0].endsWith('.png')
       )
     })
-    
+
     return environmentImages
   }, [imagesData, environment])
 
@@ -90,7 +99,7 @@ const ImageConversionPage: React.FC = () => {
         return next
       })
     },
-    []
+    [],
   )
 
   const totalSavings = useMemo(() => {
@@ -152,10 +161,26 @@ const ImageConversionPage: React.FC = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      <div
+        className="group cursor-pointer flex items-center gap-2 mb-4"
+        onClick={() => {
+          navigate(
+            '/measurements/' + params.host + '?path=' + search.get('path'),
+          )
+        }}
+      >
+        <ArrowLeft size={20} className="text-muted-foreground" />
+        <span className="group-hover:underline text-md text-muted-foreground">
+          Back to measurements of {params.host}
+        </span>
+      </div>
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
           <h1 className="text-3xl font-bold">Image Conversion</h1>
-          <Select value={environment} onValueChange={(v) => setEnvironment(v as Environment)}>
+          <Select
+            value={environment}
+            onValueChange={(v) => setEnvironment(v as Environment)}
+          >
             <SelectTrigger className="w-48">
               <SelectValue />
             </SelectTrigger>
@@ -182,8 +207,8 @@ const ImageConversionPage: React.FC = () => {
           </Select>
         </div>
         <p className="text-muted-foreground">
-          Found {pngImages.length} PNG images for {environment}. Convert them to WebP and optimize
-          for better performance.
+          Found {pngImages.length} PNG images for {environment}. Convert them to
+          WebP and optimize for better performance.
         </p>
       </div>
 
@@ -219,7 +244,7 @@ const ImageConversionPage: React.FC = () => {
                       (1 -
                         totalSavings.processedTotal /
                           totalSavings.originalTotal) *
-                        100
+                        100,
                     )}
                     % reduction
                   </span>
@@ -228,7 +253,11 @@ const ImageConversionPage: React.FC = () => {
                     {filesize(totalSavings.processedTotal)}
                   </span>
                 </div>
-                <Button onClick={handleDownloadAll} disabled={downloading} className="gap-2">
+                <Button
+                  onClick={handleDownloadAll}
+                  disabled={downloading}
+                  className="gap-2"
+                >
                   {downloading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (

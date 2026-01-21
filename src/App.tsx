@@ -28,6 +28,7 @@ import PaymentsPage from './pages/PaymentsPage'
 import RatingsPage from './pages/RatingsPage'
 import ReleasesPage from './pages/ReleasesPage'
 import SearchPage from './pages/SearchPage'
+import ThumbnailPage from './pages/ThumbnailPage'
 import WalletPage from './pages/WalletPage'
 import WebsitesPage from './pages/WebsitesPage'
 
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
       },
       { path: '/measurements/:host/history', element: <PathHistoryPage /> },
       { path: '/measurements/:host/images', element: <ImageConversionPage /> },
+      { path: '/measurements/:host/thumbnail', element: <ThumbnailPage /> },
       { path: '/images', element: <LocalImageConversionPage /> },
       {
         path: 'measure',
