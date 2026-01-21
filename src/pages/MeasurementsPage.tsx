@@ -75,8 +75,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     }
   }, [measurementDevicesData, selectedDevice])
 
-  const [measurementsQuery, { data: measurementsQueryData, refetch }] =
-    useMeasurementsLazyQuery({ fetchPolicy: 'network-only' })
+  const [
+    measurementsQuery,
+    { data: measurementsQueryData, startPolling, stopPolling },
+  ] = useMeasurementsLazyQuery({ fetchPolicy: 'network-only' })
   const {
     createMeasure,
     data: createMeasurementData,
@@ -88,7 +90,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
   })
 
   useEffect(() => {
-    if (createMeasurementData?.createMeasurement) {
+    if (
+      createMeasurementData?.createMeasurement &&
+      new URL(createMeasurementData.createMeasurement.url).host === params.host
+    ) {
       const newMeasurement = createMeasurementData?.createMeasurement
       const newUrlObj = new URL(newMeasurement?.url || url)
       navigate(
@@ -106,6 +111,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     createMeasurementData?.createMeasurement,
     measurementDevicesData?.measurementDevices,
     navigate,
+    params.host,
     selectedConnection,
     selectedDevice,
     url,
@@ -189,23 +195,6 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     )
   }, [measurement, params.host, selectedPath])
 
-  const search = useCallback(
-    (url: string) => {
-      const urlObj = new URL(url)
-      url = new URL(urlObj.pathname, `https://${urlObj.host}`).href
-      measurementsQuery({
-        variables: { host: params.host! },
-      }).then((data) => {
-        if (!data.error && !data.data?.measurements?.length) {
-          navigate(`/measure/?url=${encodeURIComponent(url)}`)
-        } else {
-          navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
-        }
-      })
-    },
-    [measurementsQuery, navigate, params.host],
-  )
-
   useEffect(() => {
     const hasExistingMeasurements = (
       measurements?:
@@ -276,21 +265,31 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       ) &&
       measurement
     ) {
-      const interval = setInterval(() => {
-        if (measurement?.url) {
-          console.debug('Refetching measurement status for', measurement.url)
-          refetch({ host: params.host })
-        }
-      }, 2000)
-      return () => clearInterval(interval)
+      startPolling(2000)
+      return () => {
+        stopPolling()
+      }
+    } else {
+      stopPolling()
     }
   }, [
     measurementsQuery,
     params,
-    refetch,
     measurementsQueryData?.measurements,
     measurement,
+    startPolling,
+    stopPolling,
   ])
+
+  const search = useCallback(
+    (url: string) => {
+      const urlObj = new URL(url)
+      url = new URL(urlObj.pathname, `https://${urlObj.host}`).href
+      stopPolling()
+      navigate(`/measurements/${urlObj.host}?path=` + urlObj.pathname)
+    },
+    [navigate, stopPolling],
+  )
 
   useEffect(() => {
     const device = searchParams.get('device')
