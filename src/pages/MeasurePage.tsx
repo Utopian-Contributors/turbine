@@ -1,7 +1,7 @@
+import { LoadingMeasurement } from '@/components/Measurement/Loading'
 import AutoProgress from '@/components/ui/auto-progress'
 import { SearchWebsite } from '@/components/ui/search-website'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
-import { motion } from 'framer-motion'
 import { abbreviateNumber } from 'js-abbreviation-number'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
@@ -21,7 +21,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   const location = useLocation()
   const searchParams = useMemo(
     () => new URLSearchParams(location.search),
-    [location.search]
+    [location.search],
   )
 
   const { data: measurementStatsQueryData } = useMeasurementStatsQuery()
@@ -52,7 +52,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     ) {
       navigate(
         `/measurements/${measurementStatusData?.measurement?.host?.host}?path=` +
-          new URL(measurementStatusData?.measurement?.url).pathname
+          new URL(measurementStatusData?.measurement?.url).pathname,
       )
     } else if (!measurementStatusData?.measurement && pendingMeasurementId) {
       measurementStatusQuery({
@@ -92,7 +92,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
         })
       }
     },
-    [createMeasure, navigate]
+    [createMeasure, navigate],
   )
 
   useEffect(() => {
@@ -155,76 +155,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
         ) : null}
         {measurementStatusData?.measurement?.status ===
         MeasurementStatus.Pending ? (
-          <div className="flex flex-col items-center gap-2 my-6">
-            <div className="text-4xl m-6 text-white whitespace-nowrap overflow-hidden">
-              Measuring website...
-            </div>
-            <AutoProgress />
-            <motion.div
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 0 }}
-              transition={{
-                delay: 5,
-                repeat: Infinity,
-                repeatType: 'reverse',
-                repeatDelay: 4,
-              }}
-              className="flex flex-col gap-2 mt-6 items-center"
-            >
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{
-                  delay: 1,
-                  repeat: Infinity,
-                  repeatType: 'reverse',
-                  repeatDelay: 4,
-                }}
-                className="text-lg text-green-100 px-3 py-1"
-              >
-                Reading SEO metadata
-              </motion.span>
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{
-                  delay: 2,
-                  repeat: Infinity,
-                  repeatType: 'reverse',
-                  repeatDelay: 4,
-                }}
-                className="text-lg text-green-100 px-3 py-1"
-              >
-                Analyzing the website bundle
-              </motion.span>
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{
-                  delay: 3,
-                  repeat: Infinity,
-                  repeatType: 'reverse',
-                  repeatDelay: 4,
-                }}
-                className="text-lg text-green-100 px-3 py-1"
-              >
-                Measuring image dimensions
-              </motion.span>
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{
-                  delay: 4,
-                  repeat: Infinity,
-                  repeatType: 'reverse',
-                  repeatDelay: 4,
-                }}
-                className="text-lg text-green-100 px-3 py-1"
-              >
-                Tracking performance
-              </motion.span>
-            </motion.div>
-          </div>
+          <LoadingMeasurement />
         ) : null}
         {measurementStatusData?.measurement?.status !==
           MeasurementStatus.Pending &&
@@ -234,7 +165,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
                 <p className="text-5xl font-thin">
                   {abbreviateNumber(
                     measurementStatsQueryData.measurementStats
-                      ?.totalWebsiteHosts ?? 0
+                      ?.totalWebsiteHosts ?? 0,
                   )}
                 </p>
                 <p className="text-md font-bold w-32">Websites measured</p>
@@ -243,7 +174,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
                 <p className="text-5xl font-thin">
                   {abbreviateNumber(
                     measurementStatsQueryData.measurementStats
-                      ?.totalMeasurements ?? 0
+                      ?.totalMeasurements ?? 0,
                   )}
                 </p>
                 <p className="text-md font-bold w-32">Measurements created</p>
@@ -252,7 +183,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
                 <p className="text-5xl font-thin">
                   {abbreviateNumber(
                     measurementStatsQueryData.measurementStats
-                      ?.totalAccessibilityViolations ?? 0
+                      ?.totalAccessibilityViolations ?? 0,
                   )}
                 </p>
                 <p className="text-md font-bold w-32">

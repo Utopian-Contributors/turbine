@@ -9,7 +9,13 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { toHeaderCase } from 'js-convert-case'
-import { ArrowLeft, CheckIcon, CircleQuestionMark, XIcon } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckIcon,
+  CircleQuestionMark,
+  XIcon,
+} from 'lucide-react'
 import { useWebsiteRatingQuery } from '../../generated/graphql'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -21,6 +27,7 @@ interface RatingsSectionProps {
   value?: boolean | number | string
   files?: string[]
   error?: string
+  warning?: string
   errorScreenshot?: string
   learnMoreUrl?: string
 }
@@ -31,6 +38,7 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
   value,
   files,
   error,
+  warning,
   errorScreenshot,
   learnMoreUrl,
 }) => {
@@ -40,6 +48,10 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
         {error ? (
           <div className="hidden md:block w-fit h-fit bg-red-500 text-white rounded-full p-1 mt-1">
             <XIcon size={16} />
+          </div>
+        ) : warning ? (
+          <div className="hidden md:block w-fit h-fit bg-yellow-500 text-white rounded-full p-1 mt-1">
+            <AlertCircle size={16} />
           </div>
         ) : (
           <div className="hidden md:block w-fit h-fit bg-green-500 text-white rounded-full p-1 mt-1">
@@ -62,12 +74,14 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
           <h3 className="hidden md:block text-lg font-medium">{title}</h3>
           <div className="flex gap-1 items-center mb-1 lg:mb-2">
             <p className="text-sm text-gray-500">{description}</p>
-            {learnMoreUrl ? <a href={learnMoreUrl} target="_blank">
-              <CircleQuestionMark
-                size={16}
-                className="cursor-pointer text-gray-400"
-              />
-            </a> : null}
+            {learnMoreUrl ? (
+              <a href={learnMoreUrl} target="_blank">
+                <CircleQuestionMark
+                  size={16}
+                  className="cursor-pointer text-gray-400"
+                />
+              </a>
+            ) : null}
           </div>
           {errorScreenshot && (
             <img
@@ -92,12 +106,17 @@ const RatingsSection: React.FC<RatingsSectionProps> = ({
         </div>
       </div>
       <div className="hidden md:block">
+        {warning && !errorScreenshot ? (
+          <span className="bg-yellow-100 rounded-sm font-medium px-2 py-1">
+            {warning}
+          </span>
+        ) : null}
         {error && !errorScreenshot ? (
           <span className="bg-red-100 rounded-sm font-medium px-2 py-1">
             {error}
           </span>
         ) : null}
-        {!error && typeof value !== 'boolean' ? (
+        {!error && !warning && typeof value !== 'boolean' ? (
           <span className="bg-gray-100 rounded-sm font-medium px-2 py-1">
             {value}
           </span>
@@ -113,7 +132,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
   const params = useParams()
   const search = useMemo(
     () => new URLSearchParams(location.search),
-    [location.search]
+    [location.search],
   )
 
   const { data: websiteQueryData } = useWebsiteRatingQuery({
@@ -122,7 +141,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
 
   const rating = useMemo(() => {
     return websiteQueryData?.website?.ratings?.find(
-      (r) => new URL(r.url).pathname === search.get('path')
+      (r) => new URL(r.url).pathname === search.get('path'),
     )
   }, [search, websiteQueryData?.website?.ratings])
 
@@ -141,6 +160,10 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
     }
   }, [])
 
+  const meta = useMemo(() => {
+    return JSON.parse(rating?.measurement?.meta || '{}')
+  }, [rating?.measurement?.meta])
+
   return (
     <div className="max-w-screen lg:max-w-3xl mx-auto p-4 pb-40 lg:py-6">
       <div
@@ -150,7 +173,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
             '/measurements/' +
               websiteQueryData?.website?.host +
               '?path=' +
-              search.get('path')
+              search.get('path'),
           )
         }}
       >
@@ -176,7 +199,8 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
         <div className="border rounded-lg p-4 mt-6">
           <h2 className="text-lg lg:text-xl">No ratings available.</h2>
           <p className="text-pretty text-muted-foreground mt-2">
-            A website must be measured using multiple bandwidth environments (WiFi & 4G or 3G) in order to get a rating.
+            A website must be measured using multiple bandwidth environments
+            (WiFi & 4G or 3G) in order to get a rating.
           </p>
         </div>
       )}
@@ -276,6 +300,45 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                   }
                   learnMoreUrl="https://ogp.me/"
                 />
+                {!meta['og:title'] ? (
+                  <RatingsSection
+                    title="OpenGraph title meta tag"
+                    description="Has a OpenGraph title meta tag."
+                    value={meta['og:title']}
+                    warning={
+                      !meta['og:title']
+                        ? 'No OpenGraph title meta tag was found'
+                        : undefined
+                    }
+                    learnMoreUrl="https://ogp.me/"
+                  />
+                ) : null}
+                {!meta['og:description'] ? (
+                  <RatingsSection
+                    title="OpenGraph description meta tag"
+                    description="Has a OpenGraph description meta tag."
+                    value={meta['og:description']}
+                    warning={
+                      !meta['og:description']
+                        ? 'No OpenGraph description meta tag was found'
+                        : undefined
+                    }
+                    learnMoreUrl="https://ogp.me/"
+                  />
+                ) : null}
+                {!meta['twitter:card'] ? (
+                  <RatingsSection
+                    title="Twitter card meta tag"
+                    description="Has a twitter card meta tag."
+                    value={meta['twitter:card']}
+                    warning={
+                      !meta['twitter:card']
+                        ? 'No twitter card meta tag was found'
+                        : undefined
+                    }
+                    learnMoreUrl="https://developer.x.com/en/docs/x-for-websites/cards/overview/markup"
+                  />
+                ) : null}
               </div>
             </AccordionContent>
           </AccordionItem>

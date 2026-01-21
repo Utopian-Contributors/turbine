@@ -32,6 +32,10 @@ query websiteRating($host: String!) {
 
       overallScore
       createdAt
+      measurement {
+        id
+        meta
+      }
     }
   }
 }

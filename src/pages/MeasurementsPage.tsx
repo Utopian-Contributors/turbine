@@ -5,6 +5,7 @@ import Bundle from '@/components/Measurement/Bundle'
 import BundleOverheadCTA from '@/components/Measurement/BundleOverheadCTA'
 import ConvertImagesCTA from '@/components/Measurement/ConvertImagesCTA'
 import Environments from '@/components/Measurement/Environments'
+import { LoadingMeasurement } from '@/components/Measurement/Loading'
 import Pricetag from '@/components/Pricetag'
 import AutoProgress from '@/components/ui/auto-progress'
 import { Button } from '@/components/ui/button'
@@ -52,24 +53,24 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
   const params = useParams<{ host: string }>()
   const searchParams = useMemo(
     () => new URLSearchParams(location.search),
-    [location.search]
+    [location.search],
   )
   const selectedPath = searchParams.get('path') || '/'
   const url = useMemo(
     () => new URL(selectedPath ?? '/', `https://${params.host}`).href,
-    [selectedPath, params.host]
+    [selectedPath, params.host],
   )
 
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null)
   const { data: measurementDevicesData } = useMeasurementDevicesQuery()
   const [selectedConnection, setSelectedConnection] = useState<ConnectionType>(
-    ConnectionType.Wifi
+    ConnectionType.Wifi,
   )
 
   useEffect(() => {
     if (!selectedDevice && measurementDevicesData?.measurementDevices?.length) {
       setSelectedDevice(
-        measurementDevicesData.measurementDevices[0]?.id || null
+        measurementDevicesData.measurementDevices[0]?.id || null,
       )
     }
   }, [measurementDevicesData, selectedDevice])
@@ -95,10 +96,10 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
           newUrlObj.pathname
         }&device=${
           measurementDevicesData?.measurementDevices?.find(
-            (d) => d.id === selectedDevice
+            (d) => d.id === selectedDevice,
           )?.type
         }&connection=${selectedConnection}`,
-        { replace: true }
+        { replace: true },
       )
     }
   }, [
@@ -113,7 +114,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
   const completedMeasurements = useMemo(() => {
     return (
       measurementsQueryData?.measurements?.filter(
-        (m) => m.status === MeasurementStatus.Completed
+        (m) => m.status === MeasurementStatus.Completed,
       ) || []
     )
   }, [measurementsQueryData?.measurements])
@@ -133,16 +134,14 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         }
       })
     const partialMatch = completedMeasurements?.find(
-      (m) => new URL(m.redirect || m.url).pathname === selectedPath
+      (m) => new URL(m.redirect || m.url).pathname === selectedPath,
     )
 
-    const fallbackMatch =
-      completedMeasurements.length === 0 &&
-      measurementsQueryData?.measurements?.length
-        ? measurementsQueryData?.measurements?.find(
-            (m) => new URL(m.redirect || m.url).pathname === selectedPath
-          )
-        : null
+    const fallbackMatch = measurementsQueryData?.measurements?.length
+      ? measurementsQueryData?.measurements?.find(
+          (m) => new URL(m.redirect || m.url).pathname === selectedPath,
+        )
+      : null
     return fullMatch || partialMatch || fallbackMatch || null
   }, [
     completedMeasurements,
@@ -157,8 +156,8 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       host: measurement?.redirect
         ? new URL(measurement.redirect).host
         : measurement?.url
-        ? new URL(measurement?.url).host!
-        : params.host || '',
+          ? new URL(measurement?.url).host!
+          : params.host || '',
     },
   })
 
@@ -178,7 +177,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         </div>
         <div className="col-span-4 lg:col-span-1 flex flex-col gap-4">
           {measurement.bundledFiles.find(
-            (f) => f.type === 'image/png' || f.url.endsWith('.png')
+            (f) => f.type === 'image/png' || f.url.endsWith('.png'),
           ) &&
             params.host && (
               <ConvertImagesCTA host={params.host} path={selectedPath} />
@@ -204,7 +203,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         }
       })
     },
-    [measurementsQuery, navigate, params.host]
+    [measurementsQuery, navigate, params.host],
   )
 
   useEffect(() => {
@@ -213,14 +212,13 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         | (Pick<Measurement, 'url' | 'redirect'> & {
             host?: Pick<WebsiteHost, 'host'> | null
           })[]
-        | null
+        | null,
     ) => {
       return measurements?.some((m) => {
         return (
-          m.host?.host === params.host &&
+          new URL(m.redirect || m.url).host === params.host &&
           (!selectedPath ||
-            new URL(m.url).pathname === selectedPath ||
-            (m.redirect && new URL(m.redirect).pathname === selectedPath))
+            new URL(m.redirect || m.url).pathname === selectedPath)
         )
       })
     }
@@ -257,7 +255,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
             (m) =>
               new URL(m.url).pathname === selectedPath &&
               m.device.type === device &&
-              m.connectionType === connection
+              m.connectionType === connection,
           )
         ) {
           createMeasure({
@@ -268,13 +266,13 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         }
       }
     },
-    [createMeasure, measurementsQueryData?.measurements, selectedPath, url]
+    [createMeasure, measurementsQueryData?.measurements, selectedPath, url],
   )
 
   useEffect(() => {
     if (
       measurementsQueryData?.measurements?.some(
-        (m) => m.status === MeasurementStatus.Pending
+        (m) => m.status === MeasurementStatus.Pending,
       ) &&
       measurement
     ) {
@@ -299,7 +297,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     const connection = searchParams.get('connection') as ConnectionType
     if (device) {
       const deviceObj = measurementDevicesData?.measurementDevices?.find(
-        (d) => d.type === (device as DeviceType)
+        (d) => d.type === (device as DeviceType),
       )
       if (deviceObj) {
         setSelectedDevice(deviceObj.id)
@@ -307,8 +305,8 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     } else {
       setSelectedDevice(
         measurementDevicesData?.measurementDevices?.find(
-          (d) => d.type === DeviceType.Desktop
-        )?.id || null
+          (d) => d.type === DeviceType.Desktop,
+        )?.id || null,
       )
     }
     if (connection) {
@@ -322,7 +320,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
 
   const rating = useMemo(() => {
     return websiteQueryData?.website?.ratings?.find(
-      (r) => new URL(r.url).pathname === selectedPath
+      (r) => new URL(r.url).pathname === selectedPath,
     )
   }, [selectedPath, websiteQueryData?.website?.ratings])
 
@@ -377,6 +375,9 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       {measurement?.status === MeasurementStatus.Failed && (
         <p>Measurement failed. Please try again later.</p>
       )}
+      {measurement?.status === MeasurementStatus.Pending ? (
+        <LoadingMeasurement dark />
+      ) : null}
       {measurementsQueryData?.measurements
         ?.filter((m) => new URL(m.redirect || m.url).pathname === selectedPath)
         .some((m) => m?.status === MeasurementStatus.Completed) &&
@@ -464,7 +465,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     if (selectedDevice && selectedConnection) {
                       const device =
                         measurementDevicesData?.measurementDevices?.find(
-                          (d) => d.id === selectedDevice
+                          (d) => d.id === selectedDevice,
                         )?.type
                       if (!device) return
                       createMeasure({
@@ -485,8 +486,8 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     <SelectTrigger className="w-fit">
                       {toHeaderCase(
                         measurementDevicesData?.measurementDevices?.find(
-                          (device) => device.id === selectedDevice
-                        )?.type || 'Select device'
+                          (device) => device.id === selectedDevice,
+                        )?.type || 'Select device',
                       )}
                     </SelectTrigger>
                     <SelectContent>
@@ -495,7 +496,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                           <SelectItem value={device.id} key={device.id}>
                             {toHeaderCase(device.type)}
                           </SelectItem>
-                        )
+                        ),
                       )}
                     </SelectContent>
                   </Select>
@@ -541,7 +542,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
               {measurement.bundledFiles.filter(
                 (f) =>
                   f.type.includes('png') ||
-                  f.url.split('?')[0].toLowerCase().endsWith('.png')
+                  f.url.split('?')[0].toLowerCase().endsWith('.png'),
               ).length > 0 && (
                 <div
                   className="cursor-pointer w-full lg:w-fit border rounded-md border-amber-200 bg-amber-500/10 shadow-sm flex flex-col gap-2 p-4"
@@ -550,7 +551,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                       '/measurements/' +
                         params.host +
                         '/images' +
-                        `?path=${selectedPath}`
+                        `?path=${selectedPath}`,
                     )
                   }
                 >
@@ -568,7 +569,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                       (measurement.redirect
                         ? new URL(measurement.redirect).host
                         : new URL(measurement.url).host || params.host || '') +
-                      `?path=${selectedPath}`
+                      `?path=${selectedPath}`,
                   )
                 }
               >
@@ -586,7 +587,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                     '/measurements/' +
                       params.host +
                       '/history' +
-                      `?path=${selectedPath}`
+                      `?path=${selectedPath}`,
                   )
                 }
               >
@@ -598,14 +599,17 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
             </motion.div>
             <motion.div className="flex gap-2 items-center mt-8 lg:px-6">
               {measurementsQueryData.measurements
-                .reduce((acc, m) => {
-                  const path = new URL(m.redirect || m.url).pathname
-                  if (!acc.some((item) => item.path === path)) {
-                    if (!m.title) return acc
-                    acc.push({ path, title: m.title })
-                  }
-                  return acc
-                }, [] as { path: string; title: string }[])
+                .reduce(
+                  (acc, m) => {
+                    const path = new URL(m.redirect || m.url).pathname
+                    if (!acc.some((item) => item.path === path)) {
+                      if (!m.title) return acc
+                      acc.push({ path, title: m.title })
+                    }
+                    return acc
+                  },
+                  [] as { path: string; title: string }[],
+                )
                 .reverse()
                 .map(({ path, title }) => {
                   return (
@@ -616,14 +620,14 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                         search.set('path', path)
                         navigate(
                           `/measurements/${params.host}?` + search.toString(),
-                          { replace: true }
+                          { replace: true },
                         )
                       }}
                       className={cn(
                         'h-24 w-[120px] flex flex-col justify-end border rounded-md px-2 py-2 pt-6',
                         path === selectedPath
                           ? 'border-green-500 shadow-sm'
-                          : 'cursor-pointer hover:shadow-md'
+                          : 'cursor-pointer hover:shadow-md',
                       )}
                     >
                       <p className="text-sm max-w-40 line-clamp-2">{title}</p>
@@ -640,18 +644,50 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   navigate(`/measure?` + search.toString())
                 }}
                 className={cn(
-                  'cursor-pointer w-8 h-8 bg-gray-100 shadow-sm hover:shadow-none border rounded-full flex items-center justify-center px-2 py-1 text-muted-foreground'
+                  'cursor-pointer w-8 h-8 bg-gray-100 shadow-sm hover:shadow-none border rounded-full flex items-center justify-center px-2 py-1 text-muted-foreground',
                 )}
               >
                 <Plus />
               </div>
             </motion.div>
+            {measurement.links.length ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="mt-2 lg:px-6 py-4 flex gap-1 overflow-x-auto text-sm text-gray-500"
+              >
+                {measurement.links
+                  .filter(
+                    (url) =>
+                      !measurementsQueryData.measurements?.find(
+                        (m) =>
+                          new URL(m.url).pathname === new URL(url).pathname,
+                      ),
+                  )
+                  .map((url) => (
+                    <div
+                      key={url}
+                      onClick={() =>
+                        createMeasure({
+                          url: url,
+                          device: DeviceType.Desktop,
+                          connection: ConnectionType.Wifi,
+                        })
+                      }
+                      className="cursor-pointer px-3 py-1 border rounded-md whitespace-nowrap hover:shadow-sm"
+                    >
+                      {new URL(url).pathname}
+                    </div>
+                  ))}
+              </motion.div>
+            ) : null}
             <Separator className="mt-4" />
             {measurementsQueryData.measurements && measurement && (
               <Environments
                 initial={selectedConnection}
                 measurements={measurementsQueryData.measurements.filter(
-                  (m) => new URL(m.redirect || m.url).pathname === selectedPath
+                  (m) => new URL(m.redirect || m.url).pathname === selectedPath,
                 )}
                 selectedPath={selectedPath}
                 current={measurement}

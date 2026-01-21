@@ -203,6 +203,8 @@ export type Measurement = {
   icon?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   largestContentfulPaint?: Maybe<Scalars['Int']['output']>;
+  links: Array<Scalars['String']['output']>;
+  meta?: Maybe<Scalars['String']['output']>;
   redirect?: Maybe<Scalars['String']['output']>;
   screenshots: Array<Scalars['String']['output']>;
   status: MeasurementStatus;
@@ -568,6 +570,7 @@ export type Rating = {
   httpsSupport: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   largestContentfulPaint?: Maybe<Scalars['Int']['output']>;
+  measurement?: Maybe<Measurement>;
   noMixedContent: Scalars['Boolean']['output'];
   overallScore: Scalars['Int']['output'];
   slow3GLoadTime?: Maybe<Scalars['Int']['output']>;
@@ -929,7 +932,7 @@ export type MeasurementsQueryVariables = Exact<{
 }>;
 
 
-export type MeasurementsQuery = { __typename?: 'Query', measurements?: Array<{ __typename?: 'Measurement', id: string, url: string, redirect?: string | null, title?: string | null, description?: string | null, status: MeasurementStatus, elapsed?: number | null, screenshots: Array<string>, connectionType: ConnectionType, icon?: string | null, thumbnail?: string | null, host?: { __typename?: 'WebsiteHost', id: string, host: string } | null, device: { __typename?: 'MeasurementDevice', id: string, type: DeviceType, width: number, height: number }, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, cacheControl?: string | null, elapsed: number, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> }> | null };
+export type MeasurementsQuery = { __typename?: 'Query', measurements?: Array<{ __typename?: 'Measurement', id: string, url: string, redirect?: string | null, title?: string | null, description?: string | null, status: MeasurementStatus, elapsed?: number | null, screenshots: Array<string>, connectionType: ConnectionType, links: Array<string>, icon?: string | null, thumbnail?: string | null, host?: { __typename?: 'WebsiteHost', id: string, host: string } | null, device: { __typename?: 'MeasurementDevice', id: string, type: DeviceType, width: number, height: number }, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, cacheControl?: string | null, elapsed: number, width?: number | null, height?: number | null, clientWidth?: number | null, clientHeight?: number | null }> }> | null };
 
 export type MeasurementDevicesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -997,7 +1000,7 @@ export type WebsiteRatingQueryVariables = Exact<{
 }>;
 
 
-export type WebsiteRatingQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', url: string, httpsSupport: boolean, noMixedContent: boolean, hasDescription: boolean, hasFavicon: boolean, hasOgImage: boolean, firstContentfulPaint?: number | null, largestContentfulPaint?: number | null, stableLoadTime?: number | null, fast3GLoadTime?: number | null, slow3GLoadTime?: number | null, webpUsage: Array<string>, avifUsage: Array<string>, cacheControlUsage: Array<string>, compressionUsage: Array<string>, overallScore: number, createdAt: any, accessibility: Array<{ __typename?: 'AccessibilityViolation', violationId: string, impact: string, description: string, helpUrl: string, help: string, screenshots: Array<string> }> }> | null } | null };
+export type WebsiteRatingQuery = { __typename?: 'Query', website?: { __typename?: 'WebsiteHost', id: string, host: string, ratings?: Array<{ __typename?: 'Rating', url: string, httpsSupport: boolean, noMixedContent: boolean, hasDescription: boolean, hasFavicon: boolean, hasOgImage: boolean, firstContentfulPaint?: number | null, largestContentfulPaint?: number | null, stableLoadTime?: number | null, fast3GLoadTime?: number | null, slow3GLoadTime?: number | null, webpUsage: Array<string>, avifUsage: Array<string>, cacheControlUsage: Array<string>, compressionUsage: Array<string>, overallScore: number, createdAt: any, accessibility: Array<{ __typename?: 'AccessibilityViolation', violationId: string, impact: string, description: string, helpUrl: string, help: string, screenshots: Array<string> }>, measurement?: { __typename?: 'Measurement', id: string, meta?: string | null } | null }> | null } | null };
 
 export type ReleasesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2256,6 +2259,7 @@ export const MeasurementsDocument = gql`
     bundledFiles {
       ...MeasuredFile
     }
+    links
     icon
     thumbnail
   }
@@ -2779,6 +2783,10 @@ export const WebsiteRatingDocument = gql`
       }
       overallScore
       createdAt
+      measurement {
+        id
+        meta
+      }
     }
   }
 }
