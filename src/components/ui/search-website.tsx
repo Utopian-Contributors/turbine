@@ -134,7 +134,7 @@ const SearchWebsite = React.forwardRef<HTMLInputElement, SearchWebsiteProps>(
             key="search-suggestions"
             className={cn(
               'w-xs absolute flex flex-col gap-1 px-2 py-3 bg-white/50 border rounded-lg backdrop-blur-md left-1/2 -translate-x-1/2 mt-4 shadow-lg max-h-80 overflow-y-auto transition-opacity duration-200',
-              focused ? 'opacity-100' : 'opacity-0',
+              focused ? 'opacity-100 visible' : 'opacity-0 hidden',
             )}
           >
             {websitesQueryData.websites.map((w) => (
