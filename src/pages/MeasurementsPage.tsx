@@ -580,7 +580,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 </span>
               </div>
               <div
-                className="cursor-pointer w-full lg:w-fit border rounded-md shadow-sm flex flex-col gap-2 p-4"
+                className="cursor-pointer w-full lg:w-fit border rounded-md shadow-sm flex flex-col justify-end gap-2 p-4"
                 onClick={() =>
                   navigate(
                     '/measurements/' +
