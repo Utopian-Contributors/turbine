@@ -208,15 +208,17 @@ const ThumbnailPage: React.FC = () => {
         )
 
         // Fetch the thumbnail to trigger generation
-        const response = await fetch(thumbnailApiUrl)
+        const response = await fetch(thumbnailApiUrl).catch(() => {
+          setError('Failed to fetch thumbnail')
+        })
 
-        if (!response.ok) {
-          const errorData = await response.json()
+        if (!response?.ok) {
+          const errorData = await response?.json()
           throw new Error(errorData.error || 'Failed to generate thumbnail')
         }
 
         // Create blob URL for display
-        const blob = await response.blob()
+        const blob = await response?.blob()
         const blobUrl = URL.createObjectURL(blob)
 
         // Revoke previous URL to avoid memory leak
@@ -237,10 +239,10 @@ const ThumbnailPage: React.FC = () => {
 
   // Load initial thumbnail
   useEffect(() => {
-    if (measurement && icon && !thumbnailUrl && !isGenerating) {
+    if (measurement && icon && !error && !thumbnailUrl && !isGenerating) {
       generateThumbnail(false)
     }
-  }, [measurement, icon, thumbnailUrl, isGenerating, generateThumbnail])
+  }, [measurement, icon, thumbnailUrl, isGenerating, generateThumbnail, error])
 
   // Track changes
   const handleFieldChange = useCallback(
