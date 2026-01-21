@@ -347,7 +347,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
           There was an error creating the measurement
         </div>
         <p className="text-red-500">
-          {(createMeasureError as string) ||
+          {(createMeasureError as { message?: string })?.message ||
             'Please try again later or contact support.'}
         </p>
         <Button

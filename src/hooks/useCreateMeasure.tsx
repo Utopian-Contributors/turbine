@@ -16,6 +16,9 @@ interface CreateMeasureArgs {
   url: string
   device: DeviceType
   connection: ConnectionType
+  signature?: string
+  walletAddress?: string
+  tokenMint?: string
 }
 
 export const useCreateMeasure = ({ url }: { url?: string }) => {
@@ -40,6 +43,9 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
           url,
           device,
           connection,
+          txSignature: options.signature,
+          walletAddress: options.walletAddress,
+          tokenMint: options.tokenMint,
         },
         refetchQueries: [
           {
@@ -57,7 +63,7 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
         },
       })
     },
-    [createMeasurement]
+    [createMeasurement],
   )
 
   const payAndCreate = useCallback(
@@ -72,7 +78,7 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
 
       if (tokenMint === UTCC_MINT_ADDRESS.toBase58()) {
         const measurementPrice = measurementPricesData?.measurementPrices?.find(
-          (price) => price.tokenMint === tokenMint
+          (price) => price.tokenMint === tokenMint,
         )?.amount
         if (!measurementPrice) {
           setIsPaying(false)
@@ -91,7 +97,7 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
 
       if (tokenMint === PublicKey.default.toBase58()) {
         const measurementPrice = measurementPricesData?.measurementPrices?.find(
-          (price) => price.tokenMint === tokenMint
+          (price) => price.tokenMint === tokenMint,
         )?.amount
         if (!measurementPrice) {
           setIsPaying(false)
@@ -110,7 +116,7 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
 
       if (tokenMint === USDC_MINT_ADDRESS.toBase58()) {
         const measurementPrice = measurementPricesData?.measurementPrices?.find(
-          (price) => price.tokenMint === tokenMint
+          (price) => price.tokenMint === tokenMint,
         )?.amount
         if (!measurementPrice) {
           setIsPaying(false)
@@ -133,7 +139,7 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
       }
 
       if (url) {
-        return create(options)
+        return create({ ...options, signature, walletAddress, tokenMint })
       }
     },
     [
@@ -146,7 +152,7 @@ export const useCreateMeasure = ({ url }: { url?: string }) => {
       solana,
       tokenMint,
       url,
-    ]
+    ],
   )
 
   useEffect(() => {
