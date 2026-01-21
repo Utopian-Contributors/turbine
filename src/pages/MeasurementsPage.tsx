@@ -610,10 +610,13 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   [] as { path: string; title: string }[],
                 )
                 .reverse()
-                .map(({ path, title }) => {
+                .map(({ path, title }, index) => {
                   return (
-                    <div
+                    <motion.div
                       key={path}
+                      initial={{ opacity: 0, filter: 'blur(10px)' }}
+                      animate={{ opacity: 1, filter: 'blur(0px)' }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
                       onClick={() => {
                         const search = new URLSearchParams(location.search)
                         search.set('path', path)
@@ -633,7 +636,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                       <p className="text-xs truncate text-muted-foreground px-1 mt-1">
                         {path}
                       </p>
-                    </div>
+                    </motion.div>
                   )
                 })}
               <div
@@ -649,12 +652,15 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 <Plus />
               </div>
             </motion.div>
+            <h3 className="pl-6 text-sm font-bold uppercase text-gray-200 pt-4">
+              Analyze next
+            </h3>
             {measurement.links.length ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 1 }}
-                className="mt-2 lg:px-6 py-4 flex gap-1 overflow-x-auto text-sm text-gray-500"
+                className="mt-2 lg:px-6 pb-4 flex gap-1 overflow-x-auto text-sm text-gray-500"
               >
                 {measurement.links
                   .filter(
@@ -664,8 +670,11 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                           new URL(m.url).pathname === new URL(url).pathname,
                       ),
                   )
-                  .map((url) => (
-                    <div
+                  .map((url, index) => (
+                    <motion.div
+                      initial={{ opacity: 0, filter: 'blur(10px)' }}
+                      animate={{ opacity: 1, filter: 'blur(0px)' }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
                       key={url}
                       onClick={() =>
                         createMeasure({
@@ -677,7 +686,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                       className="cursor-pointer px-3 py-1 border rounded-md whitespace-nowrap hover:shadow-sm"
                     >
                       {new URL(url).pathname}
-                    </div>
+                    </motion.div>
                   ))}
               </motion.div>
             ) : null}
@@ -704,8 +713,11 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 className="flex gap-4 px-2 lg:px-7 pb-6 pt-4 overflow-x-auto"
               >
                 {measurement.screenshots.map((img, index) => (
-                  <div
+                  <motion.div
                     key={img}
+                    initial={{ opacity: 0, filter: 'blur(10px)' }}
+                      animate={{ opacity: 1, filter: 'blur(0px)' }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
                     style={{
                       backgroundImage: `url(${
                         new URL(img, import.meta.env.VITE_SCREENSHOTS_FOLDER)
@@ -722,7 +734,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                           : `${img.split('/').pop()?.replace('.webp', '')}s`}
                       </span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </motion.div>
             ) : null}

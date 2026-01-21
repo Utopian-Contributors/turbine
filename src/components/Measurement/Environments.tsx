@@ -2,10 +2,7 @@ import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
 import { motion } from 'framer-motion'
 import { toHeaderCase, toSentenceCase } from 'js-convert-case'
-import {
-  CircleCheck,
-  CircleX
-} from 'lucide-react'
+import { CircleCheck, CircleX } from 'lucide-react'
 import React from 'react'
 import { useNavigate } from 'react-router'
 
@@ -99,7 +96,8 @@ const Environments: React.FC<EnvironmentsProps> = ({
               .map((device) => {
                 const measurementForDevice = measurements?.find(
                   (m) =>
-                    m.device.id === device.id && m.connectionType === connection
+                    m.device.id === device.id &&
+                    m.connectionType === connection,
                 )
                 return { measurementForDevice, device, connection }
               })
@@ -108,7 +106,7 @@ const Environments: React.FC<EnvironmentsProps> = ({
                   if (!a && b) return 1
                   if (a && !b) return -1
                   return 0
-                }
+                },
               )
               .map(({ measurementForDevice, device, connection }, index) => {
                 const loadTime = measurementForDevice
@@ -118,21 +116,18 @@ const Environments: React.FC<EnvironmentsProps> = ({
                   measurementForDevice
                     ? measurementForDevice.bundledFiles.reduce(
                         (a, b) => a + Number(b.size),
-                        0
+                        0,
                       )
                     : current?.bundledFiles.reduce(
                         (a, b) => a + Number(b.size),
-                        0
-                      )
+                        0,
+                      ),
                 )
                 return (
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{
-                      duration: 1,
-                      delay: 0 + index * 0.2,
-                    }}
+                    initial={{ opacity: 0, filter: 'blur(10px)' }}
+                    animate={{ opacity: 1, filter: 'blur(0px)' }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
                     key={`${device.type}-${connection}`}
                   >
                     <Card
@@ -147,14 +142,14 @@ const Environments: React.FC<EnvironmentsProps> = ({
                           : '',
                         current.id === measurementForDevice?.id
                           ? 'ring ring-green-500'
-                          : ''
+                          : '',
                       )}
                       onClick={() => {
                         if (isLoggedIn) {
                           onClick(device.type, connection)
                           navigate(
                             `/measurements/${current.host?.host}?path=${selectedPath}&device=${device.type}&connection=${connection}`,
-                            { replace: true }
+                            { replace: true },
                           )
                         } else if (current.id !== measurementForDevice?.id) {
                           login()
@@ -196,7 +191,7 @@ const Environments: React.FC<EnvironmentsProps> = ({
                             <div
                               className={cn(
                                 'flex flex-col gap-1',
-                                measurementForDevice ? '' : 'blur-xs'
+                                measurementForDevice ? '' : 'blur-xs',
                               )}
                             >
                               <span>Total load time</span>
