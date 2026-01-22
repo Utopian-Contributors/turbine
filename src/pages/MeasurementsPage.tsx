@@ -681,7 +681,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 <Plus />
               </div>
             </motion.div>
-            {measurement.links.length && (
+            {measurement.links.length > 0 && (
               <h3 className="pl-6 text-sm font-bold uppercase text-gray-200 pt-4">
                 Analyze next
               </h3>

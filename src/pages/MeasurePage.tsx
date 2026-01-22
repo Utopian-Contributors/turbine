@@ -1,3 +1,4 @@
+import { LivePreview } from '@/components/Measurement/LivePreview'
 import { LoadingMeasurement } from '@/components/Measurement/Loading'
 import AutoProgress from '@/components/ui/auto-progress'
 import { SearchWebsite } from '@/components/ui/search-website'
@@ -9,6 +10,7 @@ import {
   ConnectionType,
   DeviceType,
   MeasurementStatus,
+  useLatestMeasurementsQuery,
   useMeasurementStatsQuery,
   useMeasurementStatusLazyQuery,
 } from '../../generated/graphql'
@@ -25,6 +27,10 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   )
 
   const { data: measurementStatsQueryData } = useMeasurementStatsQuery()
+  const { data: latestMeasurementsData } = useLatestMeasurementsQuery({
+    pollInterval: 5000, // Refetch every 5 seconds
+    fetchPolicy: 'cache-and-network',
+  })
   const {
     createMeasure,
     data: createMeasurementData,
@@ -212,6 +218,17 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
             </span>
           </div>
         )}
+        {!pendingMeasurementId &&
+          measurementStatusData?.measurement?.status !==
+            MeasurementStatus.Pending &&
+          latestMeasurementsData?.latestMeasurements &&
+          latestMeasurementsData.latestMeasurements.length > 0 ? (
+          <div className="hidden lg:inline w-xl px-4 mt-12">
+            <LivePreview
+              measurements={latestMeasurementsData.latestMeasurements}
+            />
+          </div>
+        ) : null}
       </div>
       <div
         className="inset absolute top-0 w-full lg:w-[calc(100vw-256px)] z-[-1] bg-muted h-screen overflow-hidden"

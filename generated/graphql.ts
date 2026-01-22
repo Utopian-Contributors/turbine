@@ -507,6 +507,7 @@ export type Query = {
   fastestGrowingLibraries?: Maybe<Array<FastestGrowingLibrary>>;
   font?: Maybe<Font>;
   imagesToConvert: BundledImages;
+  latestMeasurements?: Maybe<Array<Measurement>>;
   latestRelease?: Maybe<NativeSupplyChainRelease>;
   library?: Maybe<Library>;
   libraryUsage?: Maybe<LibraryUsage>;
@@ -552,6 +553,11 @@ export type QueryFontArgs = {
 export type QueryImagesToConvertArgs = {
   host?: InputMaybe<Scalars['String']['input']>;
   path?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryLatestMeasurementsArgs = {
+  take?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -1063,6 +1069,11 @@ export type ToggleIntegrateVersionFileMutation = { __typename?: 'Mutation', togg
 export type VersionFileConfigFragment = { __typename?: 'VersionFileIntegrations', integrated: Array<{ __typename?: 'VersionFileUsage', bandwidth: string, file: { __typename?: 'VersionFile', id: string, path: string, integrated: boolean, version: { __typename?: 'Version', id: string, version: string } } }>, popular: Array<{ __typename?: 'VersionFileUsage', bandwidth: string, file: { __typename?: 'VersionFile', id: string, path: string, integrated: boolean, version: { __typename?: 'Version', id: string, version: string } } }> };
 
 export type VersionFileFragment = { __typename?: 'VersionFile', id: string, path: string, integrated: boolean, version: { __typename?: 'Version', id: string, version: string } };
+
+export type LatestMeasurementsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LatestMeasurementsQuery = { __typename?: 'Query', latestMeasurements?: Array<{ __typename?: 'Measurement', id: string, url: string, title?: string | null, description?: string | null, elapsed?: number | null, icon?: string | null, host?: { __typename?: 'WebsiteHost', id: string, host: string } | null, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, elapsed: number }> }> | null };
 
 export type MeasurementStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2613,6 +2624,61 @@ export function useToggleIntegrateVersionFileMutation(baseOptions?: Apollo.Mutat
 export type ToggleIntegrateVersionFileMutationHookResult = ReturnType<typeof useToggleIntegrateVersionFileMutation>;
 export type ToggleIntegrateVersionFileMutationResult = Apollo.MutationResult<ToggleIntegrateVersionFileMutation>;
 export type ToggleIntegrateVersionFileMutationOptions = Apollo.BaseMutationOptions<ToggleIntegrateVersionFileMutation, ToggleIntegrateVersionFileMutationVariables>;
+export const LatestMeasurementsDocument = gql`
+    query latestMeasurements {
+  latestMeasurements(take: 3) {
+    id
+    url
+    host {
+      id
+      host
+    }
+    title
+    description
+    elapsed
+    icon
+    bundledFiles {
+      id
+      url
+      size
+      type
+      elapsed
+    }
+  }
+}
+    `;
+
+/**
+ * __useLatestMeasurementsQuery__
+ *
+ * To run a query within a React component, call `useLatestMeasurementsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLatestMeasurementsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLatestMeasurementsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLatestMeasurementsQuery(baseOptions?: Apollo.QueryHookOptions<LatestMeasurementsQuery, LatestMeasurementsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LatestMeasurementsQuery, LatestMeasurementsQueryVariables>(LatestMeasurementsDocument, options);
+      }
+export function useLatestMeasurementsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LatestMeasurementsQuery, LatestMeasurementsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LatestMeasurementsQuery, LatestMeasurementsQueryVariables>(LatestMeasurementsDocument, options);
+        }
+export function useLatestMeasurementsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LatestMeasurementsQuery, LatestMeasurementsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LatestMeasurementsQuery, LatestMeasurementsQueryVariables>(LatestMeasurementsDocument, options);
+        }
+export type LatestMeasurementsQueryHookResult = ReturnType<typeof useLatestMeasurementsQuery>;
+export type LatestMeasurementsLazyQueryHookResult = ReturnType<typeof useLatestMeasurementsLazyQuery>;
+export type LatestMeasurementsSuspenseQueryHookResult = ReturnType<typeof useLatestMeasurementsSuspenseQuery>;
+export type LatestMeasurementsQueryResult = Apollo.QueryResult<LatestMeasurementsQuery, LatestMeasurementsQueryVariables>;
 export const MeasurementStatsDocument = gql`
     query measurementStats {
   measurementStats {

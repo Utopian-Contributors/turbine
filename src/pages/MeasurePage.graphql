@@ -1,3 +1,25 @@
+query latestMeasurements {
+  latestMeasurements(take: 3) {
+    id
+    url
+    host {
+      id
+      host
+    }
+    title
+    description
+    elapsed
+    icon
+    bundledFiles {
+      id
+      url
+      size
+      type
+      elapsed
+    }
+  }
+}
+
 query measurementStats {
   measurementStats {
     totalMeasurements
