@@ -634,6 +634,7 @@ export type QueryWebsiteArgs = {
 
 
 export type QueryWebsitesArgs = {
+  filter?: InputMaybe<WebsiteHostFilter>;
   order?: InputMaybe<WebsiteHostQueryOrder>;
   pagination?: InputMaybe<PaginationInput>;
   query?: InputMaybe<Scalars['String']['input']>;
@@ -832,6 +833,10 @@ export type WebsiteHost = {
   thumbnail?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
 };
+
+export enum WebsiteHostFilter {
+  MeasuredByMe = 'MEASURED_BY_ME'
+}
 
 export enum WebsiteHostQueryOrder {
   CreatedAtAsc = 'CREATED_AT_ASC',
@@ -1205,6 +1210,7 @@ export type WebsitesQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
   order?: InputMaybe<WebsiteHostQueryOrder>;
   pagination?: InputMaybe<PaginationInput>;
+  filter?: InputMaybe<WebsiteHostFilter>;
 }>;
 
 
@@ -3682,8 +3688,8 @@ export type SearchPageEmptyStateLazyQueryHookResult = ReturnType<typeof useSearc
 export type SearchPageEmptyStateSuspenseQueryHookResult = ReturnType<typeof useSearchPageEmptyStateSuspenseQuery>;
 export type SearchPageEmptyStateQueryResult = Apollo.QueryResult<SearchPageEmptyStateQuery, SearchPageEmptyStateQueryVariables>;
 export const WebsitesDocument = gql`
-    query websites($query: String, $order: WebsiteHostQueryOrder, $pagination: PaginationInput) {
-  websites(query: $query, order: $order, pagination: $pagination) {
+    query websites($query: String, $order: WebsiteHostQueryOrder, $pagination: PaginationInput, $filter: WebsiteHostFilter) {
+  websites(query: $query, order: $order, pagination: $pagination, filter: $filter) {
     id
     host
     ratings {
@@ -3718,6 +3724,7 @@ export const WebsitesDocument = gql`
  *      query: // value for 'query'
  *      order: // value for 'order'
  *      pagination: // value for 'pagination'
+ *      filter: // value for 'filter'
  *   },
  * });
  */

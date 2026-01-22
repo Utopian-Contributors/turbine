@@ -1,11 +1,10 @@
-import { CameraOff, List } from 'lucide-react'
+import { List } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { useLocation, useNavigate } from 'react-router'
 
 import Search from '@/components/blocks/search'
-import PreloadImage from '@/components/ui/preload-image-cover'
-import StarRating from '@/components/ui/StarRating'
+import { WebsitesGrid } from '@/components/WebsitesGrid'
 
 import {
   Select,
@@ -13,8 +12,11 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@/components/ui/select'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
+  useLoggedInQuery,
   useWebsitesQuery,
+  WebsiteHostFilter,
   WebsiteHostQueryOrder,
   type WebsiteHost,
 } from '../../generated/graphql'
@@ -40,21 +42,61 @@ const renderSelectedOrder = (order: WebsiteHostQueryOrder | null) => {
 const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const {
-    data: websitesQueryData,
-    refetch,
-    fetchMore: fetchMoreWebsites,
-  } = useWebsitesQuery({ variables: { pagination: { take: 12 } } })
+  const searchParams = new URLSearchParams(location.search)
+
+  // Read tab from URL, default to 'all'
+  const tabParam = searchParams.get('tab')
+  const activeTab: 'all' | 'measured' = tabParam === 'measured' ? 'measured' : 'all'
+
   const [selectedOrder, setSelectedOrder] =
     useState<WebsiteHostQueryOrder | null>(
-      new URLSearchParams(location.search).get('order') as WebsiteHostQueryOrder
+      searchParams.get('order') as WebsiteHostQueryOrder,
     )
   const [hasMoreWebsites, setHasMoreWebsites] = useState(true)
-  const [iconError, setIconError] = useState<Record<string, boolean>>({})
+
+  const currentFilter = activeTab === 'measured' ? WebsiteHostFilter.MeasuredByMe : null
+
+  const {
+    data: websitesQueryData,
+    fetchMore: fetchMoreWebsites,
+  } = useWebsitesQuery({
+    variables: {
+      pagination: { take: 12 },
+      filter: currentFilter,
+      query: searchParams.get('q') || undefined,
+      order: selectedOrder,
+    },
+    fetchPolicy: 'cache-and-network',
+  })
+  const { data: loggedInQueryData } = useLoggedInQuery()
 
   useEffect(() => {
     document.title = 'Turbine | Websites'
   }, [])
+
+  // Reset pagination and refetch when tab/filter changes
+  useEffect(() => {
+    setHasMoreWebsites(true)
+  }, [activeTab])
+
+  const handleTabChange = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(location.search)
+      if (value === 'all') {
+        params.delete('tab')
+      } else {
+        params.set('tab', value)
+      }
+      navigate(
+        {
+          pathname: '/websites',
+          search: params.toString(),
+        },
+        { replace: true },
+      )
+    },
+    [location.search, navigate],
+  )
 
   const loadMoreWebsites = useCallback(() => {
     if (hasMoreWebsites) {
@@ -65,6 +107,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
             take: 10,
           },
           order: selectedOrder,
+          filter: activeTab === 'measured' ? WebsiteHostFilter.MeasuredByMe : null,
         },
         updateQuery: (prev, { fetchMoreResult }) => {
           if ((fetchMoreResult.websites?.length ?? 0) < 10) {
@@ -84,6 +127,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
       })
     }
   }, [
+    activeTab,
     fetchMoreWebsites,
     hasMoreWebsites,
     selectedOrder,
@@ -97,23 +141,28 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
     }
   }, [hasMoreWebsites, lastWebsiteRefInView, loadMoreWebsites])
 
+  // Reset hasMore when filter/search changes
   useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const query = params.get('q') || ''
-    refetch({ query, order: selectedOrder })
-  }, [location.search, refetch, selectedOrder])
+    setHasMoreWebsites(true)
+  }, [location.search, selectedOrder])
 
-  const getRating = useCallback((website: WebsiteHost) => {
-    return website.ratings?.find(
-      (r) =>
-        new Date(r.createdAt).getTime() ===
-        Math.max(
-          ...(website.ratings?.map((rating) =>
-            new Date(rating.createdAt).getTime()
-          ) || [])
+  const handleWebsiteClick = useCallback(
+    (website: WebsiteHost) => {
+      if (
+        website.host &&
+        (website.rootMeasurement?.url || website.rootMeasurement?.redirect)
+      ) {
+        navigate(
+          `/measurements/${website.host}?path=${
+            new URL(
+              website.rootMeasurement?.redirect || website.rootMeasurement?.url,
+            ).pathname
+          }`,
         )
-    )
-  }, [])
+      }
+    },
+    [navigate],
+  )
 
   return (
     <div className="p-6 pb-40 lg:pb-6">
@@ -123,9 +172,13 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
             className="w-full lg:w-md lg:ml-32"
             placeholder="Search websites..."
             onChange={(value) => {
-              navigate(
-                '/websites?' + new URLSearchParams({ q: value }).toString()
-              )
+              const params = new URLSearchParams(location.search)
+              if (value) {
+                params.set('q', value)
+              } else {
+                params.delete('q')
+              }
+              navigate('/websites?' + params.toString())
             }}
           />
           <Select
@@ -138,7 +191,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
                   pathname: '/websites',
                   search: search.toString(),
                 },
-                { replace: true }
+                { replace: true },
               )
             }}
             defaultValue={WebsiteHostQueryOrder.CreatedAtDesc}
@@ -161,90 +214,20 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex lg:flex-row lg:flex-wrap flex-col gap-8 lg:gap-1 mt-6">
-          {websitesQueryData?.websites?.map(
-            (website, index) =>
-              website.rootMeasurement && (
-                <div
-                  key={website.id}
-                  onClick={() => {
-                    if (
-                      website.host &&
-                      (website.rootMeasurement?.url ||
-                        website.rootMeasurement?.redirect)
-                    ) {
-                      navigate(
-                        `/measurements/${website.host}?path=${
-                          new URL(
-                            website.rootMeasurement?.redirect ||
-                              website.rootMeasurement?.url
-                          ).pathname
-                        }`
-                      )
-                    }
-                  }}
-                  className="cursor-pointer lg:w-[calc(100%/3-0.25rem)] shadow-sm lg:shadow-none rounded-lg flex flex-col lg:flex-row lg:gap-2 overflow-hidden"
-                  ref={
-                    index === websitesQueryData.websites!.length - 1
-                      ? lastWebsiteRef
-                      : null
-                  }
-                >
-                  <div className="relative lg:mx-1 lg:my-2 w-full border rounded-lg overflow-hidden">
-                    <PreloadImage
-                      src={website.thumbnail}
-                      className="h-48 md:h-128 lg:h-48 w-full bg-cover bg-center"
-                    >
-                      {(error) =>
-                        error && (
-                          <div
-                            className="h-48 md:h-128 lg:h-48 w-full"
-                            style={{
-                              background:
-                                'linear-gradient(to bottom, var(--color-green-300), transparent), repeating-conic-gradient(#fff 0 25%, #fef 0 50%) 50% / 20px 20px',
-                            }}
-                          >
-                            <CameraOff
-                              className="relative top-1/2 -translate-y-1/2 mx-auto text-white stroke-1"
-                              size={128}
-                            />
-                          </div>
-                        )
-                      }
-                    </PreloadImage>
-                    <div className="lg:max-w-[calc(100%-2px)] w-full p-2 bg-white flex flex-col gap-2">
-                      <StarRating
-                        rating={getRating(website as WebsiteHost)?.overallScore}
-                      />
-                      <div className="max-w-full flex items-center gap-2">
-                        {website.icon && !iconError[website.icon] ? (
-                          <img
-                            src={website.icon}
-                            alt={`${website.host} icon`}
-                            className="bg-gray-100 p-1 rounded-sm w-[32px] h-[32px]"
-                            onError={() =>
-                              setIconError({
-                                ...iconError,
-                                [website.icon!]: true,
-                              })
-                            }
-                          />
-                        ) : null}
-                        <div className="w-full flex flex-col">
-                          <h3 className="max-w-[calc(100%-40px)] text-lg truncate overflow-hidden m-0">
-                            {website.title}
-                          </h3>
-                          <span className="text-gray-400 text-xs">
-                            {website.host}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-          )}
-        </div>
+        {loggedInQueryData?.loggedIn && (
+          <Tabs value={activeTab} onValueChange={handleTabChange}>
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="measured">Measured by me</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
+        <WebsitesGrid
+          key={activeTab}
+          websites={(websitesQueryData?.websites as WebsiteHost[]) ?? []}
+          onWebsiteClick={handleWebsiteClick}
+          lastItemRef={lastWebsiteRef}
+        />
       </div>
     </div>
   )

@@ -1,0 +1,100 @@
+import { CameraOff } from 'lucide-react'
+import React, { useCallback, useState } from 'react'
+
+import PreloadImage from '@/components/ui/preload-image-cover'
+import StarRating from '@/components/ui/StarRating'
+import type { WebsiteHost } from '../../generated/graphql'
+
+interface WebsitesGridProps {
+  websites: WebsiteHost[]
+  onWebsiteClick: (website: WebsiteHost) => void
+  lastItemRef?: React.Ref<HTMLDivElement>
+}
+
+export const WebsitesGrid: React.FC<WebsitesGridProps> = ({
+  websites,
+  onWebsiteClick,
+  lastItemRef,
+}) => {
+  const [iconError, setIconError] = useState<Record<string, boolean>>({})
+
+  const getRating = useCallback((website: WebsiteHost) => {
+    return website.ratings?.find(
+      (r) =>
+        new Date(r.createdAt).getTime() ===
+        Math.max(
+          ...(website.ratings?.map((rating) =>
+            new Date(rating.createdAt).getTime(),
+          ) || []),
+        ),
+    )
+  }, [])
+
+  return (
+    <div className="flex lg:flex-row lg:flex-wrap flex-col gap-8 lg:gap-1 mt-6">
+      {websites.map(
+        (website, index) =>
+          website.rootMeasurement && (
+            <div
+              key={website.id}
+              onClick={() => onWebsiteClick(website)}
+              className="cursor-pointer lg:w-[calc(100%/3-0.25rem)] shadow-sm lg:shadow-none rounded-lg flex flex-col lg:flex-row lg:gap-2 overflow-hidden"
+              ref={index === websites.length - 1 ? lastItemRef : null}
+            >
+              <div className="relative lg:mx-1 lg:my-2 w-full border rounded-lg overflow-hidden">
+                <PreloadImage
+                  src={website.thumbnail}
+                  className="h-48 md:h-128 lg:h-48 w-full bg-cover bg-center"
+                >
+                  {(error) =>
+                    error && (
+                      <div
+                        className="h-48 md:h-128 lg:h-48 w-full"
+                        style={{
+                          background:
+                            'linear-gradient(to bottom, var(--color-green-300), transparent), repeating-conic-gradient(#fff 0 25%, #fef 0 50%) 50% / 20px 20px',
+                        }}
+                      >
+                        <CameraOff
+                          className="relative top-1/2 -translate-y-1/2 mx-auto text-white stroke-1"
+                          size={128}
+                        />
+                      </div>
+                    )
+                  }
+                </PreloadImage>
+                <div className="lg:max-w-[calc(100%-2px)] w-full p-2 bg-white flex flex-col gap-2">
+                  <StarRating rating={getRating(website)?.overallScore} />
+                  <div className="max-w-full flex items-center gap-2">
+                    {website.icon && !iconError[website.icon] ? (
+                      <img
+                        src={website.icon}
+                        alt={`${website.host} icon`}
+                        className="bg-gray-100 p-1 rounded-sm w-[32px] h-[32px]"
+                        onError={() =>
+                          setIconError({
+                            ...iconError,
+                            [website.icon!]: true,
+                          })
+                        }
+                      />
+                    ) : null}
+                    <div className="w-full flex flex-col">
+                      <h3 className="max-w-[calc(100%-40px)] text-lg truncate overflow-hidden m-0">
+                        {website.title}
+                      </h3>
+                      <span className="text-gray-400 text-xs">
+                        {website.host}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ),
+      )}
+    </div>
+  )
+}
+
+export default WebsitesGrid

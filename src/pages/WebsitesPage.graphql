@@ -1,5 +1,5 @@
-query websites($query: String, $order: WebsiteHostQueryOrder, $pagination: PaginationInput) {
-  websites(query: $query, order: $order, pagination: $pagination) {
+query websites($query: String, $order: WebsiteHostQueryOrder, $pagination: PaginationInput, $filter: WebsiteHostFilter) {
+  websites(query: $query, order: $order, pagination: $pagination, filter: $filter) {
     id
     host
     ratings {
