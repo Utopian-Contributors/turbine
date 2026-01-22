@@ -24,6 +24,7 @@ import {
 
 type OgTheme = 'dark' | 'light'
 type OgStyle = 'single' | 'pattern'
+type OgFont = 'sans' | 'serif' | 'mono'
 
 const IMAGE_EXTENSIONS = [
   '.png',
@@ -69,6 +70,8 @@ const ThumbnailPage: React.FC = () => {
   const [icon, setIcon] = useState('')
   const [theme, setTheme] = useState<OgTheme>('dark')
   const [style, setStyle] = useState<OgStyle>('single')
+  const [titleFont, setTitleFont] = useState<OgFont>('sans')
+  const [subtitleFont, setSubtitleFont] = useState<OgFont>('sans')
 
   // Thumbnail state
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null)
@@ -171,6 +174,8 @@ const ThumbnailPage: React.FC = () => {
         key: cacheKey,
         theme,
         style,
+        titleFont,
+        subtitleFont,
       })
 
       if (subtitle) {
@@ -183,7 +188,17 @@ const ThumbnailPage: React.FC = () => {
 
       return `${ogBaseUrl}/og?${params.toString()}`
     },
-    [title, subtitle, icon, theme, style, cacheKey, ogBaseUrl],
+    [
+      title,
+      subtitle,
+      icon,
+      theme,
+      style,
+      titleFont,
+      subtitleFont,
+      cacheKey,
+      ogBaseUrl,
+    ],
   )
 
   // Build integration URL (full URL with all configured params)
@@ -522,6 +537,55 @@ const ThumbnailPage: React.FC = () => {
                   Pattern
                 </ToggleGroupItem>
               </ToggleGroup>
+            </div>
+
+            <div className="flex gap-2">
+              {/* Title Font */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Title Font</label>
+                <ToggleGroup
+                  type="single"
+                  value={titleFont}
+                  onValueChange={(value) => {
+                    if (value) handleFieldChange(setTitleFont, value as OgFont)
+                  }}
+                  variant="outline"
+                >
+                  <ToggleGroupItem value="sans" className="flex-1">
+                    Sans
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="serif" className="flex-1">
+                    Serif
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="mono" className="flex-1">
+                    Mono
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+
+              {/* Subtitle Font */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Subtitle Font</label>
+                <ToggleGroup
+                  type="single"
+                  value={subtitleFont}
+                  onValueChange={(value) => {
+                    if (value)
+                      handleFieldChange(setSubtitleFont, value as OgFont)
+                  }}
+                  variant="outline"
+                >
+                  <ToggleGroupItem value="sans" className="flex-1">
+                    Sans
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="serif" className="flex-1">
+                    Serif
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="mono" className="flex-1">
+                    Mono
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
             </div>
 
             {/* Generate Button */}
