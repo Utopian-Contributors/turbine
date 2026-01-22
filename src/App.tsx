@@ -5,6 +5,7 @@ import { RecoilRoot } from 'recoil'
 import RootPage from './RootPage'
 import { client } from './apollo'
 import { Auth } from './components/Auth'
+import AssetsPage from './pages/AssetsPage'
 import {
   ForgotPasswordPage,
   LoginPage,
@@ -16,18 +17,17 @@ import { NotFoundPage } from './pages/Error/404Page'
 import FontPage from './pages/FontPage'
 import FontsPage from './pages/FontsPage'
 import ImageConversionPage from './pages/ImageConversionPage'
-import LocalImageConversionPage from './pages/LocalImageConversionPage'
 import LibrariesPage from './pages/LibrariesPage'
 import LibraryPage from './pages/LibraryPage'
+import LocalImageConversionPage from './pages/LocalImageConversionPage'
 import MeasurePage from './pages/MeasurePage'
 import MeasurementsPage from './pages/MeasurementsPage'
 import NewReleasePage from './pages/NewReleasePage'
-import ReleaseDetailPage from './pages/ReleaseDetailPage'
 import PathHistoryPage from './pages/PathHistoryPage'
 import PaymentsPage from './pages/PaymentsPage'
 import RatingsPage from './pages/RatingsPage'
+import ReleaseDetailPage from './pages/ReleaseDetailPage'
 import ReleasesPage from './pages/ReleasesPage'
-import SearchPage from './pages/SearchPage'
 import ThumbnailPage from './pages/ThumbnailPage'
 import WalletPage from './pages/WalletPage'
 import WebsitesPage from './pages/WebsitesPage'
@@ -38,8 +38,8 @@ const router = createBrowserRouter([
     element: <RootPage />,
     children: [
       {
-        path: 'search',
-        element: <SearchPage />,
+        path: 'assets',
+        element: <AssetsPage />,
       },
       {
         path: 'home',

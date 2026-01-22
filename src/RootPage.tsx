@@ -4,8 +4,8 @@ import {
   Globe,
   ImageIcon,
   LogOutIcon,
+  Package,
   Scale,
-  SearchIcon,
   Ship,
   WalletIcon,
 } from 'lucide-react'
@@ -36,7 +36,12 @@ interface SidebarItem {
   subpages?: string[]
 }
 
-const items: SidebarItem[] = [
+interface SidebarGroupItem {
+  title: string
+  members: SidebarItem[]
+}
+
+const groups: SidebarGroupItem[] = [
   // {
   //   title: 'Home',
   //   url: '/home',
@@ -45,34 +50,62 @@ const items: SidebarItem[] = [
   //   ),
   // },
   {
-    title: 'Measure',
-    url: '/home',
-    icon: (selected: boolean) => (
-      <Scale className={selected ? 'text-black' : 'text-muted-foreground'} />
-    ),
+    title: 'Internet',
+    members: [
+      {
+        title: 'Measure',
+        url: '/home',
+        icon: (selected: boolean) => (
+          <Scale
+            className={selected ? 'text-black' : 'text-muted-foreground'}
+          />
+        ),
+      },
+      {
+        title: 'Websites',
+        url: '/websites',
+        icon: (selected: boolean) => (
+          <Globe
+            className={selected ? 'text-black' : 'text-muted-foreground'}
+          />
+        ),
+      },
+    ],
   },
   {
-    title: 'Search',
-    url: '/search',
-    icon: (selected: boolean) => (
-      <SearchIcon
-        className={selected ? 'text-black' : 'text-muted-foreground'}
-      />
-    ),
+    title: 'Technology',
+    members: [
+      {
+        title: 'Assets',
+        url: '/assets',
+        icon: (selected: boolean) => (
+          <Package
+            className={selected ? 'text-black' : 'text-muted-foreground'}
+          />
+        ),
+      },
+      {
+        title: 'Releases',
+        url: '/releases',
+        icon: (selected: boolean) => (
+          <Ship className={selected ? 'text-black' : 'text-muted-foreground'} />
+        ),
+      },
+    ],
   },
   {
-    title: 'Websites',
-    url: '/websites',
-    icon: (selected: boolean) => (
-      <Globe className={selected ? 'text-black' : 'text-muted-foreground'} />
-    ),
-  },
-  {
-    title: 'Releases',
-    url: '/releases',
-    icon: (selected: boolean) => (
-      <Ship className={selected ? 'text-black' : 'text-muted-foreground'} />
-    ),
+    title: 'Tools',
+    members: [
+      {
+        title: 'Images',
+        url: '/images',
+        icon: (selected: boolean) => (
+          <ImageIcon
+            className={cn(selected ? 'text-black' : 'text-muted-foreground')}
+          />
+        ),
+      },
+    ],
   },
   // {
   //   title: 'Libraries',
@@ -91,22 +124,18 @@ const items: SidebarItem[] = [
   //   ),
   // },
   {
-    title: 'Images',
-    url: '/images',
-    icon: (selected: boolean) => (
-      <ImageIcon
-        className={cn(selected ? 'text-black' : 'text-muted-foreground')}
-      />
-    ),
-  },
-  {
-    title: 'Payments',
-    url: '/payments',
-    icon: (selected: boolean) => (
-      <CreditCardIcon
-        className={cn(selected ? 'text-black' : 'text-muted-foreground')}
-      />
-    ),
+    title: 'Account',
+    members: [
+      {
+        title: 'Payments',
+        url: '/payments',
+        icon: (selected: boolean) => (
+          <CreditCardIcon
+            className={cn(selected ? 'text-black' : 'text-muted-foreground')}
+          />
+        ),
+      },
+    ],
   },
 ]
 
@@ -149,41 +178,52 @@ const RootPage: React.FC = () => {
   return (
     <SidebarProvider>
       <Sidebar collapsible="none" className="hidden lg:flex min-w-[256px]">
-        <SidebarContent>
-          <SidebarGroup>
+        <SidebarContent className="gap-0">
+          <SidebarGroup className='mb-1'>
             <img src="/turbine-wordmark.webp" width="120px" className="mb-2" />
-            <Separator className="mb-2" />
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={item.title}
-                      className={cn(
-                        location.pathname.startsWith(item.url)
-                          ? 'font-bold'
-                          : 'text-muted-foreground'
-                      )}
-                    >
-                      {location.pathname.startsWith(item.url) ? (
-                        <Link to={item.url}>
-                          {item.icon(true)}
-                          <span>{item.title}</span>
-                        </Link>
-                      ) : (
-                        <Link to={item.url}>
-                          {item.icon(false)}
-                          <span>{item.title}</span>
-                        </Link>
-                      )}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
+            <Separator />
+          </SidebarGroup>
+          {groups.map((group) => (
+            <SidebarGroup className="px-0 py-0 mb-2" key={group.title}>
+              <span className="text-xs font-bold uppercase text-gray-200 px-3 mb-1">
+                {group.title}
+              </span>
+              <SidebarGroupContent>
+                <SidebarMenu className='gap-0'>
+                  {group.members.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={item.title}
+                        className={cn(
+                          "px-3 rounded-none",
+                          location.pathname.startsWith(item.url)
+                            ? 'font-bold'
+                            : 'text-muted-foreground',
+                        )}
+                      >
+                        {location.pathname.startsWith(item.url) ? (
+                          <Link to={item.url}>
+                            {item.icon(true)}
+                            <span>{item.title}</span>
+                          </Link>
+                        ) : (
+                          <Link to={item.url}>
+                            {item.icon(false)}
+                            <span>{item.title}</span>
+                          </Link>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          ))}
+
+          <SidebarGroup className='py-0'>
             {isLoggedIn ? (
-              <div className="bg-white border rounded-lg p-4 flex justify-between items-center mt-4 mb-2">
+              <div className="bg-white border rounded-lg p-4 flex justify-between items-center mt-2 mb-2">
                 <div className="flex flex-col">
                   <p className="text-sm font-bold">{user?.name}</p>
                   <p className="text-xs text-muted-foreground">{user?.email}</p>
@@ -240,7 +280,7 @@ const RootPage: React.FC = () => {
                 onClick={() =>
                   window.open(
                     'https://github.com/utopian-contributors/turbine',
-                    '_blank'
+                    '_blank',
                   )
                 }
               >
@@ -260,9 +300,9 @@ const RootPage: React.FC = () => {
             location.pathname.startsWith(item.url) ||
             Boolean(
               item.subpages &&
-                item.subpages.some((subpage) =>
-                  location.pathname.startsWith(subpage)
-                )
+              item.subpages.some((subpage) =>
+                location.pathname.startsWith(subpage),
+              ),
             )
           return (
             <div
@@ -273,7 +313,7 @@ const RootPage: React.FC = () => {
               <div
                 className={cn(
                   'rounded-full px-8 py-4',
-                  selected ? 'bg-gray-100' : ''
+                  selected ? 'bg-gray-100' : '',
                 )}
               >
                 {item.icon(selected)}

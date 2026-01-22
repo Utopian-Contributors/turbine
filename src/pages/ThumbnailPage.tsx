@@ -279,7 +279,8 @@ const ThumbnailPage: React.FC = () => {
 
   if (!measurement) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-4">
+      <div className="flex h-full flex-col items-center justify-center gap-4 mt-20">
+        <p className="text-6xl text-muted-foreground font-thin">404</p>
         <p className="text-muted-foreground">
           No completed measurement found for this path.
         </p>

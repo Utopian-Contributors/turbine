@@ -45,10 +45,10 @@ export const useSearch = (initialSearchTerm?: string) => {
         search.set('s', 'font')
       }
 
-      if (location.pathname !== '/search') {
-        navigate('/search?' + search.toString())
+      if (location.pathname !== '/assets') {
+        navigate('/assets?' + search.toString())
       } else {
-        navigate('/search?' + search.toString(), { replace: true })
+        navigate('/assets?' + search.toString(), { replace: true })
       }
 
       setSearchTimeout(

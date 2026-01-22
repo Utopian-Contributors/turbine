@@ -86,7 +86,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
   const [editSameVersionRequirement] = useEditSameVersionRequirementMutation()
   const [openSameVersionPopover, setOpenSameVersionPopover] = useState(false)
   const [sameVersion, setSameVersion] = useState<string | null>(
-    libraryQueryData?.library?.sameVersionRequirement?.dependingOn.name || null
+    libraryQueryData?.library?.sameVersionRequirement?.dependingOn.name || null,
   )
 
   const [subpaths, setSubpaths] = useState<
@@ -166,7 +166,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
       versionFilesQuery().then((versionFilesQueryData) => {
         setSelectedFileVersion(
           versionFilesQueryData.data?.versionFileIntegrations.integrated[0].file
-            .version.version || null
+            .version.version || null,
         )
       })
     }
@@ -201,25 +201,59 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
         },
       })
     },
-    [toggleIntegrateVersion, loggedInQueryData?.loggedIn?.role]
+    [toggleIntegrateVersion, loggedInQueryData?.loggedIn?.role],
   )
 
   const loadingUsage = useMemo(() => {
     if (!libraryUsageQueryData || !libraryUsageQueryData.libraryUsage) {
       setTimeout(() => {
         refetchLibraryUsage()
-        refetchVersionUsage()
-        refetchVersionIntegrations()
+      }, 5000)
+    }
+    if (
+      !versionFilesQueryData ||
+      !versionFilesQueryData.versionFileIntegrations
+    ) {
+      setTimeout(() => {
         refetchVersionFiles()
       }, 5000)
-      return true
     }
+    if (
+      !versionIntegrationsQueryData ||
+      !versionIntegrationsQueryData.versionIntegrations
+    ) {
+      setTimeout(() => {
+        refetchVersionIntegrations()
+      }, 5000)
+    }
+    if (!versionUsageQueryData || !versionUsageQueryData.versionUsage) {
+      setTimeout(() => {
+        refetchVersionUsage()
+      }, 5000)
+    }
+    if (
+      libraryUsageQueryData &&
+      libraryUsageQueryData.libraryUsage &&
+      versionFilesQueryData &&
+      versionFilesQueryData.versionFileIntegrations &&
+      versionIntegrationsQueryData &&
+      versionIntegrationsQueryData.versionIntegrations &&
+      versionUsageQueryData &&
+      versionUsageQueryData.versionUsage
+    ) {
+      return false
+    }
+
+    return true
   }, [
     libraryUsageQueryData,
     refetchLibraryUsage,
     refetchVersionFiles,
     refetchVersionIntegrations,
     refetchVersionUsage,
+    versionFilesQueryData,
+    versionIntegrationsQueryData,
+    versionUsageQueryData,
   ])
 
   useEffect(() => {
@@ -228,7 +262,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
       libraryQueryData?.library?.sameVersionRequirement?.dependingOn.name
     ) {
       setSameVersion(
-        libraryQueryData.library.sameVersionRequirement.dependingOn.name
+        libraryQueryData.library.sameVersionRequirement.dependingOn.name,
       )
     }
     if (!subpaths.length && libraryQueryData?.library?.subpaths) {
@@ -237,7 +271,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
           id: sp.id,
           path: sp.path,
           since: sp.since?.version,
-        }))
+        })),
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -274,7 +308,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                     'stroke-[1.5]',
                     libraryQueryData.library.integrated
                       ? 'text-green-800 fill-green-500'
-                      : 'fill-gray-200'
+                      : 'fill-gray-200',
                   )}
                   width={32}
                   height={32}
@@ -294,7 +328,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                   <Link
                     to={libraryQueryData?.library.repository?.replace(
                       'git+',
-                      ''
+                      '',
                     )}
                     target="_blank"
                   >
@@ -318,7 +352,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
               <span className="font-mono">
                 Published{' '}
                 {moment(
-                  libraryQueryData?.library.lastVersion?.publishedAt
+                  libraryQueryData?.library.lastVersion?.publishedAt,
                 ).fromNow()}
               </span>
               <span className="font-mono">•</span>
@@ -368,7 +402,9 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                             value={library.name}
                             onSelect={(currentValue) => {
                               setSameVersion(
-                                currentValue === sameVersion ? '' : currentValue
+                                currentValue === sameVersion
+                                  ? ''
+                                  : currentValue,
                               )
                               if (libraryQueryData.library?.name) {
                                 editSameVersionRequirement({
@@ -387,7 +423,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                                 'ml-auto',
                                 sameVersion === library.name
                                   ? 'opacity-100'
-                                  : 'opacity-0'
+                                  : 'opacity-0',
                               )}
                             />
                           </CommandItem>
@@ -421,7 +457,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                                   return { ...sp, path: e.target.value }
                                 }
                                 return sp
-                              })
+                              }),
                             )
                           }}
                         />
@@ -440,7 +476,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                                   return { ...sp, since: value }
                                 }
                                 return sp
-                              })
+                              }),
                             )
                           }}
                         >
@@ -476,7 +512,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                         onClick={() => {
                           deleteSubpath({ variables: { subpath: subpath.id } })
                           setSubpaths(() =>
-                            subpaths.filter((sp) => sp.id !== subpath.id)
+                            subpaths.filter((sp) => sp.id !== subpath.id),
                           )
                         }}
                       >
@@ -562,7 +598,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                   for (const subpath of subpaths) {
                     if (
                       libraryQueryData.library?.subpaths.find(
-                        (sp) => sp.id === subpath.id
+                        (sp) => sp.id === subpath.id,
                       )
                     ) {
                       editSubpath({
@@ -588,7 +624,7 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             </div>
           ) : null}
           {versionIntegrationsQueryData &&
-            versionIntegrationsQueryData?.versionIntegrations && (
+            versionIntegrationsQueryData?.versionIntegrations.popular.length && (
               <VersionsCard
                 integrations={versionIntegrationsQueryData.versionIntegrations}
                 usage={versionUsageQueryData?.versionUsage}
