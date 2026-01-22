@@ -16,6 +16,7 @@ import Logout from './pages/Auth/Logout'
 import { NotFoundPage } from './pages/Error/404Page'
 import FontPage from './pages/FontPage'
 import FontsPage from './pages/FontsPage'
+import GeneralThumbnailPage from './pages/GeneralThumbnailPage'
 import ImageConversionPage from './pages/ImageConversionPage'
 import LibrariesPage from './pages/LibrariesPage'
 import LibraryPage from './pages/LibraryPage'
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
       { path: '/measurements/:host/images', element: <ImageConversionPage /> },
       { path: '/measurements/:host/thumbnail', element: <ThumbnailPage /> },
       { path: '/images', element: <LocalImageConversionPage /> },
+      { path: '/thumbnails', element: <GeneralThumbnailPage /> },
       {
         path: 'measure',
         element: <MeasurePage />,

@@ -1,5 +1,6 @@
 import {
   CreditCardIcon,
+  Eye,
   Github,
   Globe,
   ImageIcon,
@@ -97,10 +98,19 @@ const groups: SidebarGroupItem[] = [
     title: 'Tools',
     members: [
       {
-        title: 'Images',
+        title: 'Image Compression',
         url: '/images',
         icon: (selected: boolean) => (
           <ImageIcon
+            className={cn(selected ? 'text-black' : 'text-muted-foreground')}
+          />
+        ),
+      },
+      {
+        title: 'Dynamic Thumbnails',
+        url: '/thumbnails',
+        icon: (selected: boolean) => (
+          <Eye
             className={cn(selected ? 'text-black' : 'text-muted-foreground')}
           />
         ),

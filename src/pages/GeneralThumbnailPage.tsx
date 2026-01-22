@@ -3,7 +3,6 @@ import { Input } from '@/components/ui/input'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
 import {
-  ArrowLeft,
   Check,
   Copy,
   Download,
@@ -14,35 +13,13 @@ import {
   Square,
   Sun,
 } from 'lucide-react'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router'
-import {
-  ConnectionType,
-  MeasurementStatus,
-  useMeasurementsLazyQuery,
-} from '../../generated/graphql'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 type OgTheme = 'dark' | 'light'
 type OgStyle = 'single' | 'pattern'
 type OgFont = 'sans' | 'serif' | 'mono'
 
-const IMAGE_EXTENSIONS = [
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.svg',
-  '.webp',
-  '.gif',
-  '.ico',
-]
-const IMAGE_MIME_TYPES = [
-  'image/png',
-  'image/jpeg',
-  'image/svg+xml',
-  'image/webp',
-  'image/gif',
-  'image/x-icon',
-]
+const STORAGE_KEY = 'general-thumbnail-settings'
 
 interface ThumbnailSettings {
   title: string
@@ -54,48 +31,22 @@ interface ThumbnailSettings {
   subtitleFont: OgFont
 }
 
-const getStorageKey = (host: string, path: string) =>
-  `thumbnail-settings:${host}:${path}`
-
-const loadSettings = (host: string, path: string): Partial<ThumbnailSettings> => {
+const loadSettings = (): Partial<ThumbnailSettings> => {
   try {
-    const stored = localStorage.getItem(getStorageKey(host, path))
+    const stored = localStorage.getItem(STORAGE_KEY)
     return stored ? JSON.parse(stored) : {}
   } catch {
     return {}
   }
 }
 
-const ThumbnailPage: React.FC = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const params = useParams<{ host: string }>()
-
-  const searchParams = useMemo(
-    () => new URLSearchParams(location.search),
-    [location.search],
-  )
-  const selectedPath = searchParams.get('path') || '/'
-
-  const url = useMemo(
-    () => new URL(selectedPath ?? '/', `https://${params.host}`).href,
-    [selectedPath, params.host],
-  )
-
-  // GraphQL query for measurement
-  const [measurementsQuery, { data: measurementsData }] =
-    useMeasurementsLazyQuery({ fetchPolicy: 'network-only' })
-
-  // Load saved settings for this host/path
-  const savedSettings = useMemo(
-    () => loadSettings(params.host || '', selectedPath),
-    [params.host, selectedPath],
-  )
+const GeneralThumbnailPage: React.FC = () => {
+  const savedSettings = useMemo(() => loadSettings(), [])
 
   // Customization state
-  const [title, setTitle] = useState(savedSettings.title ?? '')
-  const [subtitle, setSubtitle] = useState(savedSettings.subtitle ?? '')
-  const [icon, setIcon] = useState(savedSettings.icon ?? '')
+  const [title, setTitle] = useState(savedSettings.title ?? 'Turbine')
+  const [subtitle, setSubtitle] = useState(savedSettings.subtitle ?? 'Faster than the competition.')
+  const [icon, setIcon] = useState(savedSettings.icon ?? 'https://turbine.utopian.build/logo.webp')
   const [theme, setTheme] = useState<OgTheme>(savedSettings.theme ?? 'dark')
   const [style, setStyle] = useState<OgStyle>(savedSettings.style ?? 'single')
   const [titleFont, setTitleFont] = useState<OgFont>(savedSettings.titleFont ?? 'sans')
@@ -107,84 +58,13 @@ const ThumbnailPage: React.FC = () => {
   const [hasChanges, setHasChanges] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Icon autocomplete state
-  const [iconInputOpen, setIconInputOpen] = useState(false)
-  const iconInputRef = useRef<HTMLInputElement>(null)
-
   // Copy state
   const [copied, setCopied] = useState(false)
 
-  // Fetch measurement on mount
-  useEffect(() => {
-    if (params.host) {
-      measurementsQuery({
-        variables: { host: params.host, path: selectedPath },
-      })
-    }
-  }, [params.host, selectedPath, measurementsQuery])
-
-  // Get the latest completed measurement
-  const measurement = useMemo(() => {
-    const measurements = measurementsData?.measurements || []
-    return measurements.find(
-      (m) =>
-        m.status === MeasurementStatus.Completed &&
-        m.connectionType === ConnectionType.Wifi,
-    )
-  }, [measurementsData])
-
-  // Get image suggestions from bundled files
-  const imageSuggestions = useMemo(() => {
-    if (!measurement?.bundledFiles) return []
-    const images = measurement.bundledFiles
-      .filter((file) => {
-        const mimeMatch = IMAGE_MIME_TYPES.some((mime) =>
-          file.type?.toLowerCase().includes(mime),
-        )
-        const extMatch = IMAGE_EXTENSIONS.some((ext) =>
-          file.url.toLowerCase().split('?')[0].endsWith(ext),
-        )
-        return mimeMatch || extMatch
-      })
-      .map((file) => file.url)
-    // Add measurement icon if it exists and isn't already in the list
-    if (measurement.icon && !images.includes(measurement.icon)) {
-      images.unshift(measurement.icon)
-    }
-    return images
-  }, [measurement])
-
-  // Filter suggestions based on input
-  const filteredSuggestions = useMemo(() => {
-    if (!icon) return imageSuggestions
-    const lowerIcon = icon.toLowerCase()
-    if (imageSuggestions.find((url) => url.toLowerCase() === lowerIcon)) {
-      return imageSuggestions.filter(
-        (url, index) => imageSuggestions.indexOf(url) === index,
-      )
-    }
-
-    return imageSuggestions.filter(
-      (url, index) =>
-        url.toLowerCase().includes(lowerIcon) &&
-        imageSuggestions.indexOf(url) === index,
-    )
-  }, [icon, imageSuggestions])
-
-  // Initialize form with measurement data (only if no saved settings)
-  useEffect(() => {
-    if (measurement) {
-      // Only use measurement data if there are no saved settings
-      if (!savedSettings.title) setTitle(measurement.title || '')
-      if (!savedSettings.subtitle) setSubtitle(measurement.description || '')
-      if (!savedSettings.icon) setIcon(measurement.icon || '')
-    }
-  }, [measurement, savedSettings])
-
-  // Generate cache key from URL
+  // Generate cache key from title (or use a random key)
   const cacheKey = useMemo(() => {
-    return encodeURIComponent(url)
-  }, [url])
+    return encodeURIComponent(title || 'general-thumbnail-' + Date.now())
+  }, [title])
 
   // Base URL for OG endpoint
   const ogBaseUrl = useMemo(() => {
@@ -281,16 +161,8 @@ const ThumbnailPage: React.FC = () => {
     [buildThumbnailUrl, icon, thumbnailUrl],
   )
 
-  // Load initial thumbnail (from measurement or saved settings)
-  useEffect(() => {
-    if (icon && !error && !thumbnailUrl && !isGenerating) {
-      generateThumbnail(false)
-    }
-  }, [icon, thumbnailUrl, isGenerating, generateThumbnail, error])
-
   // Save settings to localStorage
   const saveSettings = useCallback(() => {
-    if (!params.host) return
     const settings: ThumbnailSettings = {
       title,
       subtitle,
@@ -300,16 +172,22 @@ const ThumbnailPage: React.FC = () => {
       titleFont,
       subtitleFont,
     }
-    localStorage.setItem(
-      getStorageKey(params.host, selectedPath),
-      JSON.stringify(settings),
-    )
-  }, [params.host, selectedPath, title, subtitle, icon, theme, style, titleFont, subtitleFont])
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+  }, [title, subtitle, icon, theme, style, titleFont, subtitleFont])
 
   // Save to localStorage whenever settings change
   useEffect(() => {
     saveSettings()
   }, [saveSettings])
+
+  // Auto-generate thumbnail on mount if we have saved settings with an icon
+  useEffect(() => {
+    if (icon && !thumbnailUrl && !isGenerating && !error) {
+      generateThumbnail(false)
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Track changes
   const handleFieldChange = useCallback(
@@ -329,37 +207,14 @@ const ThumbnailPage: React.FC = () => {
     }
   }, [thumbnailUrl])
 
-  if (!measurement) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 mt-20">
-        <p className="text-6xl text-muted-foreground font-thin">404</p>
-        <p className="text-muted-foreground">
-          No completed measurement found for this path.
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Please run a measurement first.
-        </p>
-      </div>
-    )
-  }
-
   return (
     <div className="flex h-full flex-col gap-6 p-6 pb-40 lg:pb-0">
-      <div
-        className="group cursor-pointer flex items-center gap-2"
-        onClick={() => {
-          navigate('/measurements/' + params.host + '?path=' + selectedPath)
-        }}
-      >
-        <ArrowLeft size={20} className="text-muted-foreground" />
-        <span className="group-hover:underline text-md text-muted-foreground">
-          Back to measurements of {params.host}
-        </span>
-      </div>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Dynamic Thumbnail Generator</h1>
-          <p className="text-sm text-muted-foreground">{url}</p>
+          <p className="text-sm text-muted-foreground">
+            Create custom Open Graph thumbnails for your pages
+          </p>
         </div>
       </div>
 
@@ -484,53 +339,12 @@ const ThumbnailPage: React.FC = () => {
               <label htmlFor="icon" className="text-sm font-medium">
                 Icon URL
               </label>
-              <div className="relative">
-                <Input
-                  ref={iconInputRef}
-                  id="icon"
-                  value={icon}
-                  onChange={(e) => handleFieldChange(setIcon, e.target.value)}
-                  onFocus={() => setIconInputOpen(true)}
-                  onBlur={() => {
-                    // Delay closing to allow click on suggestions
-                    setTimeout(() => setIconInputOpen(false), 150)
-                  }}
-                  placeholder="https://example.com/icon.png"
-                  autoComplete="off"
-                />
-                {iconInputOpen && filteredSuggestions.length > 0 && (
-                  <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md">
-                    <div className="p-1 text-xs text-muted-foreground px-2 py-1.5">
-                      Images from page
-                    </div>
-                    <div className="max-h-[200px] overflow-y-auto">
-                      {filteredSuggestions.slice(0, 10).map((url) => (
-                        <div
-                          key={url}
-                          className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
-                          onMouseDown={(e) => {
-                            e.preventDefault()
-                            handleFieldChange(setIcon, url)
-                            setIconInputOpen(false)
-                          }}
-                        >
-                          <img
-                            src={url}
-                            alt=""
-                            className="h-6 w-6 shrink-0 rounded object-contain"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none'
-                            }}
-                          />
-                          <span className="truncate text-xs">
-                            {url.split('/').pop()?.split('?')[0] || url}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <Input
+                id="icon"
+                value={icon}
+                onChange={(e) => handleFieldChange(setIcon, e.target.value)}
+                placeholder="https://example.com/icon.png"
+              />
               {icon && (
                 <div className="flex items-center gap-2">
                   <img
@@ -657,7 +471,7 @@ const ThumbnailPage: React.FC = () => {
                 ) : (
                   <>
                     <RefreshCw className="mr-2 h-4 w-4" />
-                    {hasChanges ? 'Update Thumbnail URL' : 'Regenerate'}
+                    {hasChanges ? 'Update Thumbnail URL' : 'Generate Thumbnail'}
                   </>
                 )}
               </Button>
@@ -689,4 +503,4 @@ const ThumbnailPage: React.FC = () => {
   )
 }
 
-export default ThumbnailPage
+export default GeneralThumbnailPage
