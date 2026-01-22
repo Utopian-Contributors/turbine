@@ -27,7 +27,7 @@ const AssetsPage: React.FC<AssetsPageProps> = () => {
   return (
     <div>
       <Tabs value={currentTab} onValueChange={handleTabChange} className="px-6 py-4">
-        <TabsList>
+        <TabsList className='grid grid-cols-4 gap-2'>
           <TabsTrigger value="search">
             <SearchIcon />
             Search

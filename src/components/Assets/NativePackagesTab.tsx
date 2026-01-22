@@ -10,12 +10,17 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { useEffect } from 'react'
 import { useNativePackagesQuery } from '../../../generated/graphql'
 
 export function NativePackagesTab() {
   const { data, loading } = useNativePackagesQuery({
     variables: { pagination: { take: 100 } },
   })
+
+  useEffect(() => {
+    document.title = 'Turbine | Native Packages'
+  }, [])
 
   if (loading) {
     return (

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { LibraryListItem } from '@/components/Library/LibraryListItem'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { useEffect } from 'react'
 import {
   useLoggedInQuery,
   useStarredLibrariesQuery,
@@ -14,6 +15,10 @@ export function FavoritesTab() {
   const { data, loading } = useStarredLibrariesQuery({
     skip: !loggedInData?.loggedIn,
   })
+
+  useEffect(() => {
+    document.title = 'Turbine | Favorite Packages'
+  }, [])
 
   const isLoggedIn = !!loggedInData?.loggedIn
 

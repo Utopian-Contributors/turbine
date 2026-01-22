@@ -37,12 +37,14 @@ export function TopPackagesTab() {
   const { data: fastestGrowingData } = useFastestGrowingLibrariesQuery()
   const { data: oldtimersData } = useOldtimerLibrariesQuery()
 
-  // Reset hasMore when orderBy changes, and check if initial data is less than page size
+  useEffect(() => {
+    document.title = 'Turbine | Top Packages'
+  }, [])
+
   useEffect(() => {
     setHasMore(true)
   }, [orderBy])
 
-  // Check if initial load returned less than PAGE_SIZE items
   useEffect(() => {
     if (data?.topLibraries?.libraries && !loading) {
       if (data.topLibraries.libraries.length < PAGE_SIZE) {
@@ -105,11 +107,11 @@ export function TopPackagesTab() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto flex gap-6 pt-6">
+    <div className="relative max-w-4xl mx-auto flex gap-6 pt-6">
       {/* Main content */}
       <div className="flex-1">
         {/* Stats header */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-4">
           <Card>
             <CardContent className="pt-6">
               <p className="text-4xl font-thin">
@@ -137,7 +139,7 @@ export function TopPackagesTab() {
         </div>
 
         {/* Order toggle */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="sticky top-0 backdrop-blur-sm flex justify-between items-center mt-6 py-4">
           <h2 className="text-lg font-semibold">Top Packages</h2>
           <ToggleGroup
             type="single"
@@ -154,7 +156,7 @@ export function TopPackagesTab() {
         </div>
 
         {/* Library list */}
-        <div className="max-h-[calc(100vh-20rem)] overflow-y-auto flex flex-col gap-1">
+        <div className="flex flex-col gap-1">
           {data?.topLibraries?.libraries.map((library, index) => (
             <div
               key={library.id}
@@ -179,7 +181,7 @@ export function TopPackagesTab() {
       </div>
 
       {/* Sidebar */}
-      <div className="w-64 space-y-5 flex-shrink-0">
+      <div className="sticky top-4 w-64 space-y-5 flex-shrink-0 self-start">
         {/* Fastest Growing */}
         <Card>
           <CardHeader className="pb-3">
@@ -191,7 +193,7 @@ export function TopPackagesTab() {
               Month-over-month download growth
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 overflow-y-auto max-h-40">
+          <CardContent className="space-y-2">
             {fastestGrowingData?.fastestGrowingLibraries?.map((item) => (
               <div
                 key={item.library.id}
@@ -224,7 +226,7 @@ export function TopPackagesTab() {
               Oldtimers
             </CardTitle>
             <CardDescription className="text-xs text-balance">
-              Time spent as one of the top 100 downloaded packages
+              Time spent as in the top 100 downloaded packages
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">

@@ -1,7 +1,7 @@
 import { abbreviateNumber } from 'js-abbreviation-number'
 import { Globe, PackageIcon, Type } from 'lucide-react'
 import moment from 'moment'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 
 import Search from '@/components/blocks/search'
@@ -35,6 +35,10 @@ const SearchPage: React.FC<SearchPageProps> = () => {
   const { data: emptyStateData } = useSearchPageEmptyStateQuery({
     skip: !!initialSearchTerm,
   })
+
+  useEffect(() => {
+    document.title = 'Turbine | Search'
+  }, [])
 
   const showEmptyState =
     !initialSearchTerm &&
