@@ -1,4 +1,4 @@
-import { CameraOff } from 'lucide-react'
+import { CameraOff, EyeOff } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
 
 import PreloadImage from '@/components/ui/preload-image-cover'
@@ -29,6 +29,15 @@ export const WebsitesGrid: React.FC<WebsitesGridProps> = ({
         ),
     )
   }, [])
+
+  if (websites.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+        <EyeOff size={48} className="mb-4 text-gray-200" />
+        <p>No websites found</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex lg:flex-row lg:flex-wrap flex-col gap-8 lg:gap-1 mt-6">
