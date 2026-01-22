@@ -197,7 +197,7 @@ const LocalImageConversionPage: React.FC = () => {
       {/* Drop Zone */}
       <div
         className={cn(
-          'border-2 border-dashed rounded-lg p-12 text-center mb-6 transition-colors cursor-pointer',
+          'border-2 border-dashed rounded-lg p-12 text-center mb-6 transition-colors cursor-pointer hover:bg-gray-100',
           dragOver
             ? 'border-green-500 bg-green-50'
             : 'border-gray-300 hover:border-gray-400',

@@ -52,6 +52,10 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   const [hasMoreWebsites, setHasMoreWebsites] = useState(true)
   const [iconError, setIconError] = useState<Record<string, boolean>>({})
 
+  useEffect(() => {
+    document.title = 'Turbine | Websites'
+  }, [])
+
   const loadMoreWebsites = useCallback(() => {
     if (hasMoreWebsites) {
       fetchMoreWebsites({

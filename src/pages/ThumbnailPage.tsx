@@ -292,7 +292,7 @@ const ThumbnailPage: React.FC = () => {
   }
 
   return (
-    <div className="flex h-full flex-col gap-6 p-6">
+    <div className="flex h-full flex-col gap-6 p-6 pb-40 lg:pb-0">
       <div
         className="group cursor-pointer flex items-center gap-2"
         onClick={() => {
@@ -311,13 +311,13 @@ const ThumbnailPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         {/* Preview */}
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-medium">Preview</h2>
           <div
             className={cn(
-              'relative aspect-[1200/630] w-full overflow-hidden rounded-lg border bg-muted',
+              'relative aspect-[1200/630] w-full max-w-screen overflow-hidden rounded-lg border bg-muted',
               isGenerating && 'animate-pulse',
             )}
           >
@@ -540,7 +540,7 @@ const ThumbnailPage: React.FC = () => {
               </ToggleGroup>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-2">
               {/* Title Font */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Title Font</label>

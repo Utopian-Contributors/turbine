@@ -74,7 +74,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
     if (searchParams.get('url')) {
       document.title = `Measure ${new URL(searchParams.get('url')!).hostname}`
     } else {
-      document.title = 'Measure'
+      document.title = 'Measure your website'
     }
   }, [searchParams])
 
