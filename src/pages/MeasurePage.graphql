@@ -7,9 +7,10 @@ query latestMeasurements {
       host
     }
     title
-    description
     elapsed
     icon
+    createdAt
+    connectionType
     bundledFiles {
       id
       url

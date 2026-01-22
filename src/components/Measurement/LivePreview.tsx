@@ -1,6 +1,9 @@
+import { getConnectionIcon } from '@/helpers/icons'
+import { cn } from '@/lib/utils'
 import { filesize } from 'filesize'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Globe } from 'lucide-react'
+import { Globe, Package, Timer } from 'lucide-react'
+import moment from 'moment'
 import React, { useMemo } from 'react'
 import type { LatestMeasurementsQuery } from '../../../generated/graphql'
 
@@ -78,7 +81,7 @@ const MeasurementCard: React.FC<{
   // Calculate transform based on stack position
   const zIndex = total - index
   const scale = 1 - index * 0.05
-  const yOffset = index * 20
+  const yOffset = 20 * index
   const opacity = 1 - index * 0.1
 
   return (
@@ -97,7 +100,9 @@ const MeasurementCard: React.FC<{
         damping: 30,
         opacity: { duration: 0.2 },
       }}
-      className="absolute top-0 left-0 right-0 bg-gradient-to-b from-green-500/50 to-green-700/50 backdrop-blur-lg border border-green-500/30 rounded-2xl p-6 shadow-2xl"
+      className={cn(
+        'absolute top-0 left-0 right-0 bg-gradient-to-b from-green-500/70 to-green-700/70 backdrop-blur-lg border border-green-500/30 rounded-2xl p-6 shadow-2xl',
+      )}
       style={{
         transformOrigin: 'top center',
       }}
@@ -125,32 +130,46 @@ const MeasurementCard: React.FC<{
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h3 className="text-white font-semibold text-md text-balance line-clamp-2 ellipsis">
+              <h3 className="max-w-72 text-white font-semibold text-md truncate">
                 {measurement.title || measurement.host?.host || 'Unknown'}
               </h3>
               <p className="text-green-100/70 text-sm truncate">
                 {url?.host || measurement.host?.host}
                 <span className="text-green-100/50">{url?.pathname}</span>
               </p>
+              <div className="flex gap-4 mt-3">
+                {measurement.elapsed && (
+                  <div className="flex gap-1 items-center rounded-sm text-right">
+                    {getConnectionIcon(
+                      measurement.connectionType,
+                      'h-3 w-3 text-white',
+                    )}
+                    <div className="text-xs text-white">
+                      {measurement.connectionType}
+                    </div>
+                  </div>
+                )}
+                {measurement.elapsed && (
+                  <div className="flex gap-1 items-center rounded-sm text-right">
+                    <Timer className='h-3 w-3 text-white'/>
+                    <div className="text-xs text-white">
+                      {(measurement.elapsed / 1000).toFixed(2)}s
+                    </div>
+                  </div>
+                )}
+                {measurement.elapsed && (
+                  <div className="flex gap-1 items-center rounded-sm text-right">
+                    <Package className='h-3 w-3 text-white'/>
+                    <div className="text-xs text-white">
+                      {filesize(totalSize, { standard: 'jedec' })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-
-            {/* Load Time */}
-            {measurement.elapsed && (
-              <div className="bg-green-100/20 p-2 rounded-sm">
-                <div className="text-md font-bold text-white">
-                  {(measurement.elapsed / 1000).toFixed(2)}s
-                </div>
-                <div className="text-xs text-green-100/60">Load Time</div>
-              </div>
-            )}
-            {measurement.elapsed && (
-              <div className="bg-green-100/20 p-2 rounded-sm">
-                <div className="text-md font-bold text-white">
-                  {filesize(totalSize, { standard: 'jedec' })}
-                </div>
-                <div className="text-xs text-green-100/60">Bundle Size</div>
-              </div>
-            )}
+            <span className="absolute right-6 text-sm text-gray-200/50 font-bold">
+              {moment(measurement.createdAt).fromNow()}
+            </span>
           </div>
         </div>
       </div>

@@ -223,7 +223,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
             MeasurementStatus.Pending &&
           latestMeasurementsData?.latestMeasurements &&
           latestMeasurementsData.latestMeasurements.length > 0 ? (
-          <div className="hidden lg:inline w-xl px-4 mt-12">
+          <div className="hidden lg:inline w-xl px-4 mt-6">
             <LivePreview
               measurements={latestMeasurementsData.latestMeasurements}
             />

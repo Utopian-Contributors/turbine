@@ -1073,7 +1073,7 @@ export type VersionFileFragment = { __typename?: 'VersionFile', id: string, path
 export type LatestMeasurementsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LatestMeasurementsQuery = { __typename?: 'Query', latestMeasurements?: Array<{ __typename?: 'Measurement', id: string, url: string, title?: string | null, description?: string | null, elapsed?: number | null, icon?: string | null, host?: { __typename?: 'WebsiteHost', id: string, host: string } | null, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, elapsed: number }> }> | null };
+export type LatestMeasurementsQuery = { __typename?: 'Query', latestMeasurements?: Array<{ __typename?: 'Measurement', id: string, url: string, title?: string | null, elapsed?: number | null, icon?: string | null, createdAt: any, connectionType: ConnectionType, host?: { __typename?: 'WebsiteHost', id: string, host: string } | null, bundledFiles: Array<{ __typename?: 'BundledFile', id: string, url: string, size?: string | null, type: string, elapsed: number }> }> | null };
 
 export type MeasurementStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2634,9 +2634,10 @@ export const LatestMeasurementsDocument = gql`
       host
     }
     title
-    description
     elapsed
     icon
+    createdAt
+    connectionType
     bundledFiles {
       id
       url

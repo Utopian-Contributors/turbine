@@ -110,8 +110,13 @@ const Wallet: React.FC<WalletProps> = ({ className }) => {
     <Button
       onClick={open}
       disabled={isConnecting}
-      className={className}
-      style={{ background: '#7d66d9' }}
+      className={cn(
+        'phantom-gradient',
+        'relative overflow-hidden border-0',
+        'hover:shadow-lg',
+        'transition-shadow duration-300',
+        className,
+      )}
     >
       <Phantom />
       Phantom Connect

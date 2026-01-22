@@ -108,6 +108,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         { replace: true },
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     createMeasurementData?.createMeasurement,
     measurementDevicesData?.measurementDevices,
@@ -115,7 +116,6 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     params.host,
     selectedConnection,
     selectedDevice,
-    url,
   ])
 
   const completedMeasurements = useMemo(() => {
@@ -659,6 +659,12 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                         path === selectedPath
                           ? 'border-green-500 shadow-sm'
                           : 'cursor-pointer hover:shadow-md',
+                        measurementsQueryData.measurements?.find((m) =>
+                          m.url.endsWith(path) &&
+                          m.status === MeasurementStatus.Pending
+                            ? 'animate-pulse'
+                            : '',
+                        ),
                       )}
                     >
                       <p className="text-sm max-w-40 line-clamp-2">{title}</p>

@@ -46,7 +46,7 @@ const GeneralThumbnailPage: React.FC = () => {
   // Customization state
   const [title, setTitle] = useState(savedSettings.title ?? 'Turbine')
   const [subtitle, setSubtitle] = useState(savedSettings.subtitle ?? 'Faster than the competition.')
-  const [icon, setIcon] = useState(savedSettings.icon ?? 'https://turbine.utopian.build/logo.webp')
+  const [icon, setIcon] = useState(savedSettings.icon ?? 'https://turbine.utopian.build/logo.svg')
   const [theme, setTheme] = useState<OgTheme>(savedSettings.theme ?? 'dark')
   const [style, setStyle] = useState<OgStyle>(savedSettings.style ?? 'single')
   const [titleFont, setTitleFont] = useState<OgFont>(savedSettings.titleFont ?? 'sans')

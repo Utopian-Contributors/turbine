@@ -157,6 +157,7 @@ const SearchWebsite = React.forwardRef<HTMLInputElement, SearchWebsiteProps>(
                     ? lastWebsiteRef
                     : null
                 }
+                onClick={() => setFocused(false)}
               >
                 {w.icon ? (
                   <img src={w.icon} className="h-6 w-6" />
