@@ -3,7 +3,7 @@ import { ChartBarLabelCustom } from '@/components/ui/chart-bar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type {
   VersionIntegrationsQuery,
-  VersionUsageQuery
+  VersionUsageQuery,
 } from 'generated/graphql'
 import { abbreviateNumber } from 'js-abbreviation-number'
 import React from 'react'
@@ -26,10 +26,12 @@ const VersionsCard: React.FC<VersionsCardProps> = ({
     <Card className="bg-gradient-to-t from-primary/2 to-card border rounded-xl">
       <Tabs defaultValue="stats">
         <CardContent>
-          {isAdmin && <TabsList className="mb-2">
-            <TabsTrigger value="stats">Stats</TabsTrigger>
-            <TabsTrigger value="popular">Popular</TabsTrigger>
-          </TabsList>}
+          {isAdmin && (
+            <TabsList className="mb-2">
+              <TabsTrigger value="stats">Stats</TabsTrigger>
+              <TabsTrigger value="popular">Popular</TabsTrigger>
+            </TabsList>
+          )}
           <TabsContent value="popular">
             <VersionConfig
               toggleIntegrateVersion={toggleIntegrateVersion}
@@ -46,7 +48,11 @@ const VersionsCard: React.FC<VersionsCardProps> = ({
                   .map((stat) => ({
                     label: stat.version,
                     value: Number(stat.downloads),
-                    formattedValue: abbreviateNumber(Number(stat.downloads)),
+                    formattedValue: abbreviateNumber(
+                      Number(stat.downloads),
+                      undefined,
+                      { symbols: ['', 'k', 'M', 'B', 'T'] },
+                    ),
                     fill: stat.integrated
                       ? 'var(--color-green-500)'
                       : 'var(--color-gray-500)',

@@ -185,7 +185,7 @@ const LocalImageConversionPage: React.FC = () => {
   }, [processedStates, zipUrl])
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Image Tool</h1>
         <p className="text-muted-foreground">

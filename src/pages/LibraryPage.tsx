@@ -14,6 +14,7 @@ import {
   Globe,
   PackageIcon,
   Save,
+  Star,
   Trash,
 } from 'lucide-react'
 import moment from 'moment'
@@ -65,6 +66,7 @@ import {
   useLoggedInQuery,
   useSearchLibraryLazyQuery,
   useToggleIntegrateVersionMutation,
+  useToggleStarLibraryMutation,
   useVersionFilesLazyQuery,
   useVersionIntegrationsQuery,
   useVersionUsageQuery,
@@ -131,6 +133,12 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
     { data: versionFilesQueryData, refetch: refetchVersionFiles },
   ] = useVersionFilesLazyQuery({
     variables: { library: params.name || '' },
+  })
+  const [toggleStarLibrary] = useToggleStarLibraryMutation({
+    refetchQueries: [
+      { query: LibraryDocument, variables: { name: params.name || '' } },
+    ],
+    awaitRefetchQueries: true,
   })
   const [toggleIntegrateVersion] = useToggleIntegrateVersionMutation({
     refetchQueries: [
@@ -300,8 +308,8 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
       />
       <div className="flex flex-col lg:grid lg:grid-cols-3 mt-6">
         <div className="lg:col-span-2">
-          <div className="flex flex-col gap-2 p-2">
-            <div className="w-full flex justify-between items-center">
+          <div className="w-full flex justify-between items-start">
+            <div className="flex flex-col gap-2 p-2">
               <div className="flex gap-2 items-end">
                 <PackageIcon
                   className={cn(
@@ -315,7 +323,50 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                 />
                 <h1 className="text-3xl">{libraryQueryData?.library.name}</h1>
               </div>
-              <div className="flex gap-2">
+              <p>{libraryQueryData?.library.description}</p>
+              <div className="flex gap-2 text-sm text-muted-foreground">
+                <span className="font-mono">
+                  {libraryQueryData?.library.lastVersion?.version}
+                </span>
+                <span className="font-mono">•</span>
+                <span className="font-mono">
+                  Published{' '}
+                  {moment(
+                    libraryQueryData?.library.lastVersion?.publishedAt,
+                  ).fromNow()}
+                </span>
+                <span className="font-mono">•</span>
+                {libraryQueryData?.library.lastVersion?.size && (
+                  <span className="font-mono">
+                    {filesize(libraryQueryData?.library.lastVersion?.size)}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 items-end">
+              <Button
+                variant="outline"
+                className={cn(
+                  'flex gap-2 text-primary hover:text-primary',
+                )}
+                onClick={() =>
+                  libraryQueryData.library?.id &&
+                  toggleStarLibrary({
+                    variables: { libraryId: libraryQueryData.library?.id },
+                  })
+                }
+              >
+                <Star
+                  size={16}
+                  className={cn(
+                    libraryQueryData.library.isStarred
+                      ? 'text-yellow-400 fill-yellow-400'
+                      : 'text-yellow-400',
+                  )}
+                />
+                {libraryQueryData.library?.isStarred ? 'Unstar' : 'Star'}
+              </Button>
+              <div className="flex gap-2 items-center">
                 {libraryQueryData.library.homepage && (
                   <Link
                     to={libraryQueryData?.library.homepage ?? ''}
@@ -342,25 +393,6 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
                   <Icons.npm className="h-5 w-5 text-gray-200 hover:text-gray-500 cursor-pointer" />
                 </Link>
               </div>
-            </div>
-            <p>{libraryQueryData?.library.description}</p>
-            <div className="flex gap-2 text-sm text-muted-foreground">
-              <span className="font-mono">
-                {libraryQueryData?.library.lastVersion?.version}
-              </span>
-              <span className="font-mono">•</span>
-              <span className="font-mono">
-                Published{' '}
-                {moment(
-                  libraryQueryData?.library.lastVersion?.publishedAt,
-                ).fromNow()}
-              </span>
-              <span className="font-mono">•</span>
-              {libraryQueryData?.library.lastVersion?.size && (
-                <span className="font-mono">
-                  {filesize(libraryQueryData?.library.lastVersion?.size)}
-                </span>
-              )}
             </div>
           </div>
           <Separator className="my-6" />
@@ -624,7 +656,8 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             </div>
           ) : null}
           {versionIntegrationsQueryData &&
-            versionIntegrationsQueryData?.versionIntegrations.popular.length && (
+            versionIntegrationsQueryData?.versionIntegrations.popular.length >
+              0 && (
               <VersionsCard
                 integrations={versionIntegrationsQueryData.versionIntegrations}
                 usage={versionUsageQueryData?.versionUsage}

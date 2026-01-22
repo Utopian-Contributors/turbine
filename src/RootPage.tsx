@@ -244,7 +244,7 @@ const RootPage: React.FC = () => {
                     loginRedirect()
                   }}
                 >
-                  Log in
+                  Log In
                 </Button>
                 <Button
                   variant="outline"

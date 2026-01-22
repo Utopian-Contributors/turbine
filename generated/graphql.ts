@@ -73,6 +73,19 @@ export enum DeviceType {
   Tablet = 'TABLET'
 }
 
+/** A library with high week-over-week growth */
+export type FastestGrowingLibrary = {
+  __typename?: 'FastestGrowingLibrary';
+  /** Current week downloads */
+  currentDownloads: Scalars['String']['output'];
+  /** Week-over-week growth rate as percentage */
+  growthRate: Scalars['Float']['output'];
+  /** The library */
+  library: Library;
+  /** Previous week downloads */
+  previousDownloads: Scalars['String']['output'];
+};
+
 export type Font = {
   __typename?: 'Font';
   category: FontCategory;
@@ -109,6 +122,7 @@ export type Library = {
   homepage?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   integrated?: Maybe<Scalars['Boolean']['output']>;
+  isStarred?: Maybe<Scalars['Boolean']['output']>;
   lastVersion?: Maybe<Version>;
   name: Scalars['String']['output'];
   newVersions?: Maybe<Array<Version>>;
@@ -267,6 +281,7 @@ export type Mutation = {
   toggleFontIntegration?: Maybe<Font>;
   toggleIntegrateVersion?: Maybe<Version>;
   toggleIntegrateVersionFile?: Maybe<VersionFile>;
+  toggleStarLibrary?: Maybe<Library>;
   updateReleaseChangelog?: Maybe<NativeSupplyChainRelease>;
   verify?: Maybe<User>;
 };
@@ -364,6 +379,11 @@ export type MutationToggleIntegrateVersionFileArgs = {
 };
 
 
+export type MutationToggleStarLibraryArgs = {
+  libraryId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationUpdateReleaseChangelogArgs = {
   changelog: Scalars['String']['input'];
   id: Scalars['String']['input'];
@@ -372,6 +392,45 @@ export type MutationUpdateReleaseChangelogArgs = {
 
 export type MutationVerifyArgs = {
   code?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** A native (integrated) package */
+export type NativePackage = {
+  __typename?: 'NativePackage';
+  /** The library */
+  library: Library;
+  /** Date when this package was released (null if upcoming) */
+  releaseDate?: Maybe<Scalars['DateTime']['output']>;
+  /** Version of the release */
+  releaseVersion?: Maybe<Scalars['String']['output']>;
+  /** Whether this package is published or upcoming */
+  status: NativePackageStatus;
+};
+
+/** A group of native packages released in a specific period */
+export type NativePackagePeriod = {
+  __typename?: 'NativePackagePeriod';
+  /** Packages released in this period */
+  packages: Array<NativePackage>;
+  /** Period label (e.g., 'January 2026', 'December 2025') */
+  period: Scalars['String']['output'];
+};
+
+/** Status of a native package release */
+export enum NativePackageStatus {
+  Published = 'PUBLISHED',
+  Upcoming = 'UPCOMING'
+}
+
+/** Result of fetching native packages */
+export type NativePackagesResult = {
+  __typename?: 'NativePackagesResult';
+  /** Published packages grouped by release period */
+  publishedByPeriod: Array<NativePackagePeriod>;
+  /** Total count of native packages */
+  totalCount: Scalars['Int']['output'];
+  /** Upcoming native packages (not yet published) */
+  upcoming: Array<NativePackage>;
 };
 
 export type NativeSupplyChainRelease = {
@@ -408,6 +467,15 @@ export type NewNativeRelease = {
   newLibraries: Array<Library>;
 };
 
+/** A library that has been in the top 100 for a long time */
+export type OldtimerLibrary = {
+  __typename?: 'OldtimerLibrary';
+  /** The library */
+  library: Library;
+  /** Number of weeks this library has been in the top 100 */
+  weeksInTop100: Scalars['Int']['output'];
+};
+
 /** Input type for pagination */
 export type PaginationInput = {
   /** Number of items to skip */
@@ -436,6 +504,7 @@ export type PotentialSavings = {
 export type Query = {
   __typename?: 'Query';
   bigLibraries?: Maybe<Array<Library>>;
+  fastestGrowingLibraries?: Maybe<Array<FastestGrowingLibrary>>;
   font?: Maybe<Font>;
   imagesToConvert: BundledImages;
   latestRelease?: Maybe<NativeSupplyChainRelease>;
@@ -447,7 +516,9 @@ export type Query = {
   measurementPrices?: Maybe<Array<MeasurementPrice>>;
   measurementStats?: Maybe<MeasurementStats>;
   measurements?: Maybe<Array<Measurement>>;
+  nativePackages?: Maybe<NativePackagesResult>;
   newRelease?: Maybe<NewNativeRelease>;
+  oldtimerLibraries?: Maybe<Array<OldtimerLibrary>>;
   paymentInfo?: Maybe<SolanaPaymentInfo>;
   payments?: Maybe<Array<Payment>>;
   popularFonts?: Maybe<Array<Font>>;
@@ -457,6 +528,8 @@ export type Query = {
   searchFonts?: Maybe<Array<Font>>;
   searchLibrary?: Maybe<Array<LibrarySearchResult>>;
   searchStats?: Maybe<SearchStats>;
+  starredLibraries?: Maybe<Array<Library>>;
+  topLibraries?: Maybe<TopLibrariesResult>;
   users?: Maybe<Array<Maybe<User>>>;
   versionFileIntegrations: VersionFileIntegrations;
   versionIntegrations: VersionIntegrations;
@@ -503,6 +576,11 @@ export type QueryMeasurementsArgs = {
 };
 
 
+export type QueryNativePackagesArgs = {
+  pagination?: InputMaybe<PaginationInput>;
+};
+
+
 export type QueryPaymentInfoArgs = {
   publicKey?: InputMaybe<Scalars['String']['input']>;
   tokenMint?: InputMaybe<Scalars['String']['input']>;
@@ -526,6 +604,12 @@ export type QuerySearchFontsArgs = {
 
 export type QuerySearchLibraryArgs = {
   term?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryTopLibrariesArgs = {
+  orderBy?: InputMaybe<TopLibrariesOrderBy>;
+  pagination?: InputMaybe<PaginationInput>;
 };
 
 
@@ -632,6 +716,30 @@ export type TokenBalance = {
   amount: Scalars['Float']['output'];
   /** The mint address of the token */
   mint: Scalars['String']['output'];
+};
+
+/** Order top libraries by downloads or bandwidth */
+export enum TopLibrariesOrderBy {
+  Bandwidth = 'BANDWIDTH',
+  Downloads = 'DOWNLOADS'
+}
+
+/** Result of fetching top libraries */
+export type TopLibrariesResult = {
+  __typename?: 'TopLibrariesResult';
+  /** Top libraries */
+  libraries: Array<Library>;
+  /** Aggregate statistics */
+  stats: TopLibrariesStats;
+};
+
+/** Aggregate statistics for top libraries */
+export type TopLibrariesStats = {
+  __typename?: 'TopLibrariesStats';
+  /** Total bandwidth of top 100 libraries */
+  totalBandwidth: Scalars['String']['output'];
+  /** Total downloads of top 100 libraries */
+  totalDownloads: Scalars['String']['output'];
 };
 
 export type User = {
@@ -745,6 +853,43 @@ export type PaymentInfoQueryVariables = Exact<{
 
 export type PaymentInfoQuery = { __typename?: 'Query', paymentInfo?: { __typename?: 'SolanaPaymentInfo', blockhash?: string | null, fromPubKey?: string | null, treasuryPubKey?: string | null, utccBalance: { __typename?: 'TokenBalance', mint: string, amount: number }, usdcBalance: { __typename?: 'TokenBalance', mint: string, amount: number }, solBalance: { __typename?: 'TokenBalance', mint: string, amount: number } } | null };
 
+export type TopLibrariesQueryVariables = Exact<{
+  orderBy?: InputMaybe<TopLibrariesOrderBy>;
+  pagination?: InputMaybe<PaginationInput>;
+}>;
+
+
+export type TopLibrariesQuery = { __typename?: 'Query', topLibraries?: { __typename?: 'TopLibrariesResult', libraries: Array<{ __typename?: 'Library', id: string, name: string, description?: string | null, integrated?: boolean | null, homepage?: string | null, repository?: string | null, isStarred?: boolean | null, recentDownloads?: { __typename?: 'LibraryDownloads', total: string, rank: string } | null, recentBandwidth?: { __typename?: 'LibraryBandwidth', total: string, rank: string } | null }>, stats: { __typename?: 'TopLibrariesStats', totalDownloads: string, totalBandwidth: string } } | null };
+
+export type FastestGrowingLibrariesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FastestGrowingLibrariesQuery = { __typename?: 'Query', fastestGrowingLibraries?: Array<{ __typename?: 'FastestGrowingLibrary', growthRate: number, currentDownloads: string, previousDownloads: string, library: { __typename?: 'Library', id: string, name: string, integrated?: boolean | null } }> | null };
+
+export type OldtimerLibrariesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type OldtimerLibrariesQuery = { __typename?: 'Query', oldtimerLibraries?: Array<{ __typename?: 'OldtimerLibrary', weeksInTop100: number, library: { __typename?: 'Library', id: string, name: string, integrated?: boolean | null } }> | null };
+
+export type NativePackagesQueryVariables = Exact<{
+  pagination?: InputMaybe<PaginationInput>;
+}>;
+
+
+export type NativePackagesQuery = { __typename?: 'Query', nativePackages?: { __typename?: 'NativePackagesResult', totalCount: number, upcoming: Array<{ __typename?: 'NativePackage', releaseDate?: any | null, releaseVersion?: string | null, status: NativePackageStatus, library: { __typename?: 'Library', id: string, name: string, description?: string | null, integrated?: boolean | null, homepage?: string | null, repository?: string | null, isStarred?: boolean | null, subpaths: Array<{ __typename?: 'LibrarySubpath', id: string, path: string }> } }>, publishedByPeriod: Array<{ __typename?: 'NativePackagePeriod', period: string, packages: Array<{ __typename?: 'NativePackage', releaseDate?: any | null, releaseVersion?: string | null, status: NativePackageStatus, library: { __typename?: 'Library', id: string, name: string, description?: string | null, integrated?: boolean | null, homepage?: string | null, repository?: string | null, subpaths: Array<{ __typename?: 'LibrarySubpath', id: string, path: string }> } }> }> } | null };
+
+export type StarredLibrariesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type StarredLibrariesQuery = { __typename?: 'Query', starredLibraries?: Array<{ __typename?: 'Library', id: string, name: string, description?: string | null, integrated?: boolean | null, homepage?: string | null, repository?: string | null, isStarred?: boolean | null, recentDownloads?: { __typename?: 'LibraryDownloads', total: string, rank: string } | null }> | null };
+
+export type ToggleStarLibraryMutationVariables = Exact<{
+  libraryId: Scalars['String']['input'];
+}>;
+
+
+export type ToggleStarLibraryMutation = { __typename?: 'Mutation', toggleStarLibrary?: { __typename?: 'Library', id: string, name: string } | null };
+
 export type SendResetLinkMutationVariables = Exact<{
   email: Scalars['String']['input'];
 }>;
@@ -831,7 +976,7 @@ export type LibraryQueryVariables = Exact<{
 }>;
 
 
-export type LibraryQuery = { __typename?: 'Query', library?: { __typename?: 'Library', name: string, description?: string | null, homepage?: string | null, repository?: string | null, integrated?: boolean | null, lastVersion?: { __typename?: 'Version', version: string, size?: number | null, publishedAt: any } | null, versions: Array<{ __typename?: 'Version', version: string, publishedAt: any }>, subpaths: Array<{ __typename?: 'LibrarySubpath', id: string, path: string, since: { __typename?: 'Version', id: string, version: string } }>, sameVersionRequirement?: { __typename?: 'SameVersionRequirement', id: string, dependingOn: { __typename?: 'Library', id: string, name: string } } | null } | null };
+export type LibraryQuery = { __typename?: 'Query', library?: { __typename?: 'Library', id: string, name: string, description?: string | null, homepage?: string | null, repository?: string | null, integrated?: boolean | null, isStarred?: boolean | null, lastVersion?: { __typename?: 'Version', version: string, size?: number | null, publishedAt: any } | null, versions: Array<{ __typename?: 'Version', version: string, publishedAt: any }>, subpaths: Array<{ __typename?: 'LibrarySubpath', id: string, path: string, since: { __typename?: 'Version', id: string, version: string } }>, sameVersionRequirement?: { __typename?: 'SameVersionRequirement', id: string, dependingOn: { __typename?: 'Library', id: string, name: string } } | null } | null };
 
 export type EditSameVersionRequirementMutationVariables = Exact<{
   library: Scalars['String']['input'];
@@ -1246,6 +1391,318 @@ export type PaymentInfoQueryHookResult = ReturnType<typeof usePaymentInfoQuery>;
 export type PaymentInfoLazyQueryHookResult = ReturnType<typeof usePaymentInfoLazyQuery>;
 export type PaymentInfoSuspenseQueryHookResult = ReturnType<typeof usePaymentInfoSuspenseQuery>;
 export type PaymentInfoQueryResult = Apollo.QueryResult<PaymentInfoQuery, PaymentInfoQueryVariables>;
+export const TopLibrariesDocument = gql`
+    query topLibraries($orderBy: TopLibrariesOrderBy, $pagination: PaginationInput) {
+  topLibraries(orderBy: $orderBy, pagination: $pagination) {
+    libraries {
+      id
+      name
+      description
+      integrated
+      homepage
+      repository
+      isStarred
+      recentDownloads {
+        total
+        rank
+      }
+      recentBandwidth {
+        total
+        rank
+      }
+    }
+    stats {
+      totalDownloads
+      totalBandwidth
+    }
+  }
+}
+    `;
+
+/**
+ * __useTopLibrariesQuery__
+ *
+ * To run a query within a React component, call `useTopLibrariesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTopLibrariesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTopLibrariesQuery({
+ *   variables: {
+ *      orderBy: // value for 'orderBy'
+ *      pagination: // value for 'pagination'
+ *   },
+ * });
+ */
+export function useTopLibrariesQuery(baseOptions?: Apollo.QueryHookOptions<TopLibrariesQuery, TopLibrariesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TopLibrariesQuery, TopLibrariesQueryVariables>(TopLibrariesDocument, options);
+      }
+export function useTopLibrariesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TopLibrariesQuery, TopLibrariesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TopLibrariesQuery, TopLibrariesQueryVariables>(TopLibrariesDocument, options);
+        }
+export function useTopLibrariesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<TopLibrariesQuery, TopLibrariesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TopLibrariesQuery, TopLibrariesQueryVariables>(TopLibrariesDocument, options);
+        }
+export type TopLibrariesQueryHookResult = ReturnType<typeof useTopLibrariesQuery>;
+export type TopLibrariesLazyQueryHookResult = ReturnType<typeof useTopLibrariesLazyQuery>;
+export type TopLibrariesSuspenseQueryHookResult = ReturnType<typeof useTopLibrariesSuspenseQuery>;
+export type TopLibrariesQueryResult = Apollo.QueryResult<TopLibrariesQuery, TopLibrariesQueryVariables>;
+export const FastestGrowingLibrariesDocument = gql`
+    query fastestGrowingLibraries {
+  fastestGrowingLibraries {
+    library {
+      id
+      name
+      integrated
+    }
+    growthRate
+    currentDownloads
+    previousDownloads
+  }
+}
+    `;
+
+/**
+ * __useFastestGrowingLibrariesQuery__
+ *
+ * To run a query within a React component, call `useFastestGrowingLibrariesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFastestGrowingLibrariesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFastestGrowingLibrariesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useFastestGrowingLibrariesQuery(baseOptions?: Apollo.QueryHookOptions<FastestGrowingLibrariesQuery, FastestGrowingLibrariesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FastestGrowingLibrariesQuery, FastestGrowingLibrariesQueryVariables>(FastestGrowingLibrariesDocument, options);
+      }
+export function useFastestGrowingLibrariesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FastestGrowingLibrariesQuery, FastestGrowingLibrariesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FastestGrowingLibrariesQuery, FastestGrowingLibrariesQueryVariables>(FastestGrowingLibrariesDocument, options);
+        }
+export function useFastestGrowingLibrariesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<FastestGrowingLibrariesQuery, FastestGrowingLibrariesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<FastestGrowingLibrariesQuery, FastestGrowingLibrariesQueryVariables>(FastestGrowingLibrariesDocument, options);
+        }
+export type FastestGrowingLibrariesQueryHookResult = ReturnType<typeof useFastestGrowingLibrariesQuery>;
+export type FastestGrowingLibrariesLazyQueryHookResult = ReturnType<typeof useFastestGrowingLibrariesLazyQuery>;
+export type FastestGrowingLibrariesSuspenseQueryHookResult = ReturnType<typeof useFastestGrowingLibrariesSuspenseQuery>;
+export type FastestGrowingLibrariesQueryResult = Apollo.QueryResult<FastestGrowingLibrariesQuery, FastestGrowingLibrariesQueryVariables>;
+export const OldtimerLibrariesDocument = gql`
+    query oldtimerLibraries {
+  oldtimerLibraries {
+    library {
+      id
+      name
+      integrated
+    }
+    weeksInTop100
+  }
+}
+    `;
+
+/**
+ * __useOldtimerLibrariesQuery__
+ *
+ * To run a query within a React component, call `useOldtimerLibrariesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOldtimerLibrariesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOldtimerLibrariesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useOldtimerLibrariesQuery(baseOptions?: Apollo.QueryHookOptions<OldtimerLibrariesQuery, OldtimerLibrariesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OldtimerLibrariesQuery, OldtimerLibrariesQueryVariables>(OldtimerLibrariesDocument, options);
+      }
+export function useOldtimerLibrariesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OldtimerLibrariesQuery, OldtimerLibrariesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OldtimerLibrariesQuery, OldtimerLibrariesQueryVariables>(OldtimerLibrariesDocument, options);
+        }
+export function useOldtimerLibrariesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<OldtimerLibrariesQuery, OldtimerLibrariesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<OldtimerLibrariesQuery, OldtimerLibrariesQueryVariables>(OldtimerLibrariesDocument, options);
+        }
+export type OldtimerLibrariesQueryHookResult = ReturnType<typeof useOldtimerLibrariesQuery>;
+export type OldtimerLibrariesLazyQueryHookResult = ReturnType<typeof useOldtimerLibrariesLazyQuery>;
+export type OldtimerLibrariesSuspenseQueryHookResult = ReturnType<typeof useOldtimerLibrariesSuspenseQuery>;
+export type OldtimerLibrariesQueryResult = Apollo.QueryResult<OldtimerLibrariesQuery, OldtimerLibrariesQueryVariables>;
+export const NativePackagesDocument = gql`
+    query nativePackages($pagination: PaginationInput) {
+  nativePackages(pagination: $pagination) {
+    upcoming {
+      library {
+        id
+        name
+        description
+        integrated
+        homepage
+        repository
+        isStarred
+        subpaths {
+          id
+          path
+        }
+      }
+      releaseDate
+      releaseVersion
+      status
+    }
+    publishedByPeriod {
+      period
+      packages {
+        library {
+          id
+          name
+          description
+          integrated
+          homepage
+          repository
+          subpaths {
+            id
+            path
+          }
+        }
+        releaseDate
+        releaseVersion
+        status
+      }
+    }
+    totalCount
+  }
+}
+    `;
+
+/**
+ * __useNativePackagesQuery__
+ *
+ * To run a query within a React component, call `useNativePackagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNativePackagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNativePackagesQuery({
+ *   variables: {
+ *      pagination: // value for 'pagination'
+ *   },
+ * });
+ */
+export function useNativePackagesQuery(baseOptions?: Apollo.QueryHookOptions<NativePackagesQuery, NativePackagesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<NativePackagesQuery, NativePackagesQueryVariables>(NativePackagesDocument, options);
+      }
+export function useNativePackagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<NativePackagesQuery, NativePackagesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<NativePackagesQuery, NativePackagesQueryVariables>(NativePackagesDocument, options);
+        }
+export function useNativePackagesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<NativePackagesQuery, NativePackagesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<NativePackagesQuery, NativePackagesQueryVariables>(NativePackagesDocument, options);
+        }
+export type NativePackagesQueryHookResult = ReturnType<typeof useNativePackagesQuery>;
+export type NativePackagesLazyQueryHookResult = ReturnType<typeof useNativePackagesLazyQuery>;
+export type NativePackagesSuspenseQueryHookResult = ReturnType<typeof useNativePackagesSuspenseQuery>;
+export type NativePackagesQueryResult = Apollo.QueryResult<NativePackagesQuery, NativePackagesQueryVariables>;
+export const StarredLibrariesDocument = gql`
+    query starredLibraries {
+  starredLibraries {
+    id
+    name
+    description
+    integrated
+    homepage
+    repository
+    isStarred
+    recentDownloads {
+      total
+      rank
+    }
+  }
+}
+    `;
+
+/**
+ * __useStarredLibrariesQuery__
+ *
+ * To run a query within a React component, call `useStarredLibrariesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useStarredLibrariesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useStarredLibrariesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useStarredLibrariesQuery(baseOptions?: Apollo.QueryHookOptions<StarredLibrariesQuery, StarredLibrariesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<StarredLibrariesQuery, StarredLibrariesQueryVariables>(StarredLibrariesDocument, options);
+      }
+export function useStarredLibrariesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<StarredLibrariesQuery, StarredLibrariesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<StarredLibrariesQuery, StarredLibrariesQueryVariables>(StarredLibrariesDocument, options);
+        }
+export function useStarredLibrariesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<StarredLibrariesQuery, StarredLibrariesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<StarredLibrariesQuery, StarredLibrariesQueryVariables>(StarredLibrariesDocument, options);
+        }
+export type StarredLibrariesQueryHookResult = ReturnType<typeof useStarredLibrariesQuery>;
+export type StarredLibrariesLazyQueryHookResult = ReturnType<typeof useStarredLibrariesLazyQuery>;
+export type StarredLibrariesSuspenseQueryHookResult = ReturnType<typeof useStarredLibrariesSuspenseQuery>;
+export type StarredLibrariesQueryResult = Apollo.QueryResult<StarredLibrariesQuery, StarredLibrariesQueryVariables>;
+export const ToggleStarLibraryDocument = gql`
+    mutation toggleStarLibrary($libraryId: String!) {
+  toggleStarLibrary(libraryId: $libraryId) {
+    id
+    name
+  }
+}
+    `;
+export type ToggleStarLibraryMutationFn = Apollo.MutationFunction<ToggleStarLibraryMutation, ToggleStarLibraryMutationVariables>;
+
+/**
+ * __useToggleStarLibraryMutation__
+ *
+ * To run a mutation, you first call `useToggleStarLibraryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleStarLibraryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleStarLibraryMutation, { data, loading, error }] = useToggleStarLibraryMutation({
+ *   variables: {
+ *      libraryId: // value for 'libraryId'
+ *   },
+ * });
+ */
+export function useToggleStarLibraryMutation(baseOptions?: Apollo.MutationHookOptions<ToggleStarLibraryMutation, ToggleStarLibraryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ToggleStarLibraryMutation, ToggleStarLibraryMutationVariables>(ToggleStarLibraryDocument, options);
+      }
+export type ToggleStarLibraryMutationHookResult = ReturnType<typeof useToggleStarLibraryMutation>;
+export type ToggleStarLibraryMutationResult = Apollo.MutationResult<ToggleStarLibraryMutation>;
+export type ToggleStarLibraryMutationOptions = Apollo.BaseMutationOptions<ToggleStarLibraryMutation, ToggleStarLibraryMutationVariables>;
 export const SendResetLinkDocument = gql`
     mutation sendResetLink($email: String!) {
   sendResetLink(email: $email)
@@ -1715,11 +2172,13 @@ export type BigLibrariesQueryResult = Apollo.QueryResult<BigLibrariesQuery, BigL
 export const LibraryDocument = gql`
     query library($name: String!) {
   library(name: $name) {
+    id
     name
     description
     homepage
     repository
     integrated
+    isStarred
     lastVersion {
       version
       size

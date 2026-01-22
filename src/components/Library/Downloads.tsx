@@ -29,7 +29,11 @@ const Downloads: React.FC<DownloadsProps> = ({
         <p className="text-sm text-muted-foreground">(last week)</p>
       </div>
       <p className="text-4xl font-light">
-        {downloads ? abbreviateNumber(Number(downloads)) : 'Loading...'}
+        {downloads
+          ? abbreviateNumber(Number(downloads), undefined, {
+              symbols: ['', 'k', 'M', 'B', 'T'],
+            })
+          : 'Loading...'}
       </p>
       {prevDownloads !== null && downloads !== null && (
         <div
@@ -38,8 +42,8 @@ const Downloads: React.FC<DownloadsProps> = ({
             Number(downloads) > Number(prevDownloads)
               ? 'text-green-500'
               : Number(downloads) < Number(prevDownloads)
-              ? 'text-red-500'
-              : 'text-yellow-500'
+                ? 'text-red-500'
+                : 'text-yellow-500',
           )}
         >
           {Number(downloads) > Number(prevDownloads) ? (
@@ -49,7 +53,13 @@ const Downloads: React.FC<DownloadsProps> = ({
           ) : (
             <MoveRight width={20} className="inline-block mb-1 mr-1" />
           )}
-          <p>{abbreviateNumber(Number(downloads) - Number(prevDownloads))}</p>
+          <p>
+            {abbreviateNumber(
+              Number(downloads) - Number(prevDownloads),
+              undefined,
+              { symbols: ['', 'k', 'M', 'B', 'T'] },
+            )}
+          </p>
         </div>
       )}
     </div>

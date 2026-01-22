@@ -160,7 +160,7 @@ const ImageConversionPage: React.FC = () => {
     return <div className="p-6 text-red-500">Error: {error.message}</div>
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto">
       <div
         className="group cursor-pointer flex items-center gap-2 mb-4"
         onClick={() => {

@@ -1,10 +1,12 @@
 query library($name: String!) {
   library(name: $name) {
+    id
     name
     description
     homepage
     repository
     integrated
+    isStarred
     lastVersion {
       version
       size
