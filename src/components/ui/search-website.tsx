@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Globe, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { useWebsitesQuery } from '../../../generated/graphql'
 import { Button } from './button'
 import './input.css'
@@ -19,7 +19,6 @@ const SearchWebsite = React.forwardRef<HTMLInputElement, SearchWebsiteProps>(
   ({ className, type, onSearch, initial, autoFocus, ...props }) => {
     const [value, setValue] = React.useState('https://')
     const inputRef = useRef<HTMLInputElement | null>(null)
-    const navigate = useNavigate()
 
     const {
       data: websitesQueryData,
@@ -94,7 +93,13 @@ const SearchWebsite = React.forwardRef<HTMLInputElement, SearchWebsiteProps>(
             type={type}
             value={value}
             onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
+            onBlur={(e) => {
+              // Check if the new focus target is within the suggestions dropdown
+              const relatedTarget = e.relatedTarget as HTMLElement | null
+              if (!relatedTarget?.closest('[data-suggestions]')) {
+                setFocused(false)
+              }
+            }}
             onChange={(e) => {
               if (e.target.value === '') {
                 setValue('https://')
@@ -132,15 +137,16 @@ const SearchWebsite = React.forwardRef<HTMLInputElement, SearchWebsiteProps>(
         {websitesQueryData?.websites?.length ? (
           <div
             key="search-suggestions"
+            data-suggestions
             className={cn(
               'w-xs absolute flex flex-col gap-1 px-2 py-3 bg-white/50 border rounded-lg backdrop-blur-md left-1/2 -translate-x-1/2 mt-4 shadow-lg max-h-80 overflow-y-auto transition-opacity duration-200',
               focused ? 'opacity-100 visible' : 'opacity-0 hidden',
             )}
           >
             {websitesQueryData.websites.map((w) => (
-              <div
+              <Link
                 className="cursor-pointer w-full hover:bg-white/50 transition duration-200 px-3 p-4 rounded-md flex gap-2"
-                onClick={() => navigate(`/measurements/${w.host}`)}
+                to={`/measurements/${w.host}`}
                 key={w.id}
                 ref={
                   websitesQueryData.websites?.length &&
@@ -160,7 +166,7 @@ const SearchWebsite = React.forwardRef<HTMLInputElement, SearchWebsiteProps>(
                   </div>
                 )}
                 <p className="truncate">{w.title ?? w.host}</p>
-              </div>
+              </Link>
             ))}
           </div>
         ) : null}
