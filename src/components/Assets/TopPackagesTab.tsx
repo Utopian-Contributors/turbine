@@ -226,7 +226,7 @@ export function TopPackagesTab() {
               Oldtimers
             </CardTitle>
             <CardDescription className="text-xs text-balance">
-              Time spent as in the top 100 downloaded packages
+              Time spent in the top 100 downloaded packages
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 overflow-y-auto h-[calc(50vh-72px-2rem-104px)]">
