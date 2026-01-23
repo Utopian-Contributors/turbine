@@ -181,9 +181,9 @@ export function TopPackagesTab() {
       </div>
 
       {/* Sidebar */}
-      <div className="sticky top-4 w-64 space-y-5 flex-shrink-0 self-start">
+      <div className="sticky max-h-full top-4 w-64 space-y-5 flex-shrink-0 self-start">
         {/* Fastest Growing */}
-        <Card>
+        <Card className="max-h-full">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <TrendingUp className="h-4 w-4 text-green-500" />
@@ -193,7 +193,7 @@ export function TopPackagesTab() {
               Month-over-month download growth
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-2 overflow-y-auto h-[calc(50vh-72px-2rem-104px)]">
             {fastestGrowingData?.fastestGrowingLibraries?.map((item) => (
               <div
                 key={item.library.id}
@@ -219,7 +219,7 @@ export function TopPackagesTab() {
         </Card>
 
         {/* Oldtimers */}
-        <Card>
+        <Card className="max-h-full">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <Clock className="h-4 w-4 text-gray-500" />
@@ -229,7 +229,7 @@ export function TopPackagesTab() {
               Time spent as in the top 100 downloaded packages
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-2 overflow-y-auto h-[calc(50vh-72px-2rem-104px)]">
             {oldtimersData?.oldtimerLibraries?.map((item) => (
               <div
                 key={item.library.id}
