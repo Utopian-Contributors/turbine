@@ -193,7 +193,7 @@ export function TopPackagesTab() {
               Month-over-month download growth
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 overflow-y-auto h-[calc(50vh-72px-2rem-104px)]">
+          <CardContent className="space-y-2 overflow-y-auto max-h-[calc(50vh-72px-2rem-104px)]">
             {fastestGrowingData?.fastestGrowingLibraries?.map((item) => (
               <div
                 key={item.library.id}
@@ -229,7 +229,7 @@ export function TopPackagesTab() {
               Time spent in the top 100 downloaded packages
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 overflow-y-auto h-[calc(50vh-72px-2rem-104px)]">
+          <CardContent className="space-y-2 overflow-y-auto max-h-[calc(50vh-72px-2rem-104px)]">
             {oldtimersData?.oldtimerLibraries?.map((item) => (
               <div
                 key={item.library.id}
