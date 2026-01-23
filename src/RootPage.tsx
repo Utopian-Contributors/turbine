@@ -189,8 +189,14 @@ const RootPage: React.FC = () => {
     <SidebarProvider>
       <Sidebar collapsible="none" className="hidden lg:flex min-w-[256px]">
         <SidebarContent className="gap-0">
-          <SidebarGroup className='mb-1'>
-            <img src="/turbine-wordmark.webp" width="120px" className="mb-2" />
+          <SidebarGroup className="mb-1">
+            <Link to="/home">
+              <img
+                src="/turbine-wordmark.webp"
+                width="120px"
+                className="mb-2"
+              />
+            </Link>
             <Separator />
           </SidebarGroup>
           {groups.map((group) => (
@@ -199,14 +205,14 @@ const RootPage: React.FC = () => {
                 {group.title}
               </span>
               <SidebarGroupContent>
-                <SidebarMenu className='gap-0'>
+                <SidebarMenu className="gap-0">
                   {group.members.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
                         asChild
                         tooltip={item.title}
                         className={cn(
-                          "px-3 rounded-none",
+                          'px-3 rounded-none',
                           location.pathname.startsWith(item.url)
                             ? 'font-bold'
                             : 'text-muted-foreground',
@@ -231,7 +237,7 @@ const RootPage: React.FC = () => {
             </SidebarGroup>
           ))}
 
-          <SidebarGroup className='py-0'>
+          <SidebarGroup className="py-0">
             {isLoggedIn ? (
               <div className="bg-white border rounded-lg p-4 flex justify-between items-center mt-2 mb-2">
                 <div className="flex flex-col">

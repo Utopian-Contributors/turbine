@@ -30,6 +30,7 @@ import {
   Plus,
   Repeat,
   Sparkles,
+  XCircle,
 } from 'lucide-react'
 import moment from 'moment'
 import { useLocation, useNavigate, useParams } from 'react-router'
@@ -353,7 +354,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         </p>
         <Button
           variant="destructive"
-          className="text-white mt-6"
+          className="text-red-500 mt-6"
           onClick={() => setError(null)}
         >
           Close
@@ -373,7 +374,17 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
         onSearch={search}
       />
       {measurement?.status === MeasurementStatus.Failed && (
-        <p>Measurement failed. Please try again later.</p>
+        <div className="flex flex-col items-center mt-8 gap-4">
+          <XCircle className="h-12 w-12 text-red-500" />
+          <p className="text-lg">Measurement failed.</p>
+          <p className="max-w-xs text-gray-400 text-center">
+            This could be because of connection-issues, browser challenges, or
+            other unexpected errors with {new URL(measurement.url).host}.
+          </p>
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            Go Back
+          </Button>
+        </div>
       )}
       {measurement?.status === MeasurementStatus.Pending ? (
         <LoadingMeasurement dark />

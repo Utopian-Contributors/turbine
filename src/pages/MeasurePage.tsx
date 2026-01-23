@@ -1,6 +1,7 @@
 import { LivePreview } from '@/components/Measurement/LivePreview'
 import { LoadingMeasurement } from '@/components/Measurement/Loading'
 import AutoProgress from '@/components/ui/auto-progress'
+import { Button } from '@/components/ui/button'
 import { SearchWebsite } from '@/components/ui/search-website'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
 import { abbreviateNumber } from 'js-abbreviation-number'
@@ -163,8 +164,38 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
         MeasurementStatus.Pending ? (
           <LoadingMeasurement />
         ) : null}
+        {measurementStatusData?.measurement?.status ===
+        MeasurementStatus.Failed ? (
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-2xl text-red-500 mt-6">
+              Measurement failed.
+            </div>
+            <p className="max-w-xs text-primary text-center">
+              This could be because of connection-issues, browser challenges, or
+              other unexpected errors with{' '}
+              <a
+                href={measurementStatusData.measurement.url}
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                {new URL(measurementStatusData.measurement.url).host}
+              </a>
+              .
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4 mx-auto"
+              onClick={() => window.location.reload()}
+            >
+              Go back
+            </Button>
+          </div>
+        ) : null}
         {measurementStatusData?.measurement?.status !==
           MeasurementStatus.Pending &&
+          measurementStatusData?.measurement?.status !==
+            MeasurementStatus.Failed &&
           measurementStatsQueryData && (
             <div className="hidden lg:flex gap-2 mt-8 mb-4">
               <div className="w-44 flex flex-col justify-between gap-2 bg-green-600/50 backdrop-blur border border-green-500/50 rounded-md text-white p-4">
@@ -199,30 +230,32 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
             </div>
           )}
         {measurementStatusData?.measurement?.status !==
-          MeasurementStatus.Pending && (
-          <div className="max-w-xl flex flex-wrap justify-center gap-2 p-4">
-            <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
-              Understand SEO
-            </span>
-            <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
-              Analyze bundles
-            </span>
-            <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
-              Compress images
-            </span>
-            <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
-              Track performance
-            </span>
-            <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
-              Offload fonts & scripts
-            </span>
-          </div>
-        )}
-        {!pendingMeasurementId &&
+          MeasurementStatus.Pending &&
           measurementStatusData?.measurement?.status !==
-            MeasurementStatus.Pending &&
-          latestMeasurementsData?.latestMeasurements &&
-          latestMeasurementsData.latestMeasurements.length > 0 ? (
+            MeasurementStatus.Failed && (
+            <div className="max-w-xl flex flex-wrap justify-center gap-2 p-4">
+              <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
+                Understand SEO
+              </span>
+              <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
+                Analyze bundles
+              </span>
+              <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
+                Compress images
+              </span>
+              <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
+                Track performance
+              </span>
+              <span className="border rounded-full border border-green-700 bg-green-600 text-sm text-green-100 px-3 py-1">
+                Offload fonts & scripts
+              </span>
+            </div>
+          )}
+        {!pendingMeasurementId &&
+        measurementStatusData?.measurement?.status !==
+          MeasurementStatus.Pending &&
+        latestMeasurementsData?.latestMeasurements &&
+        latestMeasurementsData.latestMeasurements.length > 0 ? (
           <div className="hidden lg:inline w-xl px-4 mt-6">
             <LivePreview
               measurements={latestMeasurementsData.latestMeasurements}

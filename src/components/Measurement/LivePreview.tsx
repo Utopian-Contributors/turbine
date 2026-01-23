@@ -85,7 +85,7 @@ const MeasurementCard: React.FC<{
   const opacity = 1 - index * 0.1
 
   return (
-    <motion.div
+    <motion.a
       initial={{ scale: 0.8, opacity: 0, y: -50 }}
       animate={{
         scale,
@@ -100,6 +100,11 @@ const MeasurementCard: React.FC<{
         damping: 30,
         opacity: { duration: 0.2 },
       }}
+      href={
+        '/measurements/' +
+        measurement.host?.host +
+        `?path=${encodeURIComponent(new URL(measurement.url).pathname)}`
+      }
       className={cn(
         'absolute top-0 left-0 right-0 bg-gradient-to-b from-green-500/70 to-green-700/70 backdrop-blur-lg border border-green-500/30 rounded-2xl p-6 shadow-2xl',
       )}
@@ -151,7 +156,7 @@ const MeasurementCard: React.FC<{
                 )}
                 {measurement.elapsed && (
                   <div className="flex gap-1 items-center rounded-sm text-right">
-                    <Timer className='h-3 w-3 text-white'/>
+                    <Timer className="h-3 w-3 text-white" />
                     <div className="text-xs text-white">
                       {(measurement.elapsed / 1000).toFixed(2)}s
                     </div>
@@ -159,7 +164,7 @@ const MeasurementCard: React.FC<{
                 )}
                 {measurement.elapsed && (
                   <div className="flex gap-1 items-center rounded-sm text-right">
-                    <Package className='h-3 w-3 text-white'/>
+                    <Package className="h-3 w-3 text-white" />
                     <div className="text-xs text-white">
                       {filesize(totalSize, { standard: 'jedec' })}
                     </div>
@@ -173,16 +178,13 @@ const MeasurementCard: React.FC<{
           </div>
         </div>
       </div>
-    </motion.div>
+    </motion.a>
   )
 }
 
 export const LivePreview: React.FC<LivePreviewProps> = ({ measurements }) => {
   return (
-    <div
-      className="relative w-full max-w-4xl mx-auto"
-      style={{ height: '300px' }}
-    >
+    <div className="relative w-full max-w-4xl mx-auto">
       <AnimatePresence mode="popLayout">
         {measurements.map((measurement, index) => (
           <MeasurementCard
