@@ -30,7 +30,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   const { data: measurementStatsQueryData } = useMeasurementStatsQuery()
   const { data: latestMeasurementsData } = useLatestMeasurementsQuery({
     pollInterval: 5000, // Refetch every 5 seconds
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
   })
   const {
     createMeasure,
