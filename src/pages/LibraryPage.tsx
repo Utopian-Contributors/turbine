@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import moment from 'moment'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { Link } from 'react-router-dom'
 
 import VersionFilesCard from '@/components/Library/VersionFilesCard'
@@ -78,6 +78,7 @@ import {
 interface LibraryPageProps {}
 
 const LibraryPage: React.FC<LibraryPageProps> = () => {
+  const navigate = useNavigate()
   const params = useParams<{ name: string }>()
 
   const [searchLibraries, { data: searchLibrariesData }] =
@@ -346,15 +347,19 @@ const LibraryPage: React.FC<LibraryPageProps> = () => {
             <div className="flex flex-col gap-3 items-end">
               <Button
                 variant="outline"
-                className={cn(
-                  'flex gap-2 text-primary hover:text-primary',
-                )}
-                onClick={() =>
-                  libraryQueryData.library?.id &&
-                  toggleStarLibrary({
-                    variables: { libraryId: libraryQueryData.library?.id },
-                  })
-                }
+                className={cn('flex gap-2 text-primary hover:text-primary')}
+                onClick={() => {
+                  if (
+                    libraryQueryData.library?.id &&
+                    loggedInQueryData?.loggedIn
+                  ) {
+                    toggleStarLibrary({
+                      variables: { libraryId: libraryQueryData.library?.id },
+                    })
+                  } else if (!loggedInQueryData?.loggedIn) {
+                    navigate('/auth/login')
+                  }
+                }}
               >
                 <Star
                   size={16}
