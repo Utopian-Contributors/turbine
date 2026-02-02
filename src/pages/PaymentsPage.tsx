@@ -3,12 +3,12 @@ import React, { useEffect } from 'react'
 
 import Pricetag from '@/components/Pricetag'
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table'
 import { truncateMiddle } from '@/helpers/strings'
 import { cn } from '@/lib/utils'
@@ -35,7 +35,7 @@ const PaymentsPage: React.FC<PaymentsPageProps> = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-4xl font-bold mb-6">Payments</h1>
+      <h1 className="text-4xl font-light mb-6">Payments</h1>
       <Table>
         <TableHeader>
           <TableRow>

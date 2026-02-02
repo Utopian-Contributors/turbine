@@ -20,7 +20,7 @@ const WalletPage: React.FC<WalletPageProps> = () => {
     <div className="p-4">
       {isLoggedIn ? (
         <div className="w-full flex justify-between">
-          <h1 className="text-2xl font-bold mb-2">{user?.name}</h1>
+          <h1 className="text-2xl font-light mb-2">{user?.name}</h1>
           <Button
             size="icon"
             variant="outline"
@@ -31,7 +31,7 @@ const WalletPage: React.FC<WalletPageProps> = () => {
         </div>
       ) : (
         <div className="w-full mx-auto">
-          <h1 className="text-2xl font-bold mb-2">
+          <h1 className="text-2xl font-light mb-2">
             Please log in to view your wallet.
           </h1>
           <div className="w-full flex gap-2 mt-4">
@@ -58,7 +58,7 @@ const WalletPage: React.FC<WalletPageProps> = () => {
       {isLoggedIn && <Wallet className="mt-4" />}
       {isLoggedIn && isConnected && (
         <div className="flex flex-col gap-2 my-4">
-          <h3>
+          <h3 className="font-light">
             You can add funds to this wallet by sending them to the embedded
             wallet address:
           </h3>

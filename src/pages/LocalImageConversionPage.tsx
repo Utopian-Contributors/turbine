@@ -187,7 +187,7 @@ const LocalImageConversionPage: React.FC = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Image Tool</h1>
+        <h1 className="text-3xl font-light mb-2">Image Tool</h1>
         <p className="text-muted-foreground">
           Convert and optimize your images locally. Nothing is uploaded or
           stored.

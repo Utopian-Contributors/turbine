@@ -3,10 +3,10 @@ import { useLocation, useNavigate, useParams } from 'react-router'
 
 import Bundle from '@/components/Measurement/Bundle'
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { Icons } from '@/components/ui/icons'
@@ -19,13 +19,13 @@ import { toHeaderCase } from 'js-convert-case'
 import { ArrowLeft, Clock } from 'lucide-react'
 import moment from 'moment'
 import {
-    ConnectionType,
-    DeviceType,
-    MeasurementStatus,
-    useMeasurementHistoryQuery,
-    type BundledFile,
-    type Measurement,
-    type MeasurementDevice,
+  ConnectionType,
+  DeviceType,
+  MeasurementStatus,
+  useMeasurementHistoryQuery,
+  type BundledFile,
+  type Measurement,
+  type MeasurementDevice,
 } from '../../generated/graphql'
 
 const createShareLink = (
@@ -246,7 +246,7 @@ const PathHistoryPage: React.FC<PathHistoryPageProps> = () => {
           Share
         </Button>
       </div>
-      <h1 className="text-4xl font-bold">Performance History</h1>
+      <h1 className="text-4xl font-light">Performance History</h1>
       <p className="text-xl text-gray-400 mb-8">
         {params.host}
         {search.get('path')}

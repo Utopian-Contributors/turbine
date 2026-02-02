@@ -40,8 +40,8 @@ const Verify: React.FC<VerifyProps> = ({
       <Formik initialValues={{ otp: '' }} onSubmit={onSubmit}>
         {({ handleSubmit, setValues }) => (
           <FieldGroup>
-            <div className="flex flex-col items-center gap-1 text-center">
-              <h1 className="text-2xl font-bold">Enter verification code</h1>
+            <div className="flex flex-col gap-1">
+              <h1 className="text-2xl font-light">Enter verification code</h1>
               <p className="text-muted-foreground text-sm text-balance">
                 We sent a 6-digit code to your email.
               </p>
