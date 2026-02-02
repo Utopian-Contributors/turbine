@@ -211,7 +211,7 @@ const GeneralThumbnailPage: React.FC = () => {
     <div className="flex h-full flex-col gap-6 p-6 pb-40 lg:pb-0">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Dynamic Thumbnail Generator</h1>
+          <h1 className="text-2xl font-light">Dynamic Thumbnail Generator</h1>
           <p className="text-sm text-muted-foreground">
             Create custom Open Graph thumbnails for your pages
           </p>
