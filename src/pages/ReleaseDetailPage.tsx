@@ -227,7 +227,7 @@ const ReleaseDetailPage: React.FC = () => {
 
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h1 className="text-4xl font-bold">{release.version}</h1>
+          <h1 className="text-4xl font-light">{release.version}</h1>
           <Badge variant={statusBadgeVariant(release.status)}>
             {statusLabel(release.status)}
           </Badge>

@@ -62,7 +62,7 @@ const ReleasesPage: React.FC<ReleasePageProps> = () => {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-bold">Releases</h1>
+        <h1 className="text-4xl font-light">Releases</h1>
         {isAdmin && (
           <Button
             className="flex gap-2"
@@ -89,7 +89,7 @@ const ReleasesPage: React.FC<ReleasePageProps> = () => {
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold">{r.version}</h2>
+                  <h2 className="text-xl font-light">{r.version}</h2>
                   <Badge variant={statusBadgeVariant(r.status)}>
                     {statusLabel(r.status)}
                   </Badge>
