@@ -77,7 +77,7 @@ const groups: SidebarGroupItem[] = [
     title: 'Technology',
     members: [
       {
-        title: 'JavaScript',
+        title: 'JavaScript & Fonts',
         url: '/assets',
         icon: (selected: boolean) => (
           <Package
