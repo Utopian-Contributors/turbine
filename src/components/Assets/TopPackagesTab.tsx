@@ -122,7 +122,7 @@ export function TopPackagesTab() {
                 )}
               </p>
               <p className="text-sm uppercase text-gray-300">
-                Total downloads (Top 100)
+                Weekly downloads (Top 100)
               </p>
             </CardContent>
           </Card>
@@ -132,7 +132,7 @@ export function TopPackagesTab() {
                 {data?.topLibraries?.stats.totalBandwidth}
               </p>
               <p className="text-sm uppercase text-gray-300">
-                Total bandwidth (Top 100)
+                Weekly bandwidth (Top 100)
               </p>
             </CardContent>
           </Card>
