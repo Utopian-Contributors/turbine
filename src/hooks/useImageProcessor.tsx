@@ -1,4 +1,15 @@
+import { gql, useApolloClient } from '@apollo/client'
 import { useCallback, useRef } from 'react'
+
+const PROXY_IMAGE_QUERY = gql`
+  query proxyImage($url: String!) {
+    proxyImage(url: $url) {
+      data
+      contentType
+      size
+    }
+  }
+`
 
 export type ScaleOption = '1x' | '2x' | '4x'
 export type QualityOption = 'high' | 'medium' | 'low' | 'tiny'
@@ -61,6 +72,7 @@ const getQualityValue = (quality: QualityOption): number => {
 }
 
 export const useImageProcessor = () => {
+  const client = useApolloClient()
   const loadedImageRef = useRef<LoadedImage | null>(null)
 
   // Load an image from a Blob/File directly (for local files)
@@ -96,21 +108,36 @@ export const useImageProcessor = () => {
     []
   )
 
-  // Fetch and load an image from a remote URL
+  // Fetch and load an image from a remote URL via proxy (avoids CORS issues)
   const loadImageFromUrl = useCallback(
     async (imageUrl: string): Promise<LoadedImage> => {
-      const originalResponse = await fetch(imageUrl, {
-        mode: 'cors',
-        credentials: 'omit',
+      const { data, error } = await client.query({
+        query: PROXY_IMAGE_QUERY,
+        variables: { url: imageUrl },
+        fetchPolicy: 'no-cache',
       })
-      if (!originalResponse.ok) {
-        throw new Error('Failed to fetch original image')
+
+      if (error) {
+        throw new Error(`Failed to fetch image: ${error.message}`)
       }
-      const originalBlob = await originalResponse.blob()
+
+      if (!data?.proxyImage) {
+        throw new Error('Failed to fetch image via proxy')
+      }
+
+      const { data: base64Data, contentType } = data.proxyImage
+
+      // Convert base64 to blob
+      const binaryString = atob(base64Data)
+      const bytes = new Uint8Array(binaryString.length)
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i)
+      }
+      const originalBlob = new Blob([bytes], { type: contentType })
 
       return loadImageFromBlob(originalBlob)
     },
-    [loadImageFromBlob]
+    [client, loadImageFromBlob]
   )
 
   // Process an already-loaded image with given settings

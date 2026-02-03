@@ -501,6 +501,17 @@ export type PotentialSavings = {
   totalVersionSavings: Scalars['String']['output'];
 };
 
+/** An image fetched through the proxy to avoid CORS issues */
+export type ProxiedImage = {
+  __typename?: 'ProxiedImage';
+  /** The MIME type of the image (e.g., image/png, image/jpeg) */
+  contentType: Scalars['String']['output'];
+  /** Base64-encoded image data */
+  data: Scalars['String']['output'];
+  /** Size of the image in bytes */
+  size: Scalars['Int']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   bigLibraries?: Maybe<Array<Library>>;
@@ -524,6 +535,7 @@ export type Query = {
   payments?: Maybe<Array<Payment>>;
   popularFonts?: Maybe<Array<Font>>;
   potentialSavings?: Maybe<PotentialSavings>;
+  proxyImage?: Maybe<ProxiedImage>;
   release?: Maybe<NativeSupplyChainRelease>;
   releases: Array<NativeSupplyChainRelease>;
   searchFonts?: Maybe<Array<Font>>;
@@ -595,6 +607,11 @@ export type QueryPaymentInfoArgs = {
 
 export type QueryPopularFontsArgs = {
   pagination?: InputMaybe<PaginationInput>;
+};
+
+
+export type QueryProxyImageArgs = {
+  url: Scalars['String']['input'];
 };
 
 

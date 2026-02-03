@@ -96,12 +96,12 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
       setLoading(true)
       setError(null)
       try {
-        // Use File directly if available (local files), otherwise fetch from URL
+        // Use File directly if available (local files), otherwise fetch from URL via proxy
         const loaded = file
           ? await loadImageFromBlob(file)
           : await loadImageFromUrl(url)
         setLoadedImage(loaded)
-        // Create blob URL for displaying the original image (avoids CORS issues)
+        // Create blob URL for displaying the original image
         const blobUrl = URL.createObjectURL(loaded.originalBlob)
         setOriginalBlobUrl(blobUrl)
       } catch (err) {
