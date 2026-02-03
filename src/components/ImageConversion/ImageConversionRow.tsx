@@ -85,6 +85,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
 
   const { loadImageFromUrl, loadImageFromBlob, processImage } = useImageProcessor()
   const initialLoadDone = useRef(false)
+  const [originalBlobUrl, setOriginalBlobUrl] = useState<string | null>(null)
 
   // Load the image once on mount
   useEffect(() => {
@@ -100,6 +101,9 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
           ? await loadImageFromBlob(file)
           : await loadImageFromUrl(url)
         setLoadedImage(loaded)
+        // Create blob URL for displaying the original image (avoids CORS issues)
+        const blobUrl = URL.createObjectURL(loaded.originalBlob)
+        setOriginalBlobUrl(blobUrl)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load image')
         setHidden(true)
@@ -110,6 +114,15 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
 
     doLoad()
   }, [url, file, loadImageFromUrl, loadImageFromBlob])
+
+  // Clean up blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (originalBlobUrl) {
+        URL.revokeObjectURL(originalBlobUrl)
+      }
+    }
+  }, [originalBlobUrl])
 
   // Process when settings change (and image is loaded)
   useEffect(() => {
@@ -191,12 +204,15 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
               </div>
             </div>
             <div className="aspect-video bg-muted rounded-md flex items-center justify-center overflow-hidden">
-              <img
-                src={url}
-                alt=""
-                className="max-w-full max-h-full object-contain"
-                crossOrigin={url.startsWith('blob:') ? undefined : 'anonymous'}
-              />
+              {originalBlobUrl ? (
+                <img
+                  src={originalBlobUrl}
+                  alt=""
+                  className="max-w-full max-h-full object-contain"
+                />
+              ) : (
+                <div className="text-muted-foreground text-sm">Loading...</div>
+              )}
             </div>
             <div className="mt-2 text-sm">
               <div className="flex justify-between">
@@ -221,7 +237,7 @@ const ImageConversionRow: React.FC<ImageConversionRowProps> = ({
           {/* Settings */}
           <div className="flex flex-col justify-center gap-3 lg:w-48">
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-muted-foreground">Scale</label>
+              <label className="text-xs text-muted-foreground">Downscaling</label>
               <Select
                 value={settings.scale}
                 onValueChange={(v) =>

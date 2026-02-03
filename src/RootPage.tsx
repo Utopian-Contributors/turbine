@@ -26,7 +26,6 @@ import {
 import LogoSilhouette from './components/icons/logoSilhouette'
 import Wallet from './components/Phantom/Wallet'
 import { Button } from './components/ui/button'
-import { Separator } from './components/ui/separator'
 import { useWalletOrAccLogin } from './hooks/useWalletOrAccLogin'
 import { cn } from './lib/utils'
 
@@ -187,20 +186,18 @@ const RootPage: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="none" className="hidden lg:flex min-w-[256px]">
+      <Sidebar collapsible="none" className="hidden lg:flex min-w-[256px] border-r">
         <SidebarContent className="gap-0">
-          <SidebarGroup className="mb-1">
+          <SidebarGroup className="mb-1 p-1 border-b">
             <Link to="/home">
               <img
                 src="/turbine-wordmark.webp"
-                width="120px"
-                className="mb-2"
+                className="h-14"
               />
             </Link>
-            <Separator />
           </SidebarGroup>
           {groups.map((group) => (
-            <SidebarGroup className="px-0 py-0 mb-2" key={group.title}>
+            <SidebarGroup className="px-0 py-0 my-2" key={group.title}>
               <span className="text-xs font-bold uppercase text-gray-200 px-3 mb-1">
                 {group.title}
               </span>
