@@ -1,3 +1,4 @@
+import { GenerateImprovementsDialog } from '@/components/GenerateImprovementsDialog'
 import StarRating from '@/components/ui/StarRating'
 import React, { useCallback, useMemo } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router'
@@ -192,6 +193,7 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
         {rating && (
           <div className="flex flex-col lg:items-end gap-2">
             <StarRating size={40} rating={rating?.overallScore} />
+            <GenerateImprovementsDialog rating={rating} meta={meta} />
           </div>
         )}
       </div>
