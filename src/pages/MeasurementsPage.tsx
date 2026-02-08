@@ -29,7 +29,6 @@ import {
   FileWarning,
   Plus,
   Repeat,
-  Sparkles,
   XCircle,
 } from 'lucide-react'
 import moment from 'moment'
@@ -404,12 +403,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 >
                   <PreloadImage
                     src={measurement.thumbnail}
-                    onClick={() =>
-                      navigate(
-                        `/measurements/${params.host}/thumbnail?path=${selectedPath}`,
-                      )
-                    }
-                    className="cursor-pointer relative w-full h-48 lg:w-[12rem] lg:h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
+                    className="relative w-full h-48 lg:w-[12rem] lg:h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
                   >
                     {(error) =>
                       error ? (
@@ -417,31 +411,8 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                           <div className="h-full flex flex-col items-center justify-center gap-1 text-gray-300">
                             <EyeOff size={20} /> No thumbnail
                           </div>
-                          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-4 bg-white border flex items-center justify-center gap-1 px-2 py-1 rounded-full">
-                            <span className="flex items-center gap-1 font-medium">
-                              <Sparkles
-                                size={16}
-                                className="animate-[rainbow-icon_3s_linear_infinite]"
-                              />
-                              <span className="bg-[linear-gradient(90deg,#ef4444,#f97316,#eab308,#22c55e,#06b6d4,#3b82f6,#8b5cf6,#ec4899,#ef4444)] bg-[length:200%_auto] animate-[rainbow_3s_linear_infinite] bg-clip-text text-transparent text-xs">
-                                Generate
-                              </span>
-                            </span>
-                          </div>
                         </div>
-                      ) : (
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-4 bg-white border flex items-center justify-center gap-1 px-2 py-1 rounded-full">
-                          <span className="flex items-center gap-1 font-medium">
-                            <Sparkles
-                              size={16}
-                              className="animate-[rainbow-icon_3s_linear_infinite]"
-                            />
-                            <span className="bg-[linear-gradient(90deg,#ef4444,#f97316,#eab308,#22c55e,#06b6d4,#3b82f6,#8b5cf6,#ec4899,#ef4444)] bg-[length:200%_auto] animate-[rainbow_3s_linear_infinite] bg-clip-text text-transparent text-xs">
-                              Generate
-                            </span>
-                          </span>
-                        </div>
-                      )
+                      ) : null
                     }
                   </PreloadImage>
                 </motion.div>
