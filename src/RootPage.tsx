@@ -1,13 +1,10 @@
 import {
   CreditCardIcon,
-  Eye,
   Github,
   Globe,
   ImageIcon,
   LogOutIcon,
-  Package,
   Scale,
-  Ship,
   WalletIcon,
 } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
@@ -73,27 +70,6 @@ const groups: SidebarGroupItem[] = [
     ],
   },
   {
-    title: 'Technology',
-    members: [
-      {
-        title: 'JavaScript & Fonts',
-        url: '/assets',
-        icon: (selected: boolean) => (
-          <Package
-            className={selected ? 'text-black' : 'text-muted-foreground'}
-          />
-        ),
-      },
-      {
-        title: 'Releases',
-        url: '/releases',
-        icon: (selected: boolean) => (
-          <Ship className={selected ? 'text-black' : 'text-muted-foreground'} />
-        ),
-      },
-    ],
-  },
-  {
     title: 'Tools',
     members: [
       {
@@ -101,15 +77,6 @@ const groups: SidebarGroupItem[] = [
         url: '/images',
         icon: (selected: boolean) => (
           <ImageIcon
-            className={cn(selected ? 'text-black' : 'text-muted-foreground')}
-          />
-        ),
-      },
-      {
-        title: 'Dynamic Thumbnails',
-        url: '/thumbnails',
-        icon: (selected: boolean) => (
-          <Eye
             className={cn(selected ? 'text-black' : 'text-muted-foreground')}
           />
         ),
