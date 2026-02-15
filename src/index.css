@@ -166,13 +166,3 @@
     background-position: 0% 50%;
   }
 }
-
-.phantom-gradient {
-  background: linear-gradient(-45deg, #ab9ff2, #7d66d9, #534bb1, #6e54c7, #ab9ff2);
-  background-size: 400% 400%;
-  animation: gradient-shift 8s ease infinite;
-}
-
-.phantom-gradient:hover {
-  animation-play-state: paused;
-}

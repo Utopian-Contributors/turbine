@@ -6,14 +6,13 @@
   "scripts": {
     "dev": "concurrently -n \"APP, TYPECHECK, GRAPHQL\" \"vite\" \"tsc -b --watch\" \"graphql-codegen --config codegen.yml --watch\"",
     "generate": "graphql-codegen --config codegen.yml --watch",
-    "build": "tsc -b && vite build && vite-sustainable",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@base-ui-components/react": "^1.0.0-beta.4",
-    "@phantom/react-sdk": "^1.0.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -30,11 +29,6 @@
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/themes": "^3.2.1",
-    "@solana/wallet-adapter-base": "^0.9.27",
-    "@solana/wallet-adapter-react": "^0.15.39",
-    "@solana/wallet-adapter-react-ui": "^0.9.39",
-    "@solana/wallet-adapter-wallets": "^0.19.37",
-    "@solana/web3.js": "^1.98.4",
     "@tailwindcss/vite": "^4.1.17",
     "@types/semver": "^7.7.1",
     "buffer": "^6.0.3",
@@ -42,10 +36,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "filesize": "^11.0.13",
-    "formik": "^2.4.9",
     "framer-motion": "12.23.24",
     "graphql": "^16.12.0",
-    "input-otp": "^1.4.2",
     "js-abbreviation-number": "^1.4.0",
     "js-convert-case": "^4.2.0",
     "jszip": "^3.10.1",
@@ -58,13 +50,11 @@
     "react-router": "^7.9.5",
     "react-router-dom": "^7.9.5",
     "recharts": "2.15.4",
-    "recoil": "^0.7.7",
     "semver": "^7.7.3",
     "shiki": "^3.15.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.17",
-    "vite-plugin-splash-screen": "^0.2.2",
-    "yup": "^1.7.1"
+    "vite-plugin-splash-screen": "^0.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -85,7 +75,6 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.45.0",
     "vite": "^7.1.7",
-    "vite-bundle-analyzer": "^1.3.2",
-    "vite-sustainable": "^0.0.36"
+    "vite-bundle-analyzer": "^1.3.2"
   }
 }

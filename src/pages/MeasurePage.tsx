@@ -1,6 +1,5 @@
 import { LivePreview } from '@/components/Measurement/LivePreview'
 import { LoadingMeasurement } from '@/components/Measurement/Loading'
-import AutoProgress from '@/components/ui/auto-progress'
 import { Button } from '@/components/ui/button'
 import { SearchWebsite } from '@/components/ui/search-website'
 import { useCreateMeasure } from '@/hooks/useCreateMeasure'
@@ -35,10 +34,7 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
   const {
     createMeasure,
     data: createMeasurementData,
-    isPaying,
-  } = useCreateMeasure({
-    url: searchParams.get('url') || undefined,
-  })
+  } = useCreateMeasure()
   const [measurementStatusQuery, { data: measurementStatusData, refetch }] =
     useMeasurementStatusLazyQuery()
   const [pendingMeasurementId, setPendingMeasurementId] = useState<
@@ -129,17 +125,6 @@ const MeasurePage: React.FC<MeasurePageProps> = () => {
       'Measure and optimize the performance of your website'
     )
   }, [searchParams])
-
-  if (isPaying) {
-    return (
-      <div className="flex flex-col items-center gap-2 my-6 mt-[58px]">
-        <div className="text-2xl animate-pulse m-6 text-muted-foreground whitespace-nowrap overflow-hidden">
-          Processing payment...
-        </div>
-        <AutoProgress />
-      </div>
-    )
-  }
 
   return (
     <div className="w-full h-screen overflow-hidden">
