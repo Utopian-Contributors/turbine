@@ -1,7 +1,0 @@
-mutation register($data: CreateUserInput!) {
-  register(data: $data) {
-    id
-    email
-    accessToken
-  }
-}

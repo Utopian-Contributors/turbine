@@ -7,7 +7,6 @@ import React from 'react'
 import { useNavigate } from 'react-router'
 
 import { getConnectionIcon, getDeviceIcon } from '@/helpers/icons'
-import { useWalletOrAccLogin } from '@/hooks/useWalletOrAccLogin'
 import { TabsContent } from '@radix-ui/react-tabs'
 import {
   ConnectionType,
@@ -17,7 +16,6 @@ import {
   type MeasuredFileFragment,
   type Measurement,
 } from '../../../generated/graphql'
-import Pricetag from '../Pricetag'
 import { Card, CardContent, CardHeader } from '../ui/card'
 import { Skeleton } from '../ui/skeleton'
 import { Spinner } from '../ui/spinner'
@@ -45,7 +43,6 @@ const Environments: React.FC<EnvironmentsProps> = ({
   initial,
   onClick,
 }) => {
-  const { login, isLoggedIn } = useWalletOrAccLogin()
   const navigate = useNavigate()
 
   const { data: measurementDevicesData } = useMeasurementDevicesQuery()
@@ -145,15 +142,11 @@ const Environments: React.FC<EnvironmentsProps> = ({
                           : '',
                       )}
                       onClick={() => {
-                        if (isLoggedIn) {
-                          onClick(device.type, connection)
-                          navigate(
-                            `/measurements/${current.host?.host}?path=${selectedPath}&device=${device.type}&connection=${connection}`,
-                            { replace: true },
-                          )
-                        } else if (current.id !== measurementForDevice?.id) {
-                          login()
-                        }
+                        onClick(device.type, connection)
+                        navigate(
+                          `/measurements/${current.host?.host}?path=${selectedPath}&device=${device.type}&connection=${connection}`,
+                          { replace: true },
+                        )
                       }}
                     >
                       <CardHeader>
@@ -180,9 +173,7 @@ const Environments: React.FC<EnvironmentsProps> = ({
                               size={40}
                               className="text-white fill-red-500"
                             />
-                          ) : (
-                            <Pricetag />
-                          )}
+                          ) : null}
                         </div>
                       </CardHeader>
                       <CardContent>

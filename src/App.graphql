@@ -1,9 +1,0 @@
-query loggedIn {
-  loggedIn {
-    id
-    email
-    name
-    role
-    verified
-  }
-}

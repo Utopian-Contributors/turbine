@@ -12,11 +12,8 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@/components/ui/select'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  useLoggedInQuery,
   useWebsitesQuery,
-  WebsiteHostFilter,
   WebsiteHostQueryOrder,
   type WebsiteHost,
 } from '../../generated/graphql'
@@ -44,17 +41,11 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
 
-  // Read tab from URL, default to 'all'
-  const tabParam = searchParams.get('tab')
-  const activeTab: 'all' | 'measured' = tabParam === 'measured' ? 'measured' : 'all'
-
   const [selectedOrder, setSelectedOrder] =
     useState<WebsiteHostQueryOrder | null>(
       searchParams.get('order') as WebsiteHostQueryOrder,
     )
   const [hasMoreWebsites, setHasMoreWebsites] = useState(true)
-
-  const currentFilter = activeTab === 'measured' ? WebsiteHostFilter.MeasuredByMe : null
 
   const {
     data: websitesQueryData,
@@ -62,41 +53,15 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
   } = useWebsitesQuery({
     variables: {
       pagination: { take: 12 },
-      filter: currentFilter,
       query: searchParams.get('q') || undefined,
       order: selectedOrder,
     },
     fetchPolicy: 'cache-and-network',
   })
-  const { data: loggedInQueryData } = useLoggedInQuery()
 
   useEffect(() => {
     document.title = 'Turbine | Websites'
   }, [])
-
-  // Reset pagination and refetch when tab/filter changes
-  useEffect(() => {
-    setHasMoreWebsites(true)
-  }, [activeTab])
-
-  const handleTabChange = useCallback(
-    (value: string) => {
-      const params = new URLSearchParams(location.search)
-      if (value === 'all') {
-        params.delete('tab')
-      } else {
-        params.set('tab', value)
-      }
-      navigate(
-        {
-          pathname: '/websites',
-          search: params.toString(),
-        },
-        { replace: true },
-      )
-    },
-    [location.search, navigate],
-  )
 
   const loadMoreWebsites = useCallback(() => {
     if (hasMoreWebsites) {
@@ -107,7 +72,6 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
             take: 10,
           },
           order: selectedOrder,
-          filter: activeTab === 'measured' ? WebsiteHostFilter.MeasuredByMe : null,
         },
         updateQuery: (prev, { fetchMoreResult }) => {
           if ((fetchMoreResult.websites?.length ?? 0) < 10) {
@@ -127,7 +91,6 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
       })
     }
   }, [
-    activeTab,
     fetchMoreWebsites,
     hasMoreWebsites,
     selectedOrder,
@@ -214,16 +177,7 @@ const WebsitesPage: React.FC<WebsitesPageProps> = () => {
             </SelectContent>
           </Select>
         </div>
-        {loggedInQueryData?.loggedIn && (
-          <Tabs value={activeTab} onValueChange={handleTabChange}>
-            <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="measured">Measured by me</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        )}
         <WebsitesGrid
-          key={activeTab}
           websites={(websitesQueryData?.websites as WebsiteHost[]) ?? []}
           onWebsiteClick={handleWebsiteClick}
           lastItemRef={lastWebsiteRef}

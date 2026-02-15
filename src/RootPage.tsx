@@ -1,14 +1,12 @@
 import {
-  CreditCardIcon,
   Github,
   Globe,
   ImageIcon,
-  LogOutIcon,
   Scale,
-  WalletIcon,
 } from 'lucide-react'
 import { useEffect, type JSX } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { hideSplashScreen } from 'vite-plugin-splash-screen/runtime'
 import {
   Sidebar,
   SidebarContent,
@@ -21,9 +19,7 @@ import {
   SidebarProvider,
 } from './components/blocks/sidebar'
 import LogoSilhouette from './components/icons/logoSilhouette'
-import Wallet from './components/Phantom/Wallet'
 import { Button } from './components/ui/button'
-import { useWalletOrAccLogin } from './hooks/useWalletOrAccLogin'
 import { cn } from './lib/utils'
 
 interface SidebarItem {
@@ -39,13 +35,6 @@ interface SidebarGroupItem {
 }
 
 const groups: SidebarGroupItem[] = [
-  // {
-  //   title: 'Home',
-  //   url: '/home',
-  //   icon: (selected: boolean) => (
-  //     <HomeIcon className={selected ? 'text-black' : 'text-muted-foreground'} />
-  //   ),
-  // },
   {
     title: 'Internet',
     members: [
@@ -83,36 +72,6 @@ const groups: SidebarGroupItem[] = [
       },
     ],
   },
-  // {
-  //   title: 'Libraries',
-  //   url: '/libraries',
-  //   icon: (selected: boolean) => (
-  //     <PackageIcon
-  //       className={selected ? 'text-black' : 'text-muted-foreground'}
-  //     />
-  //   ),
-  // },
-  // {
-  //   title: 'Fonts',
-  //   url: '/fonts',
-  //   icon: (selected: boolean) => (
-  //     <TypeIcon className={selected ? 'text-black' : 'text-muted-foreground'} />
-  //   ),
-  // },
-  {
-    title: 'Account',
-    members: [
-      {
-        title: 'Payments',
-        url: '/payments',
-        icon: (selected: boolean) => (
-          <CreditCardIcon
-            className={cn(selected ? 'text-black' : 'text-muted-foreground')}
-          />
-        ),
-      },
-    ],
-  },
 ]
 
 const tabBarItems: SidebarItem[] = [
@@ -131,19 +90,15 @@ const tabBarItems: SidebarItem[] = [
       <Globe className={selected ? 'text-black' : 'text-gray-600'} />
     ),
   },
-  {
-    title: 'Wallet',
-    url: '/wallet',
-    icon: (selected: boolean) => (
-      <WalletIcon className={selected ? 'text-black' : 'text-gray-600'} />
-    ),
-  },
 ]
 
 const RootPage: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { isLoggedIn, user, loginRedirect } = useWalletOrAccLogin()
+
+  useEffect(() => {
+    hideSplashScreen()
+  }, [])
 
   useEffect(() => {
     if (location.pathname === '/') {
@@ -200,47 +155,8 @@ const RootPage: React.FC = () => {
               </SidebarGroupContent>
             </SidebarGroup>
           ))}
-
-          <SidebarGroup className="py-0">
-            {isLoggedIn ? (
-              <div className="bg-white border rounded-lg p-4 flex justify-between items-center mt-2 mb-2">
-                <div className="flex flex-col">
-                  <p className="text-sm font-bold">{user?.name}</p>
-                  <p className="text-xs text-muted-foreground">{user?.email}</p>
-                </div>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => navigate('/auth/logout', { replace: true })}
-                >
-                  <LogOutIcon width={16} className="text-red-500" />
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-2 w-full">
-                <Button
-                  className="mt-4"
-                  onClick={() => {
-                    loginRedirect()
-                  }}
-                >
-                  Log In
-                </Button>
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => {
-                    navigate('/auth/signup')
-                  }}
-                >
-                  Sign up
-                </Button>
-              </div>
-            )}
-          </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          {isLoggedIn && <Wallet />}
           <SidebarGroup>
             <div className="flex gap-2">
               <Button
