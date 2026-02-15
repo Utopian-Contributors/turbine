@@ -367,7 +367,16 @@ const RatingsPage: React.FC<RatingsPageProps> = () => {
                         key={v.violationId + ' ' + index}
                         title={toHeaderCase(v.violationId)}
                         description={v.description}
-                        error={v.description}
+                        error={
+                          v.impact === 'critical' || v.impact === 'serious'
+                            ? v.description
+                            : undefined
+                        }
+                        warning={
+                          v.impact === 'moderate' || v.impact === 'minor'
+                            ? v.description
+                            : undefined
+                        }
                         errorScreenshot={
                           v.screenshots?.length ? v.screenshots[0] : undefined
                         }
