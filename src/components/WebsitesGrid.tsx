@@ -1,7 +1,5 @@
-import { CameraOff, EyeOff } from 'lucide-react'
+import { EyeOff } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
-
-import PreloadImage from '@/components/ui/preload-image-cover'
 import StarRating from '@/components/ui/StarRating'
 import type { WebsiteHost } from '../../generated/graphql'
 
@@ -51,27 +49,13 @@ export const WebsitesGrid: React.FC<WebsitesGridProps> = ({
               ref={index === websites.length - 1 ? lastItemRef : null}
             >
               <div className="relative lg:mx-1 lg:my-2 w-full border rounded-lg overflow-hidden">
-                <PreloadImage
-                  src={website.thumbnail}
-                  className="h-48 md:h-128 lg:h-48 w-full bg-cover bg-center"
-                >
-                  {(error) =>
-                    error && (
-                      <div
-                        className="h-48 md:h-128 lg:h-48 w-full"
-                        style={{
-                          background:
-                            'linear-gradient(to bottom, var(--color-green-300), transparent), repeating-conic-gradient(#fff 0 25%, #fef 0 50%) 50% / 20px 20px',
-                        }}
-                      >
-                        <CameraOff
-                          className="relative top-1/2 -translate-y-1/2 mx-auto text-white stroke-1"
-                          size={128}
-                        />
-                      </div>
-                    )
-                  }
-                </PreloadImage>
+                <div
+                  className="h-48 md:h-128 lg:h-48 w-full"
+                  style={{
+                    background:
+                      'linear-gradient(to bottom, var(--color-green-300), transparent), repeating-conic-gradient(#fff 0 25%, #fef 0 50%) 50% / 20px 20px',
+                  }}
+                />
                 <div className="lg:max-w-[calc(100%-2px)] w-full p-2 bg-white flex flex-col gap-2">
                   <StarRating rating={getRating(website)?.overallScore} />
                   <div className="max-w-full flex items-center gap-2">

@@ -6,8 +6,6 @@ import BundleOverheadCTA from '@/components/Measurement/BundleOverheadCTA'
 import ConvertImagesCTA from '@/components/Measurement/ConvertImagesCTA'
 import Environments from '@/components/Measurement/Environments'
 import { LoadingMeasurement } from '@/components/Measurement/Loading'
-import Pricetag from '@/components/Pricetag'
-import AutoProgress from '@/components/ui/auto-progress'
 import { Button } from '@/components/ui/button'
 import PreloadImage from '@/components/ui/preload-image-cover'
 import {
@@ -85,10 +83,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
     data: createMeasurementData,
     error: createMeasureError,
     setError,
-    isPaying,
-  } = useCreateMeasure({
-    url,
-  })
+  } = useCreateMeasure()
 
   useEffect(() => {
     if (
@@ -330,17 +325,6 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
       : 'Measurements'
   }, [measurement?.title])
 
-  if (isPaying) {
-    return (
-      <div className="max-w-full flex flex-col items-center gap-2 my-6 mt-[58px]">
-        <div className="text-xl lg:text-2xl animate-pulse m-6 text-muted-foreground text-center overflow-hidden">
-          Processing payment...
-        </div>
-        <AutoProgress />
-      </div>
-    )
-  }
-
   if (createMeasureError) {
     return (
       <div className="max-w-full flex flex-col items-center gap-2 my-6 mt-[58px]">
@@ -402,7 +386,7 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                   className="h-fit w-full lg:w-fit border rounded-lg"
                 >
                   <PreloadImage
-                    src={measurement.thumbnail}
+                    src={(() => { const m = JSON.parse(measurement.meta || '{}'); return m['og:image'] || m['twitter:image']; })()}
                     className="relative w-full h-48 lg:w-[12rem] lg:h-[calc(148px-1rem)] rounded-sm bg-cover bg-center"
                   >
                     {(error) =>
@@ -464,10 +448,6 @@ const MeasurementsPage: React.FC<MeasurementsPageProps> = () => {
                 transition={{ duration: 1, delay: 0.5 }}
                 className="flex flex-col items-center lg:items-end gap-2 pt-2"
               >
-                {!(
-                  searchParams.get('device') === DeviceType.Desktop &&
-                  selectedConnection === ConnectionType.Wifi
-                ) && <Pricetag />}
                 <Button
                   className="flex gap-2"
                   variant="outline"

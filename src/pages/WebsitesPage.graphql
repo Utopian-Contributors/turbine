@@ -1,5 +1,5 @@
-query websites($query: String, $order: WebsiteHostQueryOrder, $pagination: PaginationInput, $filter: WebsiteHostFilter) {
-  websites(query: $query, order: $order, pagination: $pagination, filter: $filter) {
+query websites($query: String, $order: WebsiteHostQueryOrder, $pagination: PaginationInput) {
+  websites(query: $query, order: $order, pagination: $pagination) {
     id
     host
     ratings {
@@ -7,7 +7,6 @@ query websites($query: String, $order: WebsiteHostQueryOrder, $pagination: Pagin
       createdAt
     }
     icon
-    thumbnail
     title
     description
     rootMeasurement {

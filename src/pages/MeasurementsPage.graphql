@@ -24,7 +24,7 @@ query measurements($host: String!, $path: String) {
     }
     links
     icon
-    thumbnail
+    meta
   }
 }
 
@@ -41,17 +41,11 @@ mutation createMeasurement(
   $url: String!
   $device: DeviceType
   $connection: ConnectionType
-  $txSignature: String
-  $walletAddress: String
-  $tokenMint: String
 ) {
   createMeasurement(
     url: $url
     device: $device
     connection: $connection
-    txSignature: $txSignature
-    walletAddress: $walletAddress
-    tokenMint: $tokenMint
   ) {
     id
     url
@@ -64,7 +58,6 @@ mutation createMeasurement(
       ...MeasuredFile
     }
     icon
-    thumbnail
   }
 }
 
@@ -79,13 +72,6 @@ fragment MeasuredFile on BundledFile {
   height
   clientWidth
   clientHeight
-}
-
-query measurementPrices {
-  measurementPrices {
-    tokenMint
-    amount
-  }
 }
 
 query website($host: String!) {
