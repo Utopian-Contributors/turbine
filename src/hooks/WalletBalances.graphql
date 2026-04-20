@@ -1,0 +1,9 @@
+query WalletBalances($walletAddress: String!) {
+  walletBalances(walletAddress: $walletAddress) {
+    mint
+    symbol
+    name
+    decimals
+    amount
+  }
+}

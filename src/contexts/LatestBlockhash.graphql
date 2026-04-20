@@ -1,0 +1,6 @@
+query LatestBlockhash {
+  latestBlockhash {
+    blockhash
+    lastValidBlockHeight
+  }
+}
