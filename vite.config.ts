@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     splashScreen({
-      logoSrc: 'logo.svg',
+      logoSrc: 'utopian-icon-64.svg',
       loaderType: 'none',
     }),
   ],
@@ -18,6 +18,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      buffer: 'buffer/',
     },
+  },
+  optimizeDeps: {
+    include: ['buffer'],
   },
 })
