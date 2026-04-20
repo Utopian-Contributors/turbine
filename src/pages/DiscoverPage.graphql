@@ -1,0 +1,28 @@
+query popularDomains($take: Int) {
+  popularDomains(take: $take) {
+    domain
+    totalViews
+    faviconPath
+    jobCount
+  }
+}
+
+query popularUsers($take: Int) {
+  popularUsers(take: $take) {
+    walletAddress
+    archiveCount
+    totalViews
+  }
+}
+
+query popularArticles($take: Int, $skip: Int) {
+  popularArticles(take: $take, skip: $skip) {
+    id
+    url
+    seoTitle
+    seoDescription
+    seoOgImage
+    compressedPreviewImage(mode: ULTRA)
+    faviconPath
+  }
+}

@@ -1,0 +1,32 @@
+query collectionsForAgent($userId: String!) {
+  myCollections(userId: $userId) {
+    id
+    name
+    itemCount
+    items {
+      id
+      url
+      title
+      jobId
+      faviconPath
+    }
+  }
+}
+
+query agentCreateSearchPages($query: String, $pagination: PaginationInput) {
+  readerIndex(query: $query, pagination: $pagination) {
+    id
+    url
+    seoTitle
+    faviconPath
+  }
+}
+
+query agentCreateDomainJobs($domain: String!, $pagination: PaginationInput) {
+  completed: optimizationJobsByDomain(domain: $domain, pagination: $pagination) {
+    id
+    url
+    faviconPath
+    seoTitle
+  }
+}

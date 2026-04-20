@@ -1,0 +1,106 @@
+query keywordsForJob($jobId: String!) {
+  keywordsForJob(jobId: $jobId) {
+    id
+    keyword
+    frequency
+    cluster
+    topBid
+    topBidder
+    extractedAt
+    bids {
+      id
+      sender
+      amount
+      active
+      txSignature
+      timestamp
+      adUrl
+    }
+  }
+}
+
+query keywordBidsForWallet($walletAddress: String!) {
+  keywordBidsForWallet(walletAddress: $walletAddress) {
+    id
+    keywordId
+    jobId
+    amount
+    active
+    txSignature
+    timestamp
+    keyword {
+      keyword
+      frequency
+      job {
+        id
+        url
+        seoTitle
+        faviconPath
+        compressedPreviewImage
+      }
+    }
+  }
+}
+
+mutation extractKeywords($jobId: String!) {
+  extractKeywords(jobId: $jobId) {
+    id
+    keyword
+    frequency
+  }
+}
+
+query topKeywordBids($take: Int) {
+  topKeywordBids(take: $take) {
+    id
+    amount
+    active
+    sender
+    keyword {
+      keyword
+      frequency
+      jobId
+      job {
+        id
+        url
+        seoTitle
+        faviconPath
+        compressedPreviewImage
+      }
+    }
+  }
+}
+
+query recentKeywordExtractions($take: Int) {
+  recentKeywordExtractions(take: $take) {
+    id
+    jobId
+    keyword
+    frequency
+    extractedAt
+    job {
+      url
+      seoTitle
+      faviconPath
+    }
+  }
+}
+
+query recentKeywordBids($take: Int) {
+  recentKeywordBids(take: $take) {
+    id
+    sender
+    amount
+    timestamp
+    jobId
+    keyword {
+      keyword
+      frequency
+      job {
+        url
+        seoTitle
+        faviconPath
+      }
+    }
+  }
+}

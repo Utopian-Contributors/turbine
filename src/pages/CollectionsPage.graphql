@@ -1,0 +1,21 @@
+query myCollections($userId: String!, $pagination: PaginationInput) {
+  myCollections(userId: $userId, pagination: $pagination) {
+    id
+    name
+    slug
+    description
+    isPublic
+    itemCount
+    createdAt
+    updatedAt
+  }
+}
+
+mutation createCollection($userId: String!, $walletAddress: String!, $name: String!, $description: String, $urls: [String!]!, $jobIds: [String!]) {
+  createCollection(userId: $userId, walletAddress: $walletAddress, name: $name, description: $description, urls: $urls, jobIds: $jobIds) {
+    id
+    name
+    slug
+    itemCount
+  }
+}

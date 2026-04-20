@@ -1,0 +1,71 @@
+query archivedView($userId: String!, $jobId: String!) {
+  archivedView(userId: $userId, jobId: $jobId) {
+    id
+    userId
+    jobId
+    hosted
+    createdAt
+  }
+}
+
+query myArchive($userId: String!, $pagination: PaginationInput) {
+  myArchive(userId: $userId, pagination: $pagination) {
+    id
+    userId
+    jobId
+    amount
+    hosted
+    createdAt
+    job {
+      id
+      url
+      status
+      simpleReaderPath
+      ultraReaderPath
+      faviconPath
+      seoTitle
+      seoDescription
+      compressedPreviewImage
+      contentHashSum
+      createdAt
+      optimizedFiles {
+        id
+        originalUrl
+        originalSize
+        optimizedSize
+        savings
+        isBestVariant
+        hostingActive
+        hostedUrl
+        hostingCost
+      }
+    }
+  }
+}
+
+mutation archiveView($userId: String!, $walletAddress: String, $jobId: String!, $txSignature: String) {
+  archiveView(userId: $userId, walletAddress: $walletAddress, jobId: $jobId, txSignature: $txSignature) {
+    id
+    userId
+    jobId
+    hosted
+    createdAt
+  }
+}
+
+mutation archiveBatchViews($userId: String!, $walletAddress: String!, $jobIds: [String!]!, $txSignature: String!) {
+  archiveBatchViews(userId: $userId, walletAddress: $walletAddress, jobIds: $jobIds, txSignature: $txSignature) {
+    id
+    userId
+    jobId
+    hosted
+    createdAt
+  }
+}
+
+mutation hostArchivedView($userId: String!, $jobId: String!, $txSignature: String!) {
+  hostArchivedView(userId: $userId, jobId: $jobId, txSignature: $txSignature) {
+    id
+    hosted
+  }
+}

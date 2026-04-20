@@ -1,0 +1,82 @@
+query searchImagesCount($query: String, $family: String) {
+  searchImagesCount(query: $query, family: $family)
+}
+
+query searchImages($query: String, $family: String, $pagination: PaginationInput) {
+  searchImages(query: $query, family: $family, pagination: $pagination) {
+    id
+    originalUrl
+    originalSize
+    optimizedSize
+    savings
+    contentType
+    format
+    family
+    isBestVariant
+    storagePath
+    hostedUrl
+    width
+    height
+    aiDescription
+    aiTags
+    createdAt
+    job {
+      id
+      url
+      faviconPath
+      seoTitle
+    }
+  }
+}
+
+query keywordPromotion($query: String!) {
+  keywordPromotion(query: $query) {
+    id
+    amount
+    sender
+    active
+    keyword {
+      keyword
+      frequency
+      job {
+        id
+        url
+        seoTitle
+        faviconPath
+        compressedPreviewImage
+      }
+    }
+  }
+}
+
+query readerIndexCount($query: String, $mode: OptimizationMode) {
+  readerIndexCount(query: $query, mode: $mode)
+}
+
+query readerIndex($query: String, $pagination: PaginationInput, $mode: OptimizationMode) {
+  readerIndex(query: $query, pagination: $pagination, mode: $mode) {
+    id
+    url
+    originalPageSize
+    optimizedPageSize
+    simpleReaderSize
+    ultraReaderSize
+    optimizedFiles {
+      id
+      originalUrl
+      originalSize
+      optimizedSize
+      savings
+      isBestVariant
+    }
+    contentHashSum
+    faviconPath
+    phoneNumber
+    seoTitle
+    seoDescription
+    compressedPreviewImage(mode: $mode)
+    simpleReaderPath
+    ultraReaderPath
+    createdAt
+  }
+}

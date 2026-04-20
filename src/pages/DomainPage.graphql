@@ -1,0 +1,75 @@
+query domainJobs($domain: String!, $pagination: PaginationInput) {
+  completed: optimizationJobsByDomain(domain: $domain, pagination: $pagination) {
+    id
+    url
+    status
+    mode
+    faviconPath
+    simpleReaderPath
+    ultraReaderPath
+    seoTitle
+    seoDescription
+    compressedPreviewImage
+    readerContentHash
+    createdAt
+  }
+  active: activeOptimizationJobsByDomain(domain: $domain) {
+    id
+    url
+    status
+    mode
+    faviconPath
+    seoTitle
+    seoDescription
+    createdAt
+  }
+}
+
+query domainMentions($domain: String!) {
+  domainMentions(domain: $domain) {
+    id
+    sessionId
+    createdAt
+    job {
+      id
+      url
+      seoTitle
+      faviconPath
+    }
+  }
+}
+
+query domainHashTimeline($domain: String!) {
+  timeline: domainHashTimeline(domain: $domain) {
+    hash
+    createdAt
+  }
+}
+
+query domainTrackSchedule($domain: String!) {
+  trackSchedule(domain: $domain) {
+    id
+    domain
+    maxAge
+    lastCrawledAt
+    nextCrawlAt
+    activeTracks
+  }
+  tracksForDomain(domain: $domain) {
+    id
+    contentHash
+    verified
+    amount
+    supersededById
+    createdAt
+    job {
+      id
+      url
+      seoTitle
+      faviconPath
+      contentHashSum
+      createdAt
+    }
+  }
+}
+

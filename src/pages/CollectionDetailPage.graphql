@@ -1,0 +1,64 @@
+query collection($id: String!) {
+  collection(id: $id) {
+    id
+    name
+    slug
+    description
+    isPublic
+    createdAt
+    updatedAt
+    items {
+      id
+      url
+      title
+      description
+      jobId
+      faviconPath
+      position
+    }
+  }
+}
+
+mutation updateCollection($id: String!, $name: String, $description: String, $isPublic: Boolean) {
+  updateCollection(id: $id, name: $name, description: $description, isPublic: $isPublic) {
+    id
+    name
+    slug
+    description
+    isPublic
+  }
+}
+
+mutation addCollectionItems($collectionId: String!, $urls: [String!]!) {
+  addCollectionItems(collectionId: $collectionId, urls: $urls) {
+    id
+    items {
+      id
+      url
+      title
+      description
+      jobId
+      faviconPath
+      position
+    }
+  }
+}
+
+mutation removeCollectionItem($collectionId: String!, $itemId: String!) {
+  removeCollectionItem(collectionId: $collectionId, itemId: $itemId) {
+    id
+    items {
+      id
+      url
+      title
+      description
+      jobId
+      faviconPath
+      position
+    }
+  }
+}
+
+mutation deleteCollection($id: String!) {
+  deleteCollection(id: $id)
+}

@@ -1,0 +1,17 @@
+query optimizationJobs($pagination: PaginationInput) {
+  optimizationJobs(pagination: $pagination) {
+    id
+    url
+    mode
+    status
+    faviconPath
+    createdAt
+    optimizedFiles {
+      id
+      originalSize
+      optimizedSize
+      savings
+      isBestVariant
+    }
+  }
+}

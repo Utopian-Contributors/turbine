@@ -1,0 +1,112 @@
+query agentSessions($userId: String!, $pagination: PaginationInput) {
+  agentSessions(userId: $userId, pagination: $pagination) {
+    id
+    title
+    promptHash
+    jobIds
+    totalCost
+    createdAt
+  }
+}
+
+query agentSession($id: String!) {
+  agentSession(id: $id) {
+    id
+    title
+    systemPrompt
+    model
+    promptHash
+    jobIds
+    totalInputTokens
+    totalOutputTokens
+    totalCost
+    messages {
+      id
+      role
+      content
+      cost
+      createdAt
+    }
+    jobs {
+      id
+      url
+      seoTitle
+      seoDescription
+      faviconPath
+      compressedPreviewImage
+      simpleReaderPath
+      ultraReaderPath
+    }
+  }
+}
+
+mutation createAgentSession($userId: String!, $walletAddress: String!, $jobIds: [String!]!, $title: String, $systemPrompt: String, $model: String) {
+  createAgentSession(userId: $userId, walletAddress: $walletAddress, jobIds: $jobIds, title: $title, systemPrompt: $systemPrompt, model: $model) {
+    id
+    title
+    promptHash
+    jobIds
+  }
+}
+
+query agentSessionsByPromptHash($hash: String!, $userId: String!) {
+  agentSessionsByPromptHash(hash: $hash, userId: $userId) {
+    id
+    title
+    promptHash
+    totalCost
+    createdAt
+  }
+}
+
+mutation deleteAgentSession($id: String!) {
+  deleteAgentSession(id: $id)
+}
+
+mutation addJobToAgentSession($sessionId: String!, $jobId: String!) {
+  addJobToAgentSession(sessionId: $sessionId, jobId: $jobId) {
+    id
+    jobIds
+    jobs {
+      id
+      url
+      seoTitle
+      seoDescription
+      faviconPath
+      compressedPreviewImage
+      simpleReaderPath
+      ultraReaderPath
+    }
+  }
+}
+
+query readerIndexForSession($query: String, $pagination: PaginationInput) {
+  readerIndex(query: $query, pagination: $pagination) {
+    id
+    url
+    seoTitle
+    seoDescription
+    faviconPath
+    compressedPreviewImage
+  }
+}
+
+query agentMentionLookup($query: String!, $pagination: PaginationInput) {
+  readerIndex(query: $query, pagination: $pagination) {
+    id
+    url
+    seoTitle
+    faviconPath
+  }
+}
+
+query readerIndexForLinks($pagination: PaginationInput) {
+  readerIndex(pagination: $pagination) {
+    id
+    url
+    seoTitle
+    faviconPath
+    simpleReaderPath
+    ultraReaderPath
+  }
+}

@@ -1,0 +1,14 @@
+query collectionBySlug($slug: String!) {
+  collectionBySlug(slug: $slug) {
+    id
+    name
+    description
+    items {
+      id
+      url
+      title
+      jobId
+      position
+    }
+  }
+}

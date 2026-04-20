@@ -1,0 +1,25 @@
+mutation parseFeed($url: String!) {
+  parseFeed(url: $url) {
+    url
+    title
+    description
+  }
+}
+
+mutation createBatchJobs($urls: [String!]!, $mode: OptimizationMode) {
+  createBatchJobs(urls: $urls, mode: $mode) {
+    id
+    url
+    status
+  }
+}
+
+mutation archiveBatchViews($userId: String!, $walletAddress: String!, $jobIds: [String!]!, $txSignature: String!) {
+  archiveBatchViews(userId: $userId, walletAddress: $walletAddress, jobIds: $jobIds, txSignature: $txSignature) {
+    id
+    userId
+    jobId
+    hosted
+    createdAt
+  }
+}

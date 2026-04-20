@@ -1,0 +1,56 @@
+query stats {
+  stats {
+    totalJobs
+    totalFilesOptimized
+    totalBandwidthSaved
+  }
+}
+
+query latestJobs {
+  optimizationJobs(pagination: { take: 5 }) {
+    id
+    url
+    status
+    createdAt
+    optimizedFiles {
+      id
+      savings
+      format
+    }
+  }
+}
+
+mutation createOptimizationJob($url: String!, $mode: OptimizationMode) {
+  createOptimizationJob(url: $url, mode: $mode) {
+    id
+    url
+    status
+    mode
+  }
+}
+
+mutation dashboardParseFeed($url: String!) {
+  parseFeed(url: $url) {
+    url
+  }
+}
+
+query dashboardReaderIndex {
+  readerIndex(pagination: { take: 200 }) {
+    id
+    url
+    createdAt
+  }
+}
+
+query homePages($pagination: PaginationInput) {
+  readerIndex(pagination: $pagination) {
+    id
+    url
+    faviconPath
+    seoTitle
+    seoDescription
+    compressedPreviewImage(mode: SIMPLE)
+    createdAt
+  }
+}

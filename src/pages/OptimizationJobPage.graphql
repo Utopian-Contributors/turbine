@@ -1,0 +1,78 @@
+query optimizationJob($id: String!) {
+  optimizationJob(id: $id) {
+    id
+    url
+    status
+    mode
+    originalPageSize
+    optimizedPageSize
+    contentHashSum
+    faviconPath
+    seoTitle
+    seoDescription
+    seoOgImage
+    compressedPreviewImage
+    readerPath
+    simpleReaderPath
+    ultraReaderPath
+    simpleReaderSize
+    ultraReaderSize
+    simpleReaderCost
+    ultraReaderCost
+    createdAt
+    updatedAt
+    optimizedFiles {
+      id
+      originalUrl
+      originalSize
+      optimizedSize
+      savings
+      contentType
+      format
+      contentHash
+      algorithm
+      family
+      isBestVariant
+      storagePath
+      hostingActive
+      hostedUrl
+      downloadCost
+      hostingCost
+      width
+      height
+    }
+  }
+}
+
+mutation downloadFile($fileId: String!) {
+  downloadFile(fileId: $fileId) {
+    id
+    storagePath
+  }
+}
+
+mutation startHosting($fileId: String!) {
+  startHosting(fileId: $fileId) {
+    id
+    hostingActive
+    hostedUrl
+  }
+}
+
+mutation stopHosting($fileId: String!) {
+  stopHosting(fileId: $fileId) {
+    id
+    hostingActive
+    hostedUrl
+  }
+}
+
+mutation generatePreview($jobId: String!) {
+  generatePreview(jobId: $jobId) {
+    id
+    jobId
+    previewHtml
+    expiresAt
+    createdAt
+  }
+}
