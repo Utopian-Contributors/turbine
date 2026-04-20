@@ -19,6 +19,7 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground shadow-sm shadow-black/5 hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
+        skeu: 'skeu-btn text-white border-0 shadow-none',
       },
       size: {
         default: 'h-9 px-4 py-2',
